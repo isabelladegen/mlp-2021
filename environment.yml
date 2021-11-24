@@ -1,0 +1,13 @@
+name: mlp-2021
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - jupyter
+  - datasets
+  - numpy
+  - matplotlib
+  - pandas
+  - scikit-learn
+  - nltk
+  - pytorch
