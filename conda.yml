@@ -1,6 +1,7 @@
 name: mlp-2021
 channels:
   - conda-forge
+  - defaults
 dependencies:
   - python=3.9
   - jupyter
@@ -11,3 +12,8 @@ dependencies:
   - scikit-learn
   - nltk
   - pytorch
+  - seaborn
+  - gensim
+  - wandb # experiment mgr
+  - pytest
+  - pyhamcrest
