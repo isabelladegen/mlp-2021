@@ -1,3 +1,6 @@
+#others
+data/
+
 #jetbrains
 .idea/
 .DS_Store
