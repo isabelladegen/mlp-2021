@@ -10,12 +10,12 @@ TODO
 
 **Create**
 
-    `conda env create -f conda.yml`
-    `conda activate mlp-2021`
+    conda env create -f conda.yml
+    conda activate mlp-2021
 
 **Update**
 
-    `conda env update -n mlp-2021 --file conda.yml --prune`
+    conda env update -n mlp-2021 --file conda.yml --prune
 
 ### Configuration and Experiment Tracking
 
