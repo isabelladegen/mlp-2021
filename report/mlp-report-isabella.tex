@@ -1,94 +1,131 @@
-%
-% File mlp-report-isabella.tex
-%
-% % Based on semeval 2020 Nathan Schneider
-%% Based on the style files for COLING-2020 (feiliu@cs.ucf.edu & liang.huang.sh@gmail.com), which were, in turn,
-%% Based on the style files for COLING-2018, which were, in turn,
-%% Based on the style files for COLING-2016, which were, in turn,
-%% Based on the style files for COLING-2014, which were, in turn,
-%% Based on the style files for ACL-2014, which were, in turn,
-%% Based on the style files for ACL-2013, which were, in turn,
-%% Based on the style files for ACL-2012, which were, in turn,
-%% based on the style files for ACL-2011, which were, in turn, 
-%% based on the style files for ACL-2010, which were, in turn, 
-%% based on the style files for ACL-IJCNLP-2009, which were, in turn,
-%% based on the style files for EACL-2009 and IJCNLP-2008...
+%! Author = idegen
+%! Date = 26/11/2021
 
-%% Based on the style files for EACL 2006 by 
-%%e.agirre@ehu.es or Sergi.Balari@uab.es
-%% and that of ACL 08 by Joakim Nivre and Noah Smith
+\documentclass{article}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[default,oldstyle,scale=0.95]{opensans}
+\usepackage[]{amsthm}
+\usepackage[]{amssymb}
+\usepackage{placeins}
+\usepackage{textcomp}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage[useregional]{datetime2}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=Emerald,
+    filecolor=magenta,
+    urlcolor=cyan,
+    citecolor=RoyalBlue
+}
+\makeatletter
+\def\namedlabel#1#2{\begingroup
+#2%
+\def\@currentlabel{#2}%
+\phantomsection\label{#1}\endgroup
+}
+\makeatother
 
-\documentclass[11pt]{article}
-\usepackage{geometry}
-\usepackage{coling2020}
-\usepackage{times}
-\usepackage{url}
-\usepackage{latexsym}
-\usepackage{microtype}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.5em}
 
-\hyphenation{an-aly-sis}
-\hyphenation{an-aly-ses}
-\hyphenation{Sem-Eval}
+\pagestyle{fancy}
+\fancyhf{}
+\chead{Machine Learning Paradigms}
+\rhead{\today}
+\lhead{Isabella Degen}
+\lfoot{isabella.degen@bristol.ac.uk}
+\rfoot{Page \thepage}
 
-%\setlength\titlebox{5cm}
-\colingfinalcopy % Uncomment this line for all SemEval submissions
-
-% You can expand the titlebox if you need extra space
-% to show all the authors. Please do not make the titlebox
-% smaller than 5cm (the original size); we will check this
-% in the camera-ready version and ask you to change it back.
-
-
-\title{[SystemName] at SemEval-2020 Task [TaskNumber]: [Insert Paper Title Here]}
-
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\}
-
-\date{}
+\title{Machine Learning Paradigms - Coursework Report}
+\author{Isabella Degen - Interactive AI CDT}
 
 \begin{document}
-
-\maketitle
-\begin{abstract}
-  write some abstract
-\end{abstract}
-
-\section{Introduction}
-Motivation and Approach
+    \maketitle
 
 
-\section{Technical Background}
-\label{technical_background}
+    \section{Introduction}\label{sec:introduction}
+    Motivation and Approach %TODO: delete
+    My goal for this coursework was to gain more experience with the various ML algorithms and evaluation methods we've
+    seen during the semester, various different python frameworks available, methods to keep track of experiments, as
+    well as learning more about how to apply good software engineering practices I'm used to from industry to a ML problem.
+    I was less focused on finding the best solution or winning the competition.
 
-Be brief.
+    I followed the steps laid out on \href{https://www.kaggle.com/c/morebikes2021/overview/description}{Kaggle} and broke
+    them down into the following sub steps:
+
+    \subsection*{\label{phs:one}{Phase 1}}
+    Predictions of station's 201-275 availabilities for one month by (a) training a model per station or (b)
+    training one model for all stations.
+
+    \begin{description}
+        \item [\namedlabel{itm:phase1-step1}{Step 1}] Analyse and investigate station's test data
+        \item [\namedlabel{itm:phase1-step2}{Step 2}] Decide on what problem it is. Classification (binary, multi label), Regression, ...
+        \item [\namedlabel{itm:phase1-step3}{Step 3}] Experiment with a few models using approach a (training model per station)
+        \item [\namedlabel{itm:phase1-step4}{Step 4}] Experiment with a few models using approach b (training one model for all station)
+        \item [\namedlabel{itm:phase1-step5}{Step 5}] Tune the more promising potential solutions
+        \item [\namedlabel{itm:phase1-step6}{Step 6}] Submit results
+    \end{description}
+
+    \subsection*{\label{phs:two}{Phase 2}}
+    Use the pre-trained models for station 1-200 to predict availability for stations 201-275
+    \begin{description}
+        \item [\namedlabel{itm:phase2-step1}{Step 1}] Analyse given models
+        \item [\namedlabel{itm:phase2-step2}{Step 2}] Experiment with a few approaches
+        \item [\namedlabel{itm:phase2-step3}{Step 3}] Tune the more promising potential solutions
+        \item [\namedlabel{itm:phase2-step4}{Step 4}] Investigate performance
+        \item [\namedlabel{itm:phase2-step5}{Step 5}] Submit results
+        \item [\namedlabel{itm:phase2-step6}{Step 6}] Compare with results from \nameref{phs:one}
+    \end{description}
+
+    \subsection*{\label{phs:three}{Phase 3}}
+    Combine approaches from \nameref{phs:one} and \nameref{phs:two}
+    \begin{description}
+        \item [\namedlabel{itm:phase3-step1}{Step 1}] TODO
+
+    \end{description}
+    I keep referring back to these steps in section: \nameref{sec:method}, \nameref{sec:technical-background}, \nameref{sec:experiment-setup},
+    \nameref{sec:results}. The final sections \nameref{sec:conclusions} gives a summary of my overall learnings and conclusions.
+
+    %TODO reference to github
+    %TODO reference to weight and biases graphs
 
 
-\section{Method}
+    \section{Technical Background}\label{sec:technical-background}
 
-Description of method
+    Be brief.
 
-\section{Experiment Setup}
-Setup of the experiment
-
-\section{Results}
-Results achieved
-
-\section{Conclusions}
-share any insights you gained about how the system works.
+    Overall approach for engineering python environment setup: \cite{conda_forge_community_2015_4774216}, experiment tracking: \cite{wandb}
 
 
-\section*{Acknowledgements}
+    \section{Method}\label{sec:method}
+
+    Description of method\\
+
+    \subsection*{\nameref{phs:one}}
+
+    \subsubsection*{\nameref{itm:phase1-step1}}
+    Goal is to find out what's similar and what's different between the different station.
 
 
-\bibliographystyle{coling}
-\bibliography{bibliography}
+    \section{Experiment Setup}\label{sec:experiment-setup}
 
+
+    \section{Results}\label{sec:results}
+    Results achieved
+
+
+    \section{Conclusions}\label{sec:conclusions}
+    share any insights you gained about how the system works.
+
+
+    \section*{Acknowledgements}
+
+    \bibliographystyle{plain}
+    \bibliography{bibliography}
+%TODO reference the varsious medium articles for software engineering
 \end{document}
