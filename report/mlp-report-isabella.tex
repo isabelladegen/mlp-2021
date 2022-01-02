@@ -122,13 +122,13 @@
 
     \subsubsection*{\nameref{itm:phase1-step2}
     Given that the goal is to predict a number and given I have labelled data for some stations I decided that this is
-    probably most easiest formualted as a regression problem. I want to not decide on the algorithm and instead try a few
+    probably most easiest formulated as a regression problem. I want to not decide on the algorithm and instead try a few
     alorithms out before deciding on one.
 
     Before doing any more analysis I wanted to create the baseline for random guessing based on number of docks for each station.
     This also means I can quickly setup a pipline in pure python: load data, predict random numbers, calculate mean average error, log results
-    and do this testdriven. I from the beginning ensure that all parameters come from a configurations class \(no magic numbers and
-    strings\), this also ensures that they automatically get logged in W&B with a run which helps to keep track of what I've run
+    and do this test driven. Further more all parameters are defined in a configurations class. This avoids magic nubmers and
+    strings, ensures these values get logged in W&B which helps with reproducibility for each experiment even at this early stage.
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}

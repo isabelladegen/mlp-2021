@@ -1,15 +1,18 @@
 import wandb
 import enum
+
+from src.OneModel import OneModel
 from src.configurations import Configuration
-from src.test_data import TestData
+from src.Data import Data
+
+
+class RunResults(enum.Enum):
+    random_predictions = 1
+    wandb = 2
 
 
 class WandbLogs(enum.Enum):
-    MEAN_AVERAGE_ERROR = 'Mean average error'
-
-
-class OneModel:
-    pass
+    mean_absolute_error = 'Mean average error'
 
 
 def run(config: Configuration = Configuration()):
@@ -20,7 +23,7 @@ def run(config: Configuration = Configuration()):
         name="getting started",
         notes="just testing",
         tags=["testing"],
-        config=Configuration().as_dict()
+        config=config.as_dict()
     )
     # Reload the Configuration (to allow for sweeps)
     configuration = Configuration(**wandb.config)
@@ -33,19 +36,24 @@ def run(config: Configuration = Configuration()):
     one_model = OneModel(configuration)
 
     # Load test data
-    test_data = TestData(configuration)  # do all required preprocessing in here
+    test_data = Data(configuration, config.test_data_path)  # do all required preprocessing in here
 
     # Use models to predict number of bikes
-    if configuration.predict_random_numbers:
-        predictions = one_model.predict_random_numbers_for(test_data)
-
-        # Calculate and log mean average error
-        mean_average_error = predictions.mean_average_error()
-        wandb.log({
-            WandbLogs.MEAN_AVERAGE_ERROR.value: mean_average_error
-        })
+    results = {}
+    # if configuration.predict_random_numbers:
+    #     random_predictions = one_model.predict_random_numbers_for(test_data)
+    #     experiment-results[RunResults.random_predictions] = random_predictions
+    #
+    #     # Calculate and log mean average error
+    #     mae = random_predictions.mean_absolute_error()
+    #     wandb.log({
+    #         WandbLogs.mean_absolute_error.value: mae
+    #     })
 
         # Write csv for submission
-        predictions.write_results_to_csv()
+        # random_predictions.write_results_to_csv()
 
-    return wandb, predictions
+    results[RunResults.wandb] = wandb
+    return results
+
+

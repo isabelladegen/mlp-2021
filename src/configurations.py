@@ -3,22 +3,23 @@ import enum
 
 
 class WandbMode(enum.Enum):
-    DISABLED = 'disabled'  # choose for tests
-    ONLINE = 'online'
-    OFFLINE = 'offline'
+    disabled = 'disabled'  # choose for tests
+    online = 'online'
+    offline = 'offline'
 
 
 @dataclass
 class Configuration:
     wandb_project_name: str = 'mlp-2021'
     wandb_entity: str = 'idegen'
-    wandb_mode: str = WandbMode.ONLINE.value
+    wandb_mode: str = WandbMode.online.value
 
     # data
     test_data_path: str = '../data/Test.csv'
+    training_data_path: str = '../data/Train/'
 
-    # experiment configuration
-    predict_random_numbers: bool = True
+    # data processing
+    no_nan_in_bikes: bool = True  # removes rows that don't have a label, e.g for means square calculations
 
     def as_dict(self):
         return asdict(self)
@@ -26,4 +27,4 @@ class Configuration:
 
 @dataclass
 class TestConfiguration(Configuration):
-    wandb_mode: str = WandbMode.DISABLED.value
+    wandb_mode: str = WandbMode.disabled.value
