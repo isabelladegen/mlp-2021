@@ -63,12 +63,11 @@
     training one model for all stations.
 
     \begin{description}
-        \item [\namedlabel{itm:phase1-step1}{Step 1}] Analyse and investigate station's test data
-        \item [\namedlabel{itm:phase1-step2}{Step 2}] Decide on what problem it is. Classification (binary, multi label), Regression, ...
-        \item [\namedlabel{itm:phase1-step3}{Step 3}] Experiment with a few models using approach a (training model per station)
-        \item [\namedlabel{itm:phase1-step4}{Step 4}] Experiment with a few models using approach b (training one model for all station)
-        \item [\namedlabel{itm:phase1-step5}{Step 5}] Tune the more promising potential solutions
-        \item [\namedlabel{itm:phase1-step6}{Step 6}] Submit results
+        \item [\namedlabel{itm:phase1-step1}{Step 1}] Analyse and investigate station's test data and Decide on what problem it is. Classification (binary, multi label), Regression, ...
+        \item [\namedlabel{itm:phase1-step2}{Step 2}] Experiment with a few models using approach a (training model per station)
+        \item [\namedlabel{itm:phase1-step3}{Step 3}] Experiment with a few models using approach b (training one model for all station)
+        \item [\namedlabel{itm:phase1-step4}{Step 4}] Tune the more promising potential solutions
+        \item [\namedlabel{itm:phase1-step5}{Step 5}] Submit results
     \end{description}
 
     \subsection*{\label{phs:two}{Phase 2}}
@@ -101,6 +100,10 @@
 
     Overall approach for engineering python environment setup: \cite{conda_forge_community_2015_4774216}, experiment tracking: \cite{wandb}
 
+    \subsection*{\nameref{phs:one}}
+
+    \subsubsection*{\nameref{itm:phase1-step1}}
+    - Data Investigation in Notebook
 
     \section{Method}\label{sec:method}
 
@@ -110,6 +113,22 @@
 
     \subsubsection*{\nameref{itm:phase1-step1}}
     Goal is to find out what's similar and what's different between the different station.
+    Can I understand what the data means? What the different columns are
+
+    From that decide what sort of problem it is:
+    - Regression to predict a number but could be a classifier if we say the numbers are from a discrete set of numbers
+    - Supervised learning given we've got labelled data
+    - Might be worth to do some feature exploring with clustering to learn how the different features relate to each other
+
+    \subsubsection*{\nameref{itm:phase1-step2}
+    Given that the goal is to predict a number and given I have labelled data for some stations I decided that this is
+    probably most easiest formualted as a regression problem. I want to not decide on the algorithm and instead try a few
+    alorithms out before deciding on one.
+
+    Before doing any more analysis I wanted to create the baseline for random guessing based on number of docks for each station.
+    This also means I can quickly setup a pipline in pure python: load data, predict random numbers, calculate mean average error, log results
+    and do this testdriven. I from the beginning ensure that all parameters come from a configurations class \(no magic numbers and
+    strings\), this also ensures that they automatically get logged in W&B with a run which helps to keep track of what I've run
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}

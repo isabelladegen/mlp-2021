@@ -14,6 +14,12 @@ class Configuration:
     wandb_entity: str = 'idegen'
     wandb_mode: str = WandbMode.ONLINE.value
 
+    # data
+    test_data_path: str = '../data/Test.csv'
+
+    # experiment configuration
+    predict_random_numbers: bool = True
+
     def as_dict(self):
         return asdict(self)
 
