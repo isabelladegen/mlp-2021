@@ -22,9 +22,9 @@ class Configuration:
     no_nan_in_bikes: bool = True  # removes rows that don't have a label, e.g for means square calculations
 
     # results
-    write_predictions_to_csv = True
-    write_predictions_to_path = '../experiment-results/'
-    write_results_start_name = 'predictions'
+    log_predictions: bool = True
+    write_predictions_to_path: str = '../experiment-results/'
+    write_results_start_name: str = 'predictions_'
 
     def as_dict(self):
         return asdict(self)
@@ -33,5 +33,5 @@ class Configuration:
 @dataclass
 class TestConfiguration(Configuration):
     wandb_mode: str = WandbMode.disabled.value
-    write_predictions_to_csv = False
-    write_results_start_name = 'testing_predictions'
+    log_predictions: bool = False
+    write_results_start_name: str = 'testing_predictions_'
