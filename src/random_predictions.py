@@ -1,6 +1,5 @@
 import wandb
 import enum
-import pandas as pd
 
 from src.OneModel import OneModel
 from src.configurations import Configuration
@@ -13,14 +12,14 @@ class RunResults(enum.Enum):
 
 
 class WandbLogs(enum.Enum):
-    mean_absolute_error = 'Mean average error'
+    mean_absolute_error = 'Mean absolute error'
     predictions = 'Predictions'
 
 
 def run(config: Configuration):
     results = {}  # keep experiment-results of run
     run = wandb.init(project=config.wandb_project_name, entity=config.wandb_entity, mode=config.wandb_mode,
-                     name="random prediction", notes="random predictions", tags=["random prediction"],
+                     notes="random predictions", tags=["random prediction"],
                      config=config.as_dict())
     # Reload the Configuration (to allow for sweeps)
     configuration = Configuration(**wandb.config)

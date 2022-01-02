@@ -12,7 +12,7 @@ class RunResults(enum.Enum):
 
 
 class WandbLogs(enum.Enum):
-    mean_absolute_error = 'Mean average error'
+    mean_absolute_error = 'Mean absolute error'
 
 
 def run(config: Configuration = Configuration()):
@@ -20,7 +20,7 @@ def run(config: Configuration = Configuration()):
         project=config.wandb_project_name,
         entity=config.wandb_entity,
         mode=config.wandb_mode,
-        name="getting started",
+        # name="getting started", # this names the run
         notes="just testing",
         tags=["testing"],
         config=config.as_dict()
