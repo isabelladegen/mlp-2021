@@ -2,6 +2,7 @@ from sklearn.metrics import mean_absolute_error
 from datetime import datetime
 import os
 import csv
+import pandas as pd
 
 from src.Data import Columns
 from src.configurations import Configuration
@@ -36,3 +37,11 @@ class PredictionResult:
             writer.writerow([index + 1, prediction])
         file.close()
         return filename
+
+    def predictions_as_df(self):
+        ids = list(range(1, len(self.predictions) + 1))
+        if len(self.true_values) == len(self.predictions):  # log true values too
+            return pd.DataFrame(list(zip(ids, self.predictions, self.true_values)),
+                                columns=[Columns.id.value, Columns.bikes.value, 'true_bikes_values'])
+        return pd.DataFrame(list(zip(ids, self.predictions)),
+                            columns=[Columns.id.value, Columns.bikes.value])

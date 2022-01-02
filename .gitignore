@@ -2,6 +2,7 @@
 data/
 testingdata/
 experiment-results/
+wandb/
 
 #jetbrains
 .idea/

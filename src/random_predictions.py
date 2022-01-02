@@ -17,7 +17,7 @@ class WandbLogs(enum.Enum):
     predictions = 'Predictions'
 
 
-def run(config: Configuration = Configuration()):
+def run(config: Configuration):
     results = {}  # keep experiment-results of run
     run = wandb.init(project=config.wandb_project_name, entity=config.wandb_entity, mode=config.wandb_mode,
                      name="random prediction", notes="random predictions", tags=["random prediction"],
@@ -48,7 +48,15 @@ def run(config: Configuration = Configuration()):
         csv_filename = random_predictions.write_to_csv(configuration)
 
         # Log predictions to wandb
-        prediction_table = wandb.Table(dataframe=pd.read_csv(csv_filename))
+        prediction_table = wandb.Table(dataframe=random_predictions.predictions_as_df())
         run.log({WandbLogs.predictions.value: prediction_table})
 
     return results
+
+
+def main():
+    run(Configuration())
+
+
+if __name__ == "__main__":
+    main()

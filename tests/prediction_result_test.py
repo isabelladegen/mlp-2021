@@ -46,6 +46,20 @@ def test_creates_a_csv_file_for_the_random_predictions():
     cleanup_files()
 
 
+def test_return_df_of_id_true_value_and_predictions():
+    predictions = [1, 2, 3, 10]
+    true_values = [0, 2, 3, 5]
+    result = PredictionResult()
+    result.add_predictions(predictions)
+    result.add_true_values(true_values)
+
+    df = result.predictions_as_df()
+    assert_that(df.shape, equal_to((len(predictions), 3)))
+    assert_that(list(df.Id.values), equal_to([1, 2, 3, 4]))
+    assert_that(list(df.bikes.values), equal_to(predictions))
+    assert_that(list(df['true_bikes_values']), equal_to(true_values))
+
+
 def cleanup_files():
     config = TestConfiguration()
     for filename in glob.glob(os.path.join(config.write_predictions_to_path + config.write_results_start_name + "*")):
