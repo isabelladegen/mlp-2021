@@ -7,6 +7,7 @@ from src.configurations import Configuration
 
 
 class Columns(enum.Enum):
+    id = 'Id'
     docks = 'numDocks'  # choose for tests
     bikes = 'bikes'
 
@@ -21,7 +22,7 @@ class Data:
             self.raw_pd_df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(data_path, "*.csv"))))
         else:  # read just the one file
             self.raw_pd_df = pd.read_csv(data_path)
-        
+
         if config.no_nan_in_bikes:
             self.__remove_nan_rows_in_bikes()
 
@@ -37,6 +38,5 @@ class Data:
         return []
 
     def __remove_nan_rows_in_bikes(self):
-        if Columns.bikes.value in self.raw_pd_df: # only drop nan if the data has a bike column
+        if Columns.bikes.value in self.raw_pd_df:  # only drop nan if the data has a bike column
             self.raw_pd_df = self.raw_pd_df.dropna(subset=[Columns.bikes.value])
-
