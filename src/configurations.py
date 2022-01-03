@@ -17,6 +17,8 @@ class WandbMode(enum.Enum):
 
 class WandbLogs(enum.Enum):
     mean_absolute_error = 'Mean absolute error'
+    mean_absolute_error_validation = 'Mean absolute error validation'
+    mean_absolute_error_dev = 'Mean absolute error dev'
     predictions = 'Predictions'
 
 

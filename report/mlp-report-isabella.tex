@@ -142,14 +142,14 @@
     Firstly, I created a baseline by randomly guessing the number of bikes for each sample porvided in the training data a few
     times.
 
-    Simple Singelvariat Regression
+    Simple regression - one model for all stations
     - Goal: input variable X = number of bikes 3h ago -> predict number of bikes now
     - Second experiment is do a simple regression based on just one feature bikes 3h ago
     - Remove a further random 10\% of the Training data into a valdiation data set so I have some labelled validation data
     - now I have a development and a validation dataset that's labelled
     - 300 rows don/t hve bikes from 3 hours ago, decide what to do, e.g just drop, put to average bikes at station number, put to
     previos bikes 3h ago...
-        - initially just drop for ease
+        - I've decided to set the number to the most common number for that column
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}
@@ -176,13 +176,14 @@
         - Keeping the dataframes in memory for speed and because they are small enough
         -  reads all csv into one big dataframe and ensures that the index is unique (not like it would be by default) - see Data class
 
-        Simple Regression
+        Simple Regression - one model for all station
         - Write dev and validation csv to make loading of those data sets easier
         - have a script to do this split and it's tested two, I don't rerun it unless I want a new set
         - reuse data reading from Random Guessing
         - unlabelled rows are removed
         - ending up with 50220 samples for taining and 5580 samples for validation for development
-        - further remove the samples that don't have bikes from 3h ago
+        - for nan values in bikes_3h_ago the df column type was changed to be categorical and  used a Simple imputer
+        with the most frequent value for that column to replace none zeros
 
 %    TODO paste code
 
@@ -211,11 +212,15 @@
 
         \subsubsection*{\nameref{itm:phase1-step2}
 
-        Random Guessing
+        Random Guessing - the same if one model for all stations or not
         - for average see wandb, average random guessing had a mean average error of 7.307-7.369
 
-        Simple Regression
+        Simple Regression - one model for all stations
         - dev dataset is now of size 50220 and validation data set is 5580
+        - Mean average error for my validation test set is 3.812
+        - Mean average error for dev set I trained with is 3.767
+        - Significantly better than random guessing
+
 
 
         \section{Conclusions}\label{sec:conclusions}
