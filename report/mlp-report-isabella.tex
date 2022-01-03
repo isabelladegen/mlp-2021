@@ -125,16 +125,12 @@
     Quite a bit of iteration between step 1 and 2 - I didn't wanted to learn more about the data than I needed to
 
     \subsubsection*{\nameref{itm:phase1-step1}}
-    Goal is to find out what's similar and what's different between the different station.
-    Can I understand what the data means? What the different columns are
+    - Goal is to decide what sort of problem it is (see results)
+    - Goal is to find out what's similar and what's different between the different station
+    - Can I understand what the data means? What the different columns are by firstly understanding what data I've been given
+    (see results for interpretation of the data)
+    - Iterating back to this step as I'm building the model and need to understand more about the data
 
-    From that decide what sort of problem it is:
-    - Regression to predict a number but could be a classifier if we say the numbers are from a discrete set of numbers
-    - Supervised learning given we've got labelled data
-    - Might be worth to do some feature exploring with clustering to learn how the different features relate to each other
-
-    Given that the goal is to predict a number and given I have labelled data for some stations I decided that this could be
-    well formulated as a regression problem.
 
     \subsubsection*{\nameref{itm:phase1-step2}
     Setup
@@ -146,16 +142,20 @@
     Firstly, I created a baseline by randomly guessing the number of bikes for each sample porvided in the training data a few
     times.
 
-    Simple Regression
+    Simple Singelvariat Regression
+    - Goal: input variable X = number of bikes 3h ago -> predict number of bikes now
     - Second experiment is do a simple regression based on just one feature bikes 3h ago
     - Remove a further random 10\% of the Training data into a valdiation data set so I have some labelled validation data
-        - now I have a development and a validation dataset that's labelled
+    - now I have a development and a validation dataset that's labelled
+    - 300 rows don/t hve bikes from 3 hours ago, decide what to do, e.g just drop, put to average bikes at station number, put to
+    previos bikes 3h ago...
+        - initially just drop for ease
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}
     Overall: I'm using IDEs for coding and running: JetBrains DataSpell for Notebooks and PyCharm for pure Python. Both IDEs offer
     a rich debugging and runtime environment, test and script execution, advanced refactoring abilities and so forth.
-    - logging everything including  configurations, git revision nubmer to weight and biasess
+    - logging everything including configurations, git revision nubmer to weight and biasess
 
     \subsection*{\nameref{phs:one}}
 
@@ -164,59 +164,67 @@
     Data loaded with Pandas Dataframe
 
     \subsubsection*{\nameref{itm:phase1-step2}
-    For this I wrote pure Python. Random guessing is done just picking a  random integer between 0 and number of docks
+    For this I wrote pure Python. Random guessing is done just picking a random integer between 0 and number of docks
     for each station (using Pythons random library). I've used skikits mean absolute error calculation function. The result
     is logged to W&B.
 
     Random Guessing
-    - Similar dataloading technique from step  1 but in pure pyton
+    - Similar data loading technique from step 1 but in pure Python
     - Test drive the classes with dummy data to be able to quickly develop the code
     - Coniguration class for real runs and one for testing  (include link to class or appendix)
         - testing one is not writing to wandb
-    - Keeping the dataframes in memory for speed and because they are small enough
+        - Keeping the dataframes in memory for speed and because they are small enough
         -  reads all csv into one big dataframe and ensures that the index is unique (not like it would be by default) - see Data class
 
-    Simple Regression
-    - Write dev and validation csv to make loading of those data sets easier
+        Simple Regression
+        - Write dev and validation csv to make loading of those data sets easier
         - have a script to do this split and it's tested two, I don't rerun it unless I want a new set
-            - reuse data reading from Random Guessing
+        - reuse data reading from Random Guessing
         - unlabelled rows are removed
-
-
+        - ending up with 50220 samples for taining and 5580 samples for validation for development
+        - further remove the samples that don't have bikes from 3h ago
 
 %    TODO paste code
 
 
-    \section{Results}\label{sec:results}
-    Results achieved
+        \section{Results}\label{sec:results}
+        Results achieved
 
-    \subsection*{\nameref{phs:one}}
-    Overall:
+        \subsection*{\nameref{phs:one}}
+        Overall:
 
-    \subsubsection*{\nameref{itm:phase1-step1}}
-    - There are 55875 labelled samples
-    - 13275 rows have at least one NanValue -> what to do with nan
-    - 75 rows don't have a bike prediction - decided to remove these rows for evaluating the performance of my alogrithm
-    - Some interesting data that I didn't know what it mean
-    - Describe the columns and what I think they mean
-    - Not all data types are usefull in it's current format, e.g Weekday would have to be translated into a numerical value as day of week
+        \subsubsection*{\nameref{itm:phase1-step1}}
+        - There are 55875 labelled samples
+        - 13275 rows have at least one NanValue -> what to do with nan
+        - 75 rows don't have a bike prediction - decided to remove these rows for evaluating the performance of my alogrithm
+        - Some interesting data that I didn't know what it mean
+        - Describe the columns and what I think they mean
+        - Not all data types are usefull in it's current format, e.g Weekday would have to be translated into a numerical value as day of week
+        - 300 examples from training datas don't provide bikes from 3 hours ago
 
-    \subsubsection*{\nameref{itm:phase1-step2}
+        - This is most naturally a multivariate regression problem
+        - Multivariate Regression to predict a number but could be a classifier if we say the numbers are from a discrete set of numbers
+        - Supervised learning given we've got labelled data
+        - Might be worth to do some feature exploring with clustering to learn how the different features relate to each other
+        - Given that the goal is to predict a number and given I have labelled data for some stations I decided that this could be
+            well formulated as a regression problem.
 
-    Random Guessing
-    - for average see wandb, average random guessing had a mean average error of 7.307-7.369
+        \subsubsection*{\nameref{itm:phase1-step2}
 
-    Simple Regression
-    - dev dataset is now of size 50220 and validation data set is 5580
+        Random Guessing
+        - for average see wandb, average random guessing had a mean average error of 7.307-7.369
 
-
-    \section{Conclusions}\label{sec:conclusions}
-    share any insights you gained about how the system works.
+        Simple Regression
+        - dev dataset is now of size 50220 and validation data set is 5580
 
 
-    \section*{Acknowledgements}
+        \section{Conclusions}\label{sec:conclusions}
+        share any insights you gained about how the system works.
 
-    \bibliographystyle{plain}
-    \bibliography{bibliography}
+
+        \section*{Acknowledgements}
+
+        \bibliographystyle{plain}
+        \bibliography{bibliography}
 %TODO reference the varsious medium articles for software engineering
 \end{document}

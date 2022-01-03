@@ -28,7 +28,7 @@ class DevValidationDataWriter:
         split = config.dev_validation_data_split
 
         assert config.no_nan_in_bikes, 'Wrong configuration: You don\'t want nan values in dev/validation data'
-        training_df = Data(config, training_data_path).raw_pd_df
+        training_df = Data(config.no_nan_in_bikes, training_data_path).raw_pd_df
 
         number_of_training_examples = training_df.shape[0]
         validation_data_size: int = round(number_of_training_examples / split)

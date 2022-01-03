@@ -1,11 +1,23 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 import enum
+
+from src.Data import Columns
+
+
+class RunResults(enum.Enum):
+    predictions = 1
+    wandb = 2
 
 
 class WandbMode(enum.Enum):
     disabled = 'disabled'  # choose for tests
     online = 'online'
     offline = 'offline'
+
+
+class WandbLogs(enum.Enum):
+    mean_absolute_error = 'Mean absolute error'
+    predictions = 'Predictions'
 
 
 @dataclass
@@ -16,7 +28,7 @@ class Configuration:
     wandb_mode: str = WandbMode.online.value
 
     # data
-    test_data_path: str = '../data/Test.csv'
+    test_data_path: str = '../data/test.csv'
     training_data_path: str = '../data/Train/'
 
     # Development data
@@ -33,6 +45,17 @@ class Configuration:
     write_predictions_to_path: str = '../experiment-results/'
     write_results_start_name: str = 'predictions_'
 
+    # Models
+    features_data_type: {} = field(
+        default_factory=lambda: {Columns.data_3h_ago.value: 'category', Columns.num_docks.value: 'category'})
+    poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])
+    poisson_alpha: float = 1.0
+    poisson_fit_intercept: bool = True
+    poisson_max_iter: int = 100
+    poisson_tol: float = 0.0001
+    poisson_verbose: int = 0
+    poisson_warm_start: bool = False
+
     def as_dict(self):
         return asdict(self)
 
@@ -48,3 +71,13 @@ class TestConfiguration(Configuration):
     # Results
     log_predictions: bool = False
     write_results_start_name: str = 'testing_predictions_'
+
+    # Models  the default model values will change and we don't want flaky tests
+    poisson_features: [str] = field(
+        default_factory=lambda: [Columns.data_3h_ago.value])
+    poisson_alpha: float = 1.0
+    poisson_fit_intercept: bool = True
+    poisson_max_iter: int = 100
+    poisson_tol: float = 0.0001
+    poisson_verbose: int = 0
+    poisson_warm_start: bool = False

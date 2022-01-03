@@ -35,7 +35,7 @@ def test_writes_dev_and_validation_csv_file():
     dev_df = pd.read_csv(os.path.join(output_path, dev_filename))
     val_df = pd.read_csv(os.path.join(output_path, val_filename))
 
-    training_data = Data(config, config.training_data_path).raw_pd_df
+    training_data = Data(config.no_nan_in_bikes, config.training_data_path).raw_pd_df
     assert_that(dev_df.shape, equal_to((50220, 25)))
     assert_that(val_df.shape, equal_to((5580, 25)))
     assert_that(dev_df.shape[0] + val_df.shape[0], equal_to(training_data.shape[0]))

@@ -1,7 +1,7 @@
 import csv
 from src.Data import Data
 from src.configurations import Configuration
-from utils.station_data_builder import *
+from utils.station_data_builder import StationDataBuilder
 
 header = ["Id", "station", "latitude", "longitude", "numDocks", "timestamp", "year", "month", "day", "hour", "weekday",
           "weekhour", "isHoliday", "windMaxSpeed.m.s", "windMeanSpeed.m.s", "windDirection.grades", "temperature.C",
@@ -10,9 +10,10 @@ header = ["Id", "station", "latitude", "longitude", "numDocks", "timestamp", "ye
 
 
 class TestDataBuilder:
-    def __init__(self, config: Configuration):
-        self.config = config
-        self.rows = [[]]
+    def __init__(self,
+                 no_nan_in_bikes: bool = True):  # you want to keep nan row in for test predictions and out for training
+        self.rows = []
+        self.no_nan_in_bikes = no_nan_in_bikes
         self.testing_data_csv = "testingdata/TestDataBuilder.csv"
 
     def build(self):
@@ -22,7 +23,7 @@ class TestDataBuilder:
         for row in self.rows:
             writer.writerow(row)
         file.close()
-        return Data(self.config, self.testing_data_csv)
+        return Data(self.no_nan_in_bikes, self.testing_data_csv)
 
     def with_stations(self, stations: [StationDataBuilder]):
         for index, station in enumerate(stations):

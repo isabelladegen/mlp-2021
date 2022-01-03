@@ -18,7 +18,7 @@ def test_creates_random_predictions():
     number_of_test_samples = 55800
 
     result = run(config)
-    random_predictions = result[RunResults.random_predictions]
+    random_predictions = result[RunResults.predictions]
     predictions = random_predictions.predictions
     assert_that(len(predictions), equal_to(number_of_test_samples))
     assert_that(random_predictions.mean_absolute_error(), greater_than(2))

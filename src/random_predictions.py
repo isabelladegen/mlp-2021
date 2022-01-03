@@ -1,19 +1,8 @@
 import wandb
-import enum
 
-from src.OneModel import OneModel
-from src.configurations import Configuration
+from src.models.RandomEstimator import RandomEstimator
+from src.configurations import Configuration, RunResults, WandbLogs
 from src.Data import Data
-
-
-class RunResults(enum.Enum):
-    random_predictions = 1
-    wandb = 2
-
-
-class WandbLogs(enum.Enum):
-    mean_absolute_error = 'Mean absolute error'
-    predictions = 'Predictions'
 
 
 def run(config: Configuration):
@@ -25,14 +14,14 @@ def run(config: Configuration):
     configuration = Configuration(**wandb.config)
 
     # No training for random predictions
-    one_model = OneModel(configuration)
+    one_model = RandomEstimator(configuration)
 
     # Load test data
-    labelled_data = Data(configuration, config.training_data_path)  # do all required preprocessing in here
+    labelled_data = Data(config.no_nan_in_bikes, config.training_data_path)  # do all required preprocessing in here
 
     # Use models to predict random number of bikes
     random_predictions = one_model.predict_random_numbers_for(labelled_data)
-    results[RunResults.random_predictions] = random_predictions
+    results[RunResults.predictions] = random_predictions
 
     # Calculate and log mean average error
     mae = random_predictions.mean_absolute_error()

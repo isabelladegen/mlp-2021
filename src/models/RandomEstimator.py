@@ -5,7 +5,7 @@ from src.configurations import Configuration
 from src.Data import Data
 
 
-class OneModel:
+class RandomEstimator:
     def __init__(self, config: Configuration):
         self.configuration = config
 
@@ -15,6 +15,7 @@ class OneModel:
         for example in number_of_docks:
             result.add_prediction(random.randint(0, example))
         true_values = data.get_true_values()
-        if len(result.predictions) == len(true_values):  # only add true values if there is as many as predictions in the given data
+        if len(result.predictions) == len(
+                true_values):  # only add true values if there is as many as predictions in the given data
             result.add_true_values(true_values)
         return result
