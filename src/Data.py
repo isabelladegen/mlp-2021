@@ -19,7 +19,8 @@ class Data:
             raise "ERROR: Path: " + data_path + " does not exist!"
         if os.path.isdir(
                 data_path):  # read all csv files into one panda, obviously assume they all have the same format
-            self.raw_pd_df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(data_path, "*.csv"))))
+            # ignore_index=True required to ensure that the new dataframe has unique row indices!!!
+            self.raw_pd_df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(data_path, "*.csv"))), ignore_index=True)
         else:  # read just the one file
             self.raw_pd_df = pd.read_csv(data_path)
 

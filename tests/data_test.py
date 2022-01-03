@@ -56,7 +56,7 @@ def test_return_true_value_for_each_row_when_theres_bike_data():
     rows_without_nan_in_bikes = 744
     assert_that(len(true_values), equal_to(rows_without_nan_in_bikes))
     assert_that(true_values[0], equal_to(1))
-    assert_that(true_values[rows_without_nan_in_bikes-1], equal_to(14))
+    assert_that(true_values[rows_without_nan_in_bikes - 1], equal_to(14))
 
 
 def test_loads_all_files_into_dataframe_if_path_is_a_dir():
@@ -73,3 +73,11 @@ def test_loads_removes_nan_in_bikes_column_if_config_set_to_true():
 
     data = Data(configuration, configuration.training_data_path)
     assert_that(data.raw_pd_df.shape, equal_to((55800, 25)))
+
+
+def test_creates_unique_index_for_each_row_when_reading_multiple_files():
+    configuration = TestConfiguration()
+
+    df = Data(configuration, configuration.training_data_path).raw_pd_df
+    unique_indices = set(df.index)
+    assert_that(len(unique_indices), equal_to(55800))

@@ -135,14 +135,19 @@
     well formulated as a regression problem.
 
     \subsubsection*{\nameref{itm:phase1-step2}
+    Setup
     I wanted to not decide on an algorithm from the get go but instead create a pipeline that let me easily try out and evaluate
     a few models before spending time making one of them good. For this I setup pure Python pipeline:
     : load data, predict random numbers, calculate mean average error, log results both in csv file and to W&B
 
+    Random Guessing
     Firstly, I created a baseline by randomly guessing the number of bikes for each sample porvided in the training data a few
     times.
 
+    Simple Regression
     - Second experiment is do a simple regression based on just one feature bikes 3h ago
+    - Remove a further random 10\% of the Training data into a valdiation data set so I have some labelled validation data
+        - now I have a development and a validation dataset that's labelled
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}
@@ -161,9 +166,18 @@
     for each station (using Pythons random library). I've used skikits mean absolute error calculation function. The result
     is logged to W&B.
 
-    Similar dataloading technique from step  1
-    Test drive the classes with dummy data to be able to quickly develop the code
-    Keeping the dataframes in memory for speed and because they are small enough
+    Random Guessing
+    - Similar dataloading technique from step  1 but in pure pyton
+    - Test drive the classes with dummy data to be able to quickly develop the code
+    - Coniguration class for real runs and one for testing  (include link to class or appendix)
+        - testing one is not writing to wandb
+    - Keeping the dataframes in memory for speed and because they are small enough
+
+    Simple Regression
+    - Write dev and validation csv to make loading of those data sets easier
+        - have a script to do this split and it's tested two, I don't rerun it unless I want a new set
+        - unlabelled rows are removed
+
 
 
 %    TODO paste code
@@ -184,7 +198,12 @@
     - Not all data types are usefull in it's current format, e.g Weekday would have to be translated into a numerical value as day of week
 
     \subsubsection*{\nameref{itm:phase1-step2}
+
+    Random Guessing
     - for average see wandb, average random guessing had a mean average error of 7.307-7.369
+
+    Simple Regression
+    - dev dataset is now of size 50220 and validation data set is 5580
 
 
     \section{Conclusions}\label{sec:conclusions}
