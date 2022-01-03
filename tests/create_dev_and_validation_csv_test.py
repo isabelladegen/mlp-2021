@@ -5,7 +5,7 @@ import pandas as pd
 
 from src.Data import Data
 from src.configurations import TestConfiguration
-from src.scripts.create_dev_and_validation_csv import CsvWriter, DevValidationDataWriter
+from src.create_dev_and_validation_csv import CsvWriter, DevValidationDataWriter
 
 
 def test_creates_a_csv_file_from_a_data_frame():

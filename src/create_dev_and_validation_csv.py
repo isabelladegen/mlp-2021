@@ -1,5 +1,5 @@
 # script to split the Training dataset into a dev and a validation csv
-# these are intended to only be run when required
+# rune once or only when intended, the selected rows are randomly chosen from the full labelled training dataset
 
 import pandas as pd
 import os
@@ -38,3 +38,15 @@ class DevValidationDataWriter:
         training_df.drop(index=val_indexes, inplace=True)  # change training_df to become dev
         CsvWriter.write_csv(training_df, os.path.join(development_data_output_path, dev_filename))
         CsvWriter.write_csv(validation_df, os.path.join(development_data_output_path, val_filename))
+
+
+def create_development_data_set():
+    DevValidationDataWriter.create_new_dev_and_validation_csv(Configuration())
+
+
+def main():
+    create_development_data_set()
+
+
+if __name__ == "__main__":
+    main()

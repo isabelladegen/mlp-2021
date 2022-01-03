@@ -91,7 +91,7 @@
     \nameref{sec:results}. The final sections \nameref{sec:conclusions} gives a summary of my overall learnings and conclusions.
 
     %TODO reference to github
-    %TODO reference to weight and biases graphs
+    %TODO reference interactive to weight and biases graphs, include static version
 
 
     \section{Technical Background}\label{sec:technical-background}
@@ -99,6 +99,8 @@
     Be brief.
 
     Overall approach for engineering python environment setup: \cite{conda_forge_community_2015_4774216}, experiment tracking: \cite{wandb}
+
+    <short description of code base, the main classes and their responsibility>
 
     \subsection*{\nameref{phs:one}}
 
@@ -172,10 +174,12 @@
     - Coniguration class for real runs and one for testing  (include link to class or appendix)
         - testing one is not writing to wandb
     - Keeping the dataframes in memory for speed and because they are small enough
+        -  reads all csv into one big dataframe and ensures that the index is unique (not like it would be by default) - see Data class
 
     Simple Regression
     - Write dev and validation csv to make loading of those data sets easier
         - have a script to do this split and it's tested two, I don't rerun it unless I want a new set
+            - reuse data reading from Random Guessing
         - unlabelled rows are removed
 
 
