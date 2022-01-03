@@ -6,8 +6,12 @@ from src.models.PoissonModel import PoissonModel
 
 
 def run(config: Configuration = Configuration()):
-    wandb_run = wandb.init(project=config.wandb_project_name, entity=config.wandb_entity, mode=config.wandb_mode,
-                           notes="testing", tags=["simple regression"], config=config.as_dict())
+    wandb_run = wandb.init(project=config.wandb_project_name,
+                           entity=config.wandb_entity,
+                           mode=config.wandb_mode,
+                           notes="testing",
+                           tags=["simple regression", "number of docks", "bikes 3h ago"],
+                           config=config.as_dict())
     # Reload the Configuration (to allow for sweeps)
     configuration = Configuration(**wandb.config)
 
