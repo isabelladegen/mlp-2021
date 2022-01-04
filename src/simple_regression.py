@@ -21,8 +21,8 @@ def run(config: Configuration = Configuration()):
                                          config.development_data_path + config.dev_data_filename)
 
     # Single model for all stations
-    single_model_for_all_station = PoissonModel(configuration, all_station_training_dev_data)  # configure model
-    single_model_for_all_station.fit()  # train
+    one_model_for_all_station = PoissonModel(configuration, all_station_training_dev_data)  # configure model
+    one_model_for_all_station.fit()  # train
 
     # Model per station
     per_station_model = PerStationModel(configuration, all_station_training_dev_data,
@@ -33,8 +33,8 @@ def run(config: Configuration = Configuration()):
     val_data = Data(config.no_nan_in_bikes, config.development_data_path + config.val_data_filename)
 
     # Predict
-    one_model_dev_result = single_model_for_all_station.predict(all_station_training_dev_data)
-    one_model_val_result = single_model_for_all_station.predict(val_data)
+    one_model_dev_result = one_model_for_all_station.predict(all_station_training_dev_data)
+    one_model_val_result = one_model_for_all_station.predict(val_data)
     per_station_dev_result = per_station_model.predict(all_station_training_dev_data)
     per_station_val_result = per_station_model.predict(val_data)
 
@@ -73,6 +73,15 @@ def run(config: Configuration = Configuration()):
     wandb_run.log({WandbLogs.one_model_predictions_val.value: one_model_prediction_table_val})
     wandb_run.log({WandbLogs.per_station_predictions_dev.value: per_station_prediction_table_dev})
     wandb_run.log({WandbLogs.per_station_predictions_val.value: per_station_prediction_table_val})
+
+    # Write predictions to csv
+    if configuration.log_predictions:
+        test_data = Data(config.no_nan_in_bikes, config.test_data_path)
+        one_model_result_test = one_model_for_all_station.predict(test_data)
+        per_station_result_test = per_station_model.predict(test_data)
+
+        one_model_result_test.write_to_csv('one_model_' + wandb_run.name, configuration)
+        per_station_result_test.write_to_csv('per_station_model_' + wandb_run.name, configuration)
 
     # TODO decide what to return
     return {RunResults.predictions: one_model_val_result, RunResults.wandb: wandb}
