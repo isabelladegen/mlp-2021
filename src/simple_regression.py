@@ -2,16 +2,17 @@ import wandb
 
 from src.configurations import Configuration, WandbLogs, RunResults
 from src.Data import Data
+from src.models.Model import Model
 from src.models.PerStationModel import PerStationModel
 from src.models.PoissonModel import PoissonModel
 
 
-def run(config: Configuration = Configuration()):
+def run(model_class, config: Configuration = Configuration()):
     wandb_run = wandb.init(project=config.wandb_project_name,
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
                            notes="testing",
-                           tags=["simple regression", "bikes 3h ago", "one model", 'model per station'],
+                           tags=[str(model_class), "bikes 3h ago", "one model", 'model per station'],
                            config=config.as_dict())
     # Reload the Configuration (to allow for sweeps)
     configuration = Configuration(**wandb.config)
@@ -21,12 +22,12 @@ def run(config: Configuration = Configuration()):
                                          config.development_data_path + config.dev_data_filename)
 
     # Single model for all stations
-    one_model_for_all_station = PoissonModel(configuration, all_station_training_dev_data)  # configure model
+    one_model_for_all_station = model_class(configuration, all_station_training_dev_data)  # configure model
     one_model_for_all_station.fit()  # train
 
     # Model per station
     per_station_model = PerStationModel(configuration, all_station_training_dev_data,
-                                        PoissonModel)  # configure model
+                                        model_class)  # configure model
     per_station_model.fit()  # train all models
 
     # Load validation data
@@ -94,7 +95,7 @@ def log_per_station_mae_to_wand(key: str, per_station_values: {}):  # {station:m
 
 
 def main():
-    run(Configuration())
+    run(PoissonModel, Configuration())
 
 
 if __name__ == "__main__":
