@@ -155,9 +155,7 @@
     - same as above but train a different model for each station
     - using the same model class (PoissonModel) but having another class that can be given whatever model and that manages
         the data to be split per station
-    - also calculate mae for each station as well as overall
-
-
+    - also calculate mae for each station as well as overall both for both approaches
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}
@@ -198,7 +196,9 @@
         Simple Regression - model per station
         - simple_regression.py will run both the single model and the model per station training and prediction, the parameters are logged
             accordingly
+        - adjusted PredictionResults.py to be able to be constructed from multiple (per station results)
         - log an additional table with mae per station for both one model for all station as well as for the model per station
+        - tried both one and two features: bikes_3h_ago, numDocks as well as just bikes_3h_ago
 
         \section{Results}\label{sec:results}
         Results achieved
@@ -229,11 +229,13 @@
 
         Simple Regression - one model for all stations
         - dev dataset is now of size 50220 and validation data set is 5580
-        - Mean average error for my validation test set is 3.812
+        - MAE for my validation test set is 3.812
         - Mean average error for dev set I trained with is 3.767
         - Significantly better than random guessing
 
-
+        Simpler Regresson - model per station
+        - same data set as above
+        - MAE for
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.

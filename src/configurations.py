@@ -68,7 +68,8 @@ class Configuration:
     # Models
     features_data_type: {} = field(
         default_factory=lambda: {Columns.data_3h_ago.value: 'category', Columns.num_docks.value: 'category'})
-    poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value, Columns.num_docks.value])
+    # poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value, Columns.num_docks.value])
+    poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])
     poisson_alpha: float = 1.0
     poisson_fit_intercept: bool = True
     poisson_max_iter: int = 100

@@ -11,7 +11,7 @@ def run(config: Configuration = Configuration()):
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
                            notes="testing",
-                           tags=["simple regression", "number of docks", "bikes 3h ago"],
+                           tags=["simple regression", "bikes 3h ago", "one model", 'model per station'],
                            config=config.as_dict())
     # Reload the Configuration (to allow for sweeps)
     configuration = Configuration(**wandb.config)
