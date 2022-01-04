@@ -77,6 +77,8 @@ class Configuration:
     poisson_verbose: int = 0
     poisson_warm_start: bool = False
 
+    random_forest_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])
+
     def as_dict(self):
         return asdict(self)
 
