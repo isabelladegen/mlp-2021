@@ -3,6 +3,14 @@ import enum
 
 from src.Data import Columns
 
+ONE_MODEL = 'One model'
+ONE_MODEL = 'One model'
+PER_STATION_MODEL = 'Model per station'
+TRAINING = 'Training data'
+VALIDATION = 'Validation data'
+MAE = 'MAE'
+PER_STATION = 'per station'
+
 
 class RunResults(enum.Enum):
     predictions = 1
@@ -17,9 +25,19 @@ class WandbMode(enum.Enum):
 
 class WandbLogs(enum.Enum):
     mean_absolute_error = 'Mean absolute error'
-    mean_absolute_error_validation = 'Mean absolute error validation'
-    mean_absolute_error_dev = 'Mean absolute error dev'
+    one_model_mae_dev = ONE_MODEL + ' - ' + TRAINING + ': ' + MAE
+    one_model_mae_val = ONE_MODEL + ' - ' + VALIDATION + ': ' + MAE
+    one_model_mae_per_station_dev = ONE_MODEL + ' - ' + TRAINING + ': ' + MAE + ' ' + PER_STATION
+    one_model_mae_per_station_val = ONE_MODEL + ' - ' + VALIDATION + ': ' + MAE + ' ' + PER_STATION
+    per_station_mae_dev = PER_STATION_MODEL + ' - ' + TRAINING + ': ' + MAE
+    per_station_mae_val = PER_STATION_MODEL + ' - ' + VALIDATION + ': ' + MAE
+    per_station_mae_per_station_dev = PER_STATION_MODEL + ' - ' + TRAINING + ': ' + MAE + ' ' + PER_STATION
+    per_station_mae_per_station_val = PER_STATION_MODEL + ' - ' + VALIDATION + ': ' + MAE + ' ' + PER_STATION
     predictions = 'Predictions'
+    one_model_predictions_dev = 'Predictions one model - ' + TRAINING
+    one_model_predictions_val = 'Predictions one model - ' + VALIDATION
+    per_station_predictions_dev = 'Predictions model per station - ' + TRAINING
+    per_station_predictions_val = 'Predictions model per station - ' + VALIDATION
 
 
 @dataclass

@@ -16,7 +16,8 @@ class PoissonModel:
     def __init__(self, config: Configuration, training_data: Data):
         self.configuration = config
         self.raw_training_data = training_data
-        self.X = self.raw_training_data.get_feature_matrix_x_for(config.poisson_features,
+        self.features = config.poisson_features
+        self.X = self.raw_training_data.get_feature_matrix_x_for(self.features,
                                                                  config.features_data_type)
         self.y = self.raw_training_data.get_y()  # labelled output
 
@@ -33,23 +34,21 @@ class PoissonModel:
         self.model.fit(self.X, self.y)
         return self.model.get_params()
 
-    def predict(self, val_data: Data) -> PredictionResult:
-        feature_matrix_x = val_data.get_feature_matrix_x_for(self.configuration.poisson_features,
-                                                             self.configuration.features_data_type)
+    def predict(self, data: Data) -> PredictionResult:
+        feature_matrix_x = data.get_feature_matrix_x_for(self.configuration.poisson_features,
+                                                         self.configuration.features_data_type)
         predictions = self.model.predict(feature_matrix_x)
 
         rounded_predictions = []
         for prediction in predictions:
             rounded_predictions.append(round_half_up(prediction))
 
-        result = PredictionResult()
+        y = data.get_y()
+        result = PredictionResult(data.get_ids())
         result.add_predictions(rounded_predictions)
-        y = val_data.get_y()
-        if len(y[~np.isnan(y)]) == len(y):
-            result.add_true_values(y)
-        else:
-            print("Didn't  add true values to results as some or all bikes values were nan")
+        result.add_true_values(y)
         return result
 
-    def features(self):
-        return self.configuration.poisson_features
+
+def features(self):
+    return self.configuration.poisson_features

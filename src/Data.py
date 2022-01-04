@@ -8,6 +8,7 @@ from sklearn.impute import SimpleImputer
 
 class Columns(enum.Enum):
     id = 'Id'
+    station = 'station'
     num_docks = 'numDocks'
     bikes = 'bikes'
     data_3h_ago = 'bikes_3h_ago'
@@ -18,7 +19,19 @@ class Data:
         Loads data and does the preprocessing based on configuration
     """
 
-    def __init__(self, no_nan_in_bikes: bool, data_path):
+    def __init__(self, no_nan_in_bikes: bool, data_path_or_frame):
+        self.no_nan_in_bikes = no_nan_in_bikes
+        if isinstance(data_path_or_frame, str):
+            self.__instantiate_from_path(data_path_or_frame)
+        elif isinstance(data_path_or_frame, pd.DataFrame):
+            self.raw_pd_df = data_path_or_frame
+        else:
+            raise "Given data type is not supported: " + type(data_path_or_frame)
+
+        if self.no_nan_in_bikes:
+            self.__remove_nan_rows_in_bikes()
+
+    def __instantiate_from_path(self, data_path):
         if not os.path.exists(data_path):
             raise "ERROR: Path: " + data_path + " does not exist!"
         if os.path.isdir(
@@ -27,9 +40,6 @@ class Data:
             self.raw_pd_df = pd.concat(map(pd.read_csv, glob.glob(os.path.join(data_path, "*.csv"))), ignore_index=True)
         else:  # read just the one file
             self.raw_pd_df = pd.read_csv(data_path)
-
-        if no_nan_in_bikes:
-            self.__remove_nan_rows_in_bikes()
 
     def get_raw_pd_df(self):
         return self.raw_pd_df
@@ -47,7 +57,11 @@ class Data:
             self.raw_pd_df = self.raw_pd_df.dropna(subset=[Columns.bikes.value])
 
     def get_y(self) -> []:
-        return self.raw_pd_df.bikes.values
+        if Columns.bikes.value in self.raw_pd_df:
+            return self.raw_pd_df.bikes.values
+        else:
+            number_of_rows = self.raw_pd_df.shape[0]
+            return [None] * number_of_rows
 
     def get_feature_matrix_x_for(self, columns_to_include: [str], feature_data_types: {str: str}):
         sub_df = self.raw_pd_df[columns_to_include]
@@ -56,3 +70,18 @@ class Data:
         imp = SimpleImputer(strategy="most_frequent")
         non_nan_nd = imp.fit_transform(typed_df)
         return non_nan_nd
+
+    def get_data_per_station(self) -> {}:  # { station_id: data}
+        result = {}
+        stations = set(self.raw_pd_df[Columns.station.value])
+        for station in stations:
+            station_df = self.raw_pd_df.loc[self.raw_pd_df[Columns.station.value] == station]
+            result[station] = Data(self.no_nan_in_bikes, station_df)
+        return result
+
+    def get_ids(self):
+        if Columns.id.value in self.raw_pd_df:
+            return list(self.raw_pd_df[Columns.id.value])
+        else:
+            return list(range(0, self.raw_pd_df.shape[0]))
+

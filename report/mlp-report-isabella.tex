@@ -149,7 +149,15 @@
     - now I have a development and a validation dataset that's labelled
     - 300 rows don/t hve bikes from 3 hours ago, decide what to do, e.g just drop, put to average bikes at station number, put to
     previos bikes 3h ago...
-        - I've decided to set the number to the most common number for that column
+        - Set nan to the most common number for that column (experiment) - see get feature matrix in Data.py
+
+    Simple Regression - model per station
+    - same as above but train a different model for each station
+    - using the same model class (PoissonModel) but having another class that can be given whatever model and that manages
+        the data to be split per station
+    - also calculate mae for each station as well as overall
+
+
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}
@@ -187,6 +195,10 @@
 
 %    TODO paste code
 
+        Simple Regression - model per station
+        - simple_regression.py will run both the single model and the model per station training and prediction, the parameters are logged
+            accordingly
+        - log an additional table with mae per station for both one model for all station as well as for the model per station
 
         \section{Results}\label{sec:results}
         Results achieved

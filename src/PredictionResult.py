@@ -3,45 +3,46 @@ from datetime import datetime
 import os
 import csv
 import pandas as pd
+import enum
 
 from src.Data import Columns
 from src.configurations import Configuration
+from src.create_dev_and_validation_csv import CsvWriter
+
+
+class ResultsColumns(enum.Enum):
+    id = 'Id'
+    predictions = 'predictions'
+    true_values = 'true values'
+    mae = 'mae'
 
 
 class PredictionResult:
-    def __init__(self):
-        self.predictions = []
-        self.true_values = []
-
-    def add_prediction(self, prediction):
-        self.predictions.append(prediction)
+    def __init__(self, ids_or_prediction_results: []):
+        if all(isinstance(item, PredictionResult) for item in ids_or_prediction_results):
+            df = pd.concat([result.results_df for result in ids_or_prediction_results], ignore_index=True)
+            self.results_df = df.sort_values(by=[ResultsColumns.id.value], ignore_index=True)
+        else:
+            self.results_df = pd.DataFrame(ids_or_prediction_results, columns=[ResultsColumns.id.value])
 
     def add_predictions(self, predictions):
-        self.predictions = predictions
+        self.results_df[ResultsColumns.predictions.value] = predictions
 
     def add_true_values(self, true_values):
-        self.true_values = true_values
+        self.results_df[ResultsColumns.true_values.value] = true_values
 
     def mean_absolute_error(self):
-        assert len(self.predictions) == len(self.true_values)
-        return mean_absolute_error(self.true_values, self.predictions)
+        return mean_absolute_error(list(self.results_df[ResultsColumns.true_values.value]),
+                                   list(self.results_df[ResultsColumns.predictions.value]))
 
-    def write_to_csv(self, config: Configuration = Configuration()):
+    def write_to_csv(self, config: Configuration = Configuration()) -> str:
+        df = self.results_df[[ResultsColumns.id.value, ResultsColumns.predictions.value]]
+        df.rename(columns={ResultsColumns.predictions.value: Columns.bikes.value},
+                  inplace=True)  # format for submission
+
         curr_dt = datetime.now()
         filename = os.path.join(config.write_predictions_to_path,
                                 config.write_results_start_name + str(int(round(curr_dt.timestamp()))) + ".csv")
-        file = open(filename, 'x')  # x so we don't overwrite a file if it exists
-        writer = csv.writer(file)
-        writer.writerow([Columns.id.value, Columns.bikes.value])
-        for index, prediction in enumerate(self.predictions):
-            writer.writerow([index + 1, prediction])
-        file.close()
-        return filename
 
-    def predictions_as_df(self):
-        ids = list(range(1, len(self.predictions) + 1))
-        if len(self.true_values) == len(self.predictions):  # log true values too
-            return pd.DataFrame(list(zip(ids, self.predictions, self.true_values)),
-                                columns=[Columns.id.value, Columns.bikes.value, 'true_bikes_values'])
-        return pd.DataFrame(list(zip(ids, self.predictions)),
-                            columns=[Columns.id.value, Columns.bikes.value])
+        CsvWriter.write_csv(df, filename)
+        return filename

@@ -1,3 +1,4 @@
+import numpy
 from hamcrest import *
 
 from src.Data import Columns
@@ -5,6 +6,7 @@ from src.configurations import TestConfiguration
 from src.models.PoissonModel import PoissonModel
 from utils.station_data_builder import StationDataBuilder
 from utils.test_data_builder import TestDataBuilder
+from src.PredictionResult import ResultsColumns
 
 
 def test_returns_parameters_used_for_training_and_set_in_config():
@@ -67,14 +69,18 @@ def test_predicts_y_for_given_data_and_rounds_outcome():
     model.fit()
     prediction_result = model.predict(testing_data)
 
-    assert_that(len(prediction_result.predictions), equal_to(2))
-    assert_that(prediction_result.true_values[0], equal_to(station_test1.bikes))
-    assert_that(prediction_result.true_values[1], equal_to(station_test2.bikes))
-    assert_that(prediction_result.predictions[0], equal_to(3.0))
-    assert_that(prediction_result.predictions[1], equal_to(5.0))
+    result_df = prediction_result.results_df
+    true_values = list(result_df[ResultsColumns.true_values.value])
+    predictions = list(result_df[ResultsColumns.predictions.value])
+
+    assert_that(result_df.shape[0], equal_to(2))
+    assert_that(true_values[0], equal_to(station_test1.bikes))
+    assert_that(true_values[1], equal_to(station_test2.bikes))
+    assert_that(predictions[0], equal_to(3.0))
+    assert_that(predictions[1], equal_to(5.0))
 
 
-def test_only_adds_true_values_to_result_if_prediction_data_is_labelled():
+def test_adds_empty_true_values_to_result_if_theres_no_prediction():
     configuration = TestConfiguration()
 
     # training data
@@ -94,8 +100,11 @@ def test_only_adds_true_values_to_result_if_prediction_data_is_labelled():
     model.fit()
     prediction_result = model.predict(testing_data)
 
-    assert_that(len(prediction_result.predictions), equal_to(1))
-    assert_that(prediction_result.true_values, equal_to([]))
+    result_df = prediction_result.results_df
+    true_values = list(result_df[ResultsColumns.true_values.value])
+
+    assert_that(result_df.shape[0], equal_to(1))
+    assert_that(numpy.isnan(true_values[0]))
 
 
 def test_uses_provided_features_for_training():
@@ -120,7 +129,7 @@ def test_uses_provided_features_for_training():
 
     model = PoissonModel(configuration, training_data)
     model.fit()
-    features = model.features()
+    features = model.features
 
     assert_that(len(features), equal_to(2))
 
@@ -161,8 +170,12 @@ def test_can_predict_y_for_more_than_one_feature():
     prediction_result = model.predict(testing_data)
     print(prediction_result.mean_absolute_error())
 
-    assert_that(len(prediction_result.predictions), equal_to(2))
-    assert_that(prediction_result.true_values[0], equal_to(station_test1.bikes))
-    assert_that(prediction_result.true_values[1], equal_to(station_test2.bikes))
-    assert_that(prediction_result.predictions[0], equal_to(0.0))
-    assert_that(prediction_result.predictions[1], equal_to(2.0))
+    result_df = prediction_result.results_df
+    true_values = list(result_df[ResultsColumns.true_values.value])
+    predictions = list(result_df[ResultsColumns.predictions.value])
+
+    assert_that(result_df.shape[0], equal_to(2))
+    assert_that(true_values[0], equal_to(station_test1.bikes))
+    assert_that(true_values[1], equal_to(station_test2.bikes))
+    assert_that(predictions[0], equal_to(0.0))
+    assert_that(predictions[1], equal_to(2.0))
