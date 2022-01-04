@@ -85,3 +85,6 @@ class Data:
         else:
             return list(range(0, self.raw_pd_df.shape[0]))
 
+    def get_stations(self):
+        return list(self.raw_pd_df[Columns.station.value])
+

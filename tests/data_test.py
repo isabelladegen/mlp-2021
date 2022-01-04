@@ -176,4 +176,16 @@ def test_returns_ids_if_exist_in_data_column():
 
     assert_that(len(ids), equal_to(data.raw_pd_df.shape[0]))
     assert_that(ids[0], equal_to(1))
-    assert_that(ids[len(ids)-1], equal_to(len(ids)))
+    assert_that(ids[len(ids) - 1], equal_to(len(ids)))
+
+
+def test_returns_stations_for_data():
+    configuration = TestConfiguration()
+    data = Data(configuration.no_nan_in_bikes, configuration.test_data_path)
+
+    stations = data.get_stations()
+
+    assert_that(len(stations), equal_to(2250))
+    assert_that(len(set(stations)), equal_to(75))
+    assert_that(stations[0], equal_to(201))
+    assert_that(stations[len(stations) - 1], equal_to(275))

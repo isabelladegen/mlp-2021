@@ -1,7 +1,6 @@
 from sklearn.metrics import mean_absolute_error
 from datetime import datetime
 import os
-import csv
 import pandas as pd
 import enum
 
@@ -12,6 +11,7 @@ from src.create_dev_and_validation_csv import CsvWriter
 
 class ResultsColumns(enum.Enum):
     id = 'Id'
+    station = 'station'
     predictions = 'predictions'
     true_values = 'true values'
     mae = 'mae'
@@ -31,9 +31,21 @@ class PredictionResult:
     def add_true_values(self, true_values):
         self.results_df[ResultsColumns.true_values.value] = true_values
 
+    def add_stations(self, stations):
+        self.results_df[ResultsColumns.station.value] = stations
+
     def mean_absolute_error(self):
         return mean_absolute_error(list(self.results_df[ResultsColumns.true_values.value]),
                                    list(self.results_df[ResultsColumns.predictions.value]))
+
+    def mean_absolute_error_per_station(self):  # { station: mae}
+        list_of_stations = set(self.results_df[ResultsColumns.station.value])
+        result = {}
+        for station in list_of_stations:
+            df = self.results_df.loc[self.results_df[ResultsColumns.station.value] == station]
+            result[station] = mean_absolute_error(list(df[ResultsColumns.true_values.value]),
+                                                  list(df[ResultsColumns.predictions.value]))
+        return result
 
     def write_to_csv(self, config: Configuration = Configuration()) -> str:
         df = self.results_df[[ResultsColumns.id.value, ResultsColumns.predictions.value]]

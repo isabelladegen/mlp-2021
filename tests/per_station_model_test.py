@@ -83,7 +83,7 @@ def test_predicts_bikes_for_each_station_model_excluding_stations_not_in_trainin
     predictions = df[ResultsColumns.predictions.value]
     true_values = df['true values']
 
-    assert_that(df.shape, equal_to((2, 3)))
+    assert_that(df.shape, equal_to((2, 4)))
     assert_that(predictions[0], equal_to(0.0))
     assert_that(predictions[1], equal_to(10.0))
     assert_that(true_values[0], equal_to(0))

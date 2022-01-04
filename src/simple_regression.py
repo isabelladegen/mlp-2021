@@ -38,24 +38,13 @@ def run(config: Configuration = Configuration()):
     per_station_dev_result = per_station_model.predict(all_station_training_dev_data)
     per_station_val_result = per_station_model.predict(val_data)
 
-    # Evaluate
+    # Evaluate and Log
+    # overall mae
     one_model_mae_dev = one_model_dev_result.mean_absolute_error()
     one_model_mae_val = one_model_val_result.mean_absolute_error()
-    # TODO
-    # one_model_mae_per_station_dev = one_model_dev_result.mean_absolute_error_per_station(
-    #     WandbLogs.one_model_mae_per_station_dev.value)
-    # one_model_mae_per_station_val = one_model_val_result.mean_absolute_error_per_station(
-    #     WandbLogs.one_model_mae_per_station_val.value)
     per_station_mae_dev = per_station_dev_result.mean_absolute_error()
     per_station_mae_val = per_station_val_result.mean_absolute_error()
-    # TODO
-    # per_station_mae_per_station_dev = per_station_dev_result.mean_absolute_error_per_station(
-    #     WandbLogs.per_station_mae_per_station_dev.value)
-    # per_station_mae_per_station_val = per_station_val_result.mean_absolute_error_per_station(
-    #     WandbLogs.per_station_mae_per_station_val.value)
 
-    # Log mae to wandb
-    # Summary metrics
     wandb.log({
         WandbLogs.one_model_mae_dev.value: one_model_mae_dev,
         WandbLogs.one_model_mae_val.value: one_model_mae_val,
@@ -63,12 +52,16 @@ def run(config: Configuration = Configuration()):
         WandbLogs.per_station_mae_val.value: per_station_mae_val
     })
 
-    # Per station metrics
-    # TODO
-    # log_per_station_mae_to_wand(one_model_mae_per_station_dev)
-    # log_per_station_mae_to_wand(one_model_mae_per_station_val)
-    # log_per_station_mae_to_wand(per_station_mae_per_station_dev)
-    # log_per_station_mae_to_wand(per_station_mae_per_station_val)
+    # Per station mae
+    one_model_mae_per_station_dev = one_model_dev_result.mean_absolute_error_per_station()
+    one_model_mae_per_station_val = one_model_val_result.mean_absolute_error_per_station()
+    per_station_mae_per_station_dev = per_station_dev_result.mean_absolute_error_per_station()
+    per_station_mae_per_station_val = per_station_val_result.mean_absolute_error_per_station()
+
+    log_per_station_mae_to_wand(WandbLogs.one_model_mae_per_station_dev.value, one_model_mae_per_station_dev)
+    log_per_station_mae_to_wand(WandbLogs.one_model_mae_per_station_val.value, one_model_mae_per_station_val)
+    log_per_station_mae_to_wand(WandbLogs.per_station_mae_per_station_dev.value, per_station_mae_per_station_dev)
+    log_per_station_mae_to_wand(WandbLogs.per_station_mae_per_station_val.value, per_station_mae_per_station_val)
 
     # Log predictions to wandb
     one_model_prediction_table_dev = wandb.Table(dataframe=one_model_dev_result.results_df)
@@ -85,10 +78,10 @@ def run(config: Configuration = Configuration()):
     return {RunResults.predictions: one_model_val_result, RunResults.wandb: wandb}
 
 
-# takes a list of dictionary { 'key': value, 'station': id }
-def log_per_station_mae_to_wand(per_station_values):
-    for station_mae in per_station_values:
-        wandb.log(station_mae)
+# takes a  dictionary { station : mae }
+def log_per_station_mae_to_wand(key: str, per_station_values: {}):  # {station:mae}
+    for station, station_mae in per_station_values.items():
+        wandb.log({key: station_mae, 'station': station})
 
 
 def main():

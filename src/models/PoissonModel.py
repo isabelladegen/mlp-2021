@@ -47,6 +47,7 @@ class PoissonModel:
         result = PredictionResult(data.get_ids())
         result.add_predictions(rounded_predictions)
         result.add_true_values(y)
+        result.add_stations(data.get_stations())
         return result
 
 

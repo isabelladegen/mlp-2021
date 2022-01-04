@@ -86,6 +86,22 @@ def test_can_create_prediction_results_from_multiple_prediction_results():
     assert_that(list(df[ResultsColumns.predictions.value]), equal_to([1, 30, 2, 3, 31, 32, 10, 11, 12]))
 
 
+def test_can_calculate_mean_absolute_error_per_station():
+    predictions = [33, 4, 10]
+    true_values = [33, 4, 20]
+    stations = [1, 1, 2]
+
+    result = PredictionResult(range(0, len(predictions)))
+    result.add_predictions(predictions)
+    result.add_true_values(true_values)
+    result.add_stations(stations)
+
+    mae_per_station = result.mean_absolute_error_per_station()
+
+    assert_that(mae_per_station[1], equal_to(0.0))
+    assert_that(mae_per_station[2], equal_to(10.0))
+
+
 def cleanup_files():
     config = TestConfiguration()
     for filename in glob.glob(os.path.join(config.write_predictions_to_path + config.write_results_start_name + "*")):
