@@ -229,13 +229,28 @@
 
         Simple Regression - one model for all stations
         - dev dataset is now of size 50220 and validation data set is 5580
-        - MAE for my validation test set is 3.812
-        - Mean average error for dev set I trained with is 3.767
         - Significantly better than random guessing
 
-        Simpler Regresson - model per station
+        Simple Regression - model per station
         - same data set as above
-        - MAE for
+
+            Features = Bikes_3h_ago
+            One model - training data mae = 3.767
+            One model - validation data mae = 3.812
+            per station - training data mae = 3.236
+            per station - validation data mae = 3.327
+
+            Features = Bikes_3h_ago & num Docks
+            One model - training data mae = 3.661
+            One model - validation data mae = 3.706
+            per station - training data mae = 3.236
+            per station - validation data mae = 3.327
+
+        -> Model per station performs slightly better with minimal additional time for the single model
+        -> no difference in features used for model per station
+
+        -> overall the model per station performed better
+
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.

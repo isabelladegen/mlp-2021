@@ -49,12 +49,13 @@ class PredictionResult:
 
     def write_to_csv(self, additional_prefix: str = '', config: Configuration = Configuration()) -> str:
         df = self.results_df[[ResultsColumns.id.value, ResultsColumns.predictions.value]]
-        df.rename(columns={ResultsColumns.predictions.value: Columns.bikes.value},
-                  inplace=True)  # format for submission
+        submission_df = df.rename(
+            columns={ResultsColumns.predictions.value: Columns.bikes.value})  # format for submission
 
         curr_dt = datetime.now()
         filename = os.path.join(config.write_predictions_to_path,
-                                additional_prefix + config.write_results_start_name + str(int(round(curr_dt.timestamp()))) + ".csv")
+                                additional_prefix + config.write_results_start_name + str(
+                                    int(round(curr_dt.timestamp()))) + ".csv")
 
-        CsvWriter.write_csv(df, filename)
+        CsvWriter.write_csv(submission_df, filename)
         return filename

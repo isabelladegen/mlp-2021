@@ -37,7 +37,7 @@ def test_creates_a_csv_file_for_the_random_predictions():
     result = PredictionResult(ids)
     result.add_predictions(predictions)
 
-    filename = result.write_to_csv(TestConfiguration())
+    filename = result.write_to_csv('', TestConfiguration())
 
     df = pd.read_csv(filename)
     assert_that(df.shape, equal_to((len(predictions), 2)))
