@@ -91,7 +91,7 @@ class Configuration:
     random_forest_min_impurity_decrease: float = 0.0
     random_forest_bootstrap: bool = True
     random_forest_oob_score: bool = False
-    random_forest_n_jobs: int = None
+    random_forest_n_jobs: int = 5
     random_forest_random_state: int = None
     random_forest_verbose: int = 0
     random_forest_warm_start: bool = False
