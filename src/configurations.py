@@ -104,9 +104,9 @@ class Configuration:
                                  # Columns.full_profile_bikes.value,
                                  # Columns.full_profile_3h_diff_bikes.value
                                  ])
-    random_forest_n_estimators: int = 50
+    random_forest_n_estimators: int = 100
     random_forest_criterion: str = "squared_error"
-    random_forest_max_depth: int = 50
+    random_forest_max_depth: int = None
     random_forest_min_samples_split: int = 2
     random_forest_min_samples_leaf: int = 1
     random_forest_min_weight_fraction_leaf: float = 0.0
