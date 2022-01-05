@@ -180,6 +180,7 @@
     Start adding feature by feature, decide how to fill nan, run, quick evaluate and add more if not deterimental
         1. Add station ID (instead of long and lat) - this is expected to help the one model
         2. Add hour of week (this should be weekday and time of day encoded)
+        3. Add weather data precipitation.l.m2
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -236,6 +237,7 @@
             (run wobbly hill)
 
         For hour of week: all station have the week hour no nan, can be directly added like location again categorical data
+            run name:  easy-capybara
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -325,6 +327,7 @@
 
             \subsubsection*{\nameref{itm:phase1-step4}
         Poisson & Random Forest Use More features
+        1. Station (as location data)
         wobbly-hill-run -> include station
         Model per station - Training data: MAE 2.90737
         Model per station - Validation data: MAE 3.14606
@@ -333,6 +336,16 @@
             -> this had the wished effect that the difference between using a model per station and using just one model
             becomes way smaller
             -> However it does not necessarily hold true for the validation dataset
+
+        2. Add Weekhour (as demand data based on weekday and time of day)
+           Model per station - Training data: MAE 1.05213
+           Model per station - Validation data: MAE 2.26165
+           One model - Training data: MAE 1.18072
+           One model - Validation data: MAE 2.52993
+
+           -> this had a profound impact removing the significance of the peaks for the bad stations
+           -> However it also increased the gap between training data and validation. The start of overfitting
+           -> On 50\% of the test data this avhieve 2.92266
 
 
         \section{Conclusions}\label{sec:conclusions}

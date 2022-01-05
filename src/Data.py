@@ -13,6 +13,7 @@ class Columns(enum.Enum):
     bikes = 'bikes'
     data_3h_ago = 'bikes_3h_ago'
     weekhour = 'weekhour'
+    precipitation = 'precipitation.l.m2'
 
 
 class Data:
