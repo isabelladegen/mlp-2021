@@ -181,6 +181,10 @@
         1. Add station ID (instead of long and lat) - this is expected to help the one model
         2. Add hour of week (this should be weekday and time of day encoded)
         3. Add weather data - notbook analysis before including in test run
+        4. Add is holdiay (keep)
+        5. Add just airpressure back
+        6. Add temerature instead of airpressure (worse)
+        7. Bike profile features (first full) - I still don't know what it means
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -382,6 +386,14 @@
                 Model per station - Validation data: MAE 2.27939
                 One model - Training data: MAE 1.04464
                 One model - Validation data: MAE 2.67455
+
+
+        6. Replace air pressure with temperature
+                Model per station - Training data: MAE 0.91617
+                Model per station - Validation data: MAE 2.40878
+                One model - Training data: MAE 1.09112
+                One model - Validation data: MAE 2.73405
+                -> as predicted this overfitts worse, temperature is not a good parameter
 
 
 

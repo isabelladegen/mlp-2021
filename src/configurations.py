@@ -76,7 +76,9 @@ class Configuration:
                                  Columns.wind_direction.value: 'float64',
                                  Columns.rel_humidity.value: 'float64',
                                  Columns.air_pressure.value: 'float64',
-                                 Columns.temperature.value: 'float64'
+                                 Columns.temperature.value: 'float64',
+                                 Columns.full_profile_bikes.value: 'float64',
+                                 Columns.full_profile_3h_diff_bikes.value: 'float64'
                                  })
     # Poisson Regressor
     poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])
@@ -94,7 +96,8 @@ class Configuration:
                                  Columns.num_docks.value,
                                  Columns.week_hour.value,
                                  Columns.is_holiday.value,
-                                 Columns.temperature.value
+                                 Columns.full_profile_bikes.value,
+                                 Columns.full_profile_3h_diff_bikes.value
                                  ])
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"

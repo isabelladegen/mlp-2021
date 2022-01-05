@@ -19,6 +19,8 @@ class Columns(enum.Enum):
     wind_direction = 'windDirection.grades'
     rel_humidity = 'relHumidity.HR'
     air_pressure = 'airPressure.mb'
+    full_profile_3h_diff_bikes = 'full_profile_3h_diff_bikes'
+    full_profile_bikes = 'full_profile_bikes'
 
 
 class Data:
