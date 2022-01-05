@@ -1,4 +1,3 @@
-import datasets
 from hamcrest import *
 import numpy as np
 from src.configurations import TestConfiguration
@@ -109,7 +108,7 @@ def test_creates_x_feature_matrix_for_given_columns():
     assert_that(feature_matrix_x.shape, equal_to((data.raw_pd_df.shape[0], len(features))))
 
 
-def test_preprocess_feature_matrix_by_fill_missing_values_with_most_frequent_ones():
+def test_preprocess_feature_matrix_by_fill_missing_categorical_values_with_most_frequent_ones():
     configuration = TestConfiguration()
     configuration.poisson_features = [Columns.data_3h_ago.value, Columns.num_docks.value]
 
@@ -117,6 +116,20 @@ def test_preprocess_feature_matrix_by_fill_missing_values_with_most_frequent_one
     feature_matrix_x = data.get_feature_matrix_x_for(configuration.poisson_features, configuration.features_data_type)
 
     assert_that(np.count_nonzero(np.isnan(feature_matrix_x)), equal_to(0))
+
+
+def test_preprocesses_feature_matrix_by_filling_missing_float_values_with_most_frequent():
+    configuration = TestConfiguration()
+    features = [Columns.wind_mean_speed.value, Columns.wind_direction.value, Columns.rel_humidity.value,
+                Columns.air_pressure.value]
+    filename = configuration.training_data_path  # test data has no nan!
+
+    data = Data(configuration.no_nan_in_bikes, filename)
+    feature_matrix_x = data.get_feature_matrix_x_for(features, configuration.features_data_type)
+
+    assert_that(np.count_nonzero(np.isnan(data.raw_pd_df[features].to_numpy())),
+                equal_to(300))  # count before nan filling
+    assert_that(np.count_nonzero(np.isnan(feature_matrix_x)), equal_to(0))  # count after nan filling
 
 
 def test_can_create_data_from_data_frame_removing_nan_if_configured():

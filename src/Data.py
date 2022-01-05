@@ -12,8 +12,11 @@ class Columns(enum.Enum):
     num_docks = 'numDocks'
     bikes = 'bikes'
     data_3h_ago = 'bikes_3h_ago'
-    weekhour = 'weekhour'
-    precipitation = 'precipitation.l.m2'
+    week_hour = 'weekhour'
+    wind_mean_speed = 'windMeanSpeed.m.s'
+    wind_direction = 'windDirection.grades'
+    rel_humidity = 'relHumidity.HR'
+    air_pressure = 'airPressure.mb'
 
 
 class Data:
@@ -89,4 +92,3 @@ class Data:
 
     def get_stations(self):
         return list(self.raw_pd_df[Columns.station.value])
-

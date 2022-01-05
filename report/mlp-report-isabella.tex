@@ -180,7 +180,7 @@
     Start adding feature by feature, decide how to fill nan, run, quick evaluate and add more if not deterimental
         1. Add station ID (instead of long and lat) - this is expected to help the one model
         2. Add hour of week (this should be weekday and time of day encoded)
-        3. Add weather data precipitation.l.m2
+        3. Add weather data - notbook analysis before including in test run
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -238,6 +238,17 @@
 
         For hour of week: all station have the week hour no nan, can be directly added like location again categorical data
             run name:  easy-capybara
+
+        Weather Data:
+            - Analysis in notebook of the different weather columns: 'windMaxSpeed.m.s', 'windMeanSpeed.m.s', 'windDirection.grades',
+              'temperature.C', 'relHumidity.HR', 'airPressure.mb','precipitation.l.m2'
+            - they all have 75 data points missing but not all of them the same, so decided to fill nan with most frequent value
+            - precipitation has no training data so cannot be used
+            - temperature does not overlap between test and training - leave out for now
+            - using only one of the wind speed (going for mean)
+            - using 'windMeanSpeed.m.s', 'windDirection.grades', 'relHumidity.HR', 'airPressure.mb' -> they all have overlapping values
+            in test and training data set
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -347,6 +358,9 @@
            -> However it also increased the gap between training data and validation. The start of overfitting
            -> On 50\% of the test data this avhieve 2.92266
 
+        3. Add weather data:
+                - Percipitation cannot be added as it is 0.0 for all the provided data so nothing can be learned form it
+                alhtough it probably would be impactful
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.

@@ -70,8 +70,11 @@ class Configuration:
         default_factory=lambda: {Columns.station.value: 'category',
                                  Columns.data_3h_ago.value: 'category',
                                  Columns.num_docks.value: 'category',
-                                 Columns.weekhour.value: 'category',
-                                 Columns.precipitation.value: 'float64'
+                                 Columns.week_hour.value: 'category',
+                                 Columns.wind_mean_speed.value: 'float64',
+                                 Columns.wind_direction.value: 'float64',
+                                 Columns.rel_humidity.value: 'float64',
+                                 Columns.air_pressure.value: 'float64',
                                  })
     # Poisson Regressor
     poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])
@@ -87,8 +90,11 @@ class Configuration:
         default_factory=lambda: [Columns.station.value,
                                  Columns.data_3h_ago.value,
                                  Columns.num_docks.value,
-                                 Columns.weekhour.value,
-                                 Columns.precipitation.value
+                                 Columns.week_hour.value,
+                                 Columns.wind_mean_speed.value,
+                                 Columns.wind_direction.value,
+                                 Columns.rel_humidity.value,
+                                 Columns.air_pressure.value
                                  ])
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"
