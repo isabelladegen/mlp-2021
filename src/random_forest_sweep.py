@@ -71,22 +71,19 @@ def log_per_station_mae_to_wand(key: str, per_station_values: {}):  # {station:m
 if __name__ == '__main__':
     parameters_to_try = {
         'random_forest_n_estimators': {
-            'values': [50, 100, 120]
+            'values': [50, 100, 120] # made no difference
         },
         'random_forest_criterion': {
-            'values': ['squared_error', 'poisson']
+            'values': ['squared_error', 'absolute_error']  # squared_error better than poisson, try absolute error
         },
         'random_forest_max_depth': {
-            'values': [None, 10, 50]
+            'values': [None, 10, 50]  # 50 better than 100!
         },
         'random_forest_min_samples_split': {
-            'values': [1, 3]
-        },
-        'random_forest_bootstrap': {
-            'values': [False]
+            'values': [2, 4] # made no difference
         },
         'random_forest_ccp_alpha': {
-            'values': [0.0, 0.05, 0.1, 0.3]
+            'values': [0.0, 0.05, 0.1, 0.3]  # unclear but 0.05 did well
         },
     }
 

@@ -104,22 +104,22 @@ class Configuration:
                                  Columns.full_profile_bikes.value,
                                  Columns.full_profile_3h_diff_bikes.value
                                  ])
-    random_forest_n_estimators: int = 100
-    random_forest_criterion: str = "absolute_error"
-    random_forest_max_depth: int = None
+    random_forest_n_estimators: int = 50
+    random_forest_criterion: str = "squared_error"
+    random_forest_max_depth: int = 50
     random_forest_min_samples_split: int = 2
     random_forest_min_samples_leaf: int = 1
     random_forest_min_weight_fraction_leaf: float = 0.0
     random_forest_max_features: str = "auto"
     random_forest_max_leaf_nodes: int = None
     random_forest_min_impurity_decrease: float = 0.0
-    random_forest_bootstrap: bool = True
+    random_forest_bootstrap: bool = False
     random_forest_oob_score: bool = False
     random_forest_n_jobs: int = 5
     random_forest_random_state: int = None
     random_forest_verbose: int = 0
     random_forest_warm_start: bool = False
-    random_forest_ccp_alpha: float = 0.0  # 0 no pruning
+    random_forest_ccp_alpha: float = 0.05  # 0 no # 0 no pruning
     random_forest_max_samples: int = None
 
     def as_dict(self):
