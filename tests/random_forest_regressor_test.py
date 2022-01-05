@@ -95,5 +95,5 @@ def test_fits_the_model_and_predicts_bikes():
     assert_that(result_df.shape[0], equal_to(2))
     assert_that(true_values[0], equal_to(station_test1.bikes))
     assert_that(true_values[1], equal_to(station_test2.bikes))
-    assert_that(predictions[0], greater_than(0))
-    assert_that(predictions[1], greater_than(0))
+    assert_that(predictions[0], not_none())
+    assert_that(predictions[1], not_none())

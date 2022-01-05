@@ -101,8 +101,8 @@ class Configuration:
                                  Columns.num_docks.value,
                                  Columns.week_hour.value,
                                  Columns.is_holiday.value,
-                                 Columns.full_profile_bikes.value,
-                                 Columns.full_profile_3h_diff_bikes.value
+                                 # Columns.full_profile_bikes.value,
+                                 # Columns.full_profile_3h_diff_bikes.value
                                  ])
     random_forest_n_estimators: int = 50
     random_forest_criterion: str = "squared_error"
