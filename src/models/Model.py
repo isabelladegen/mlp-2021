@@ -7,11 +7,10 @@ from src.configurations import Configuration
 
 class Model:
     def __init__(self, config: Configuration, training_data: Data, features, model):
-        self.configuration = config
         self.raw_training_data = training_data
         self.features = features
-        self.X = self.raw_training_data.get_feature_matrix_x_for(self.features,
-                                                                 config.features_data_type)
+        self.data_type = config.features_data_type
+        self.X = self.raw_training_data.get_feature_matrix_x_for(self.features, self.data_type)
         self.y = self.raw_training_data.get_y()  # labelled output
         self.model = model
 
@@ -20,8 +19,7 @@ class Model:
         return self.model.get_params()
 
     def predict(self, data: Data) -> PredictionResult:
-        feature_matrix_x = data.get_feature_matrix_x_for(self.configuration.poisson_features,
-                                                         self.configuration.features_data_type)
+        feature_matrix_x = data.get_feature_matrix_x_for(self.features, self.data_type)
         predictions = self.model.predict(feature_matrix_x)
 
         rounded_predictions = []

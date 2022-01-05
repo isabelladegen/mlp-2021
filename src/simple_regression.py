@@ -2,9 +2,9 @@ import wandb
 
 from src.configurations import Configuration, WandbLogs, RunResults
 from src.Data import Data
-from src.models.Model import Model
 from src.models.PerStationModel import PerStationModel
 from src.models.PoissonModel import PoissonModel
+from src.models.RandomForestRegressorModel import RandomForestRegressorModel
 
 
 def run(model_class, config: Configuration = Configuration()):
@@ -12,7 +12,7 @@ def run(model_class, config: Configuration = Configuration()):
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
                            notes="testing",
-                           tags=[str(model_class), "bikes 3h ago", "one model", 'model per station'],
+                           tags=[str(model_class).split('.')[-1], "bikes 3h ago", "one model", 'model per station'],
                            config=config.as_dict())
     # Reload the Configuration (to allow for sweeps)
     configuration = Configuration(**wandb.config)
@@ -95,7 +95,7 @@ def log_per_station_mae_to_wand(key: str, per_station_values: {}):  # {station:m
 
 
 def main():
-    run(PoissonModel, Configuration())
+    run(RandomForestRegressorModel, Configuration())
 
 
 if __name__ == "__main__":

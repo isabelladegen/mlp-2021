@@ -179,3 +179,52 @@ def test_can_predict_y_for_more_than_one_feature():
     assert_that(true_values[1], equal_to(station_test2.bikes))
     assert_that(predictions[0], equal_to(0.0))
     assert_that(predictions[1], equal_to(2.0))
+
+
+def test_uses_same_data_preprocessing_for_training_and_prediction():
+    configuration = TestConfiguration()
+    configuration.poisson_features = [Columns.data_3h_ago.value]
+
+    # training data
+    station1 = StationDataBuilder()
+    station1.bikes_3h_ago = 10
+    station1.numDocks = 20
+    station1.bikes = 0
+    station2 = StationDataBuilder()
+    station2.numDocks = 10
+    station2.bikes_3h_ago = 5
+    station2.bikes = 10
+    station3 = StationDataBuilder()
+    station3.bikes_3h_ago = 0
+    station3.numDocks = 15
+    station3.bikes = 5
+
+    # testing data
+    station_test1 = StationDataBuilder()
+    station_test1.bikes_3h_ago = 10
+    station_test1.numDocks = 20
+    station_test1.bikes = 0
+    station_test2 = StationDataBuilder()
+    station_test2.bikes_3h_ago = 5
+    station_test2.numDocks = 15
+    station_test2.bikes = 5
+
+    training_data = TestDataBuilder(no_nan_in_bikes=True).with_stations([station1, station2, station3]).build()
+    testing_data = TestDataBuilder(no_nan_in_bikes=False).with_stations([station_test1, station_test2]).build()
+
+    model = PoissonModel(configuration, training_data)
+    model.fit()
+    # KEEP! modifying config in runtime should not change data preprocessing
+    configuration.poisson_features = [Columns.data_3h_ago.value, Columns.num_docks.value]
+    # this will throw an error if Model is not implemented properly
+    prediction_result = model.predict(testing_data)
+
+    result_df = prediction_result.results_df
+    true_values = list(result_df[ResultsColumns.true_values.value])
+    predictions = list(result_df[ResultsColumns.predictions.value])
+
+    assert_that(result_df.shape[0], equal_to(2))
+    assert_that(true_values[0], equal_to(station_test1.bikes))
+    assert_that(true_values[1], equal_to(station_test2.bikes))
+    assert_that(predictions[0], equal_to(3.0))
+    assert_that(predictions[1], equal_to(5.0))

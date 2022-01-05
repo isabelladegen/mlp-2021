@@ -69,6 +69,7 @@ class Configuration:
     features_data_type: {} = field(
         default_factory=lambda: {Columns.data_3h_ago.value: 'category', Columns.num_docks.value: 'category'})
     # poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value, Columns.num_docks.value])
+    # Poisson Regressor
     poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])
     poisson_alpha: float = 1.0
     poisson_fit_intercept: bool = True
@@ -77,7 +78,25 @@ class Configuration:
     poisson_verbose: int = 0
     poisson_warm_start: bool = False
 
-    random_forest_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])
+    # Random Forest Regressor
+    random_forest_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value, Columns.num_docks.value])
+    random_forest_n_estimators: int = 100
+    random_forest_criterion: str = "absolute_error"
+    random_forest_max_depth: int = None
+    random_forest_min_samples_split: int = 2
+    random_forest_min_samples_leaf: int = 1
+    random_forest_min_weight_fraction_leaf: float = 0.0
+    random_forest_max_features: str = "auto"
+    random_forest_max_leaf_nodes: int = None
+    random_forest_min_impurity_decrease: float = 0.0
+    random_forest_bootstrap: bool = True
+    random_forest_oob_score: bool = False
+    random_forest_n_jobs: int = None
+    random_forest_random_state: int = None
+    random_forest_verbose: int = 0
+    random_forest_warm_start: bool = False
+    random_forest_ccp_alpha: float = 0.0  # 0 no pruning
+    random_forest_max_samples: int = None
 
     def as_dict(self):
         return asdict(self)

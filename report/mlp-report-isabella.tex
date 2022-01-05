@@ -177,7 +177,7 @@
     Random Guessing
     - Similar data loading technique from step 1 but in pure Python
     - Test drive the classes with dummy data to be able to quickly develop the code
-    - Coniguration class for real runs and one for testing  (include link to class or appendix)
+    - Configuration class for real runs and one for testing  (include link to class or appendix)
         - testing one is not writing to wandb
         - Keeping the dataframes in memory for speed and because they are small enough
         -  reads all csv into one big dataframe and ensures that the index is unique (not like it would be by default) - see Data class
@@ -199,6 +199,9 @@
         - adjusted PredictionResults.py to be able to be constructed from multiple (per station results)
         - log an additional table with mae per station for both one model for all station as well as for the model per station
         - tried both one and two features: bikes_3h_ago, numDocks as well as just bikes_3h_ago
+
+        Random Forest Regressor
+        - Reuse all the previous code but implement new parameters
 
         \section{Results}\label{sec:results}
         Results achieved
@@ -251,6 +254,38 @@
 
         -> overall the model per station performed better
 
+        Random Forest Regressor:
+        First run: one feature 3h_bikes - 4th peach-bird
+        Model per station - Training data: MAE 2.90715
+        Model per station - Validation data: MAE 3.14552
+        One model - Training data: MAE 3.19787
+        One model - Validation data: MAE 3.28136
+
+        Second run: 2 features num of Docks and 3h_bikes - 4th autumn-rain
+        Model per station - Training data: MAE 2.90709
+        Model per station - Validation data: MAE 3.14749
+        One model - Training data: MAE 3.12366
+        One model - Validation data: MAE 3.26918
+
+        One Model:
+        Station differences:
+        -> Random Forest does better for all stations, so far all algorithms struggle with a few stations:
+        - station 233 - MAE 11.6 for PoissonRegressor (2 features - classic pyramid - training), ~8 for Random Forest * both (particularly in training ata)
+        - station 249 - MAE 11.25 Poisson (classic pyramid - validation), 8.1 Random Forest (Peach bird - validation),
+                        6.3 (Peach  bird - training)
+        - station 208 - MAE 7.7 Poissn classic pyramid validation, 6.71 Random Forest Peach bird - validation
+        - station 230 - MAE 7.6 Poisson classic pyramid validation, 7.1 Random Forest (peach bird - validation)
+
+        -> A few stations do better than average
+        - station 209-211, 213, 227, 252, 256-259, 262, 265-270, 272-275 all have MAE around 2 for Random Forest
+
+        Differences in Training and Validation:
+        - Most stations do worse in validation as expected given the alorithm is trained on the training data, however for station
+          233 this is not the case it does worse in training (11.6training, 10.4 validation poisson-classic pyramid),
+            (8.1 training, 7.6 validation peach bird -  random forest)
+
+        For multiple models these trends are the same (the numbers are slightly different)
+        - Multiple models perform slightly better (see weave)
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.
