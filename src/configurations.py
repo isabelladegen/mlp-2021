@@ -67,8 +67,9 @@ class Configuration:
 
     # Models
     features_data_type: {} = field(
-        default_factory=lambda: {Columns.data_3h_ago.value: 'category', Columns.num_docks.value: 'category'})
-    # poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value, Columns.num_docks.value])
+        default_factory=lambda: {Columns.station.value: 'category',
+                                 Columns.data_3h_ago.value: 'category',
+                                 Columns.num_docks.value: 'category'})
     # Poisson Regressor
     poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])
     poisson_alpha: float = 1.0
@@ -80,7 +81,9 @@ class Configuration:
 
     # Random Forest Regressor
     random_forest_features: [str] = field(
-        default_factory=lambda: [Columns.station, Columns.data_3h_ago.value, Columns.num_docks.value])
+        default_factory=lambda: [Columns.station.value,
+                                 Columns.data_3h_ago.value,
+                                 Columns.num_docks.value])
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"
     random_forest_max_depth: int = None
