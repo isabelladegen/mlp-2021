@@ -92,7 +92,8 @@ class Configuration:
                                  Columns.data_3h_ago.value,
                                  Columns.num_docks.value,
                                  Columns.week_hour.value,
-                                 Columns.is_holiday.value
+                                 Columns.is_holiday.value,
+                                 Columns.air_pressure.value
                                  ])
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"

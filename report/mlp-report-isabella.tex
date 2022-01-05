@@ -250,6 +250,8 @@
             in test and training data set
             -> Run name is vital-hill-32
 
+        Is Holiday (without weather): Run astral-feather
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -330,7 +332,7 @@
         - station 209-211, 213, 227, 252, 256-259, 262, 265-270, 272-275 all have MAE around 2 for Random Forest
 
         Differences in Training and Validation:
-        - Most stations do worse in validation as expected given the alorithm is trained on the training data, however for station
+        - Most stations do worse in validation as expected given the algorithm is trained on the training data, however for station
           233 this is not the case it does worse in training (11.6training, 10.4 validation poisson-classic pyramid),
             (8.1 training, 7.6 validation peach bird -  random forest)
 
@@ -359,14 +361,22 @@
            -> However it also increased the gap between training data and validation. The start of overfitting
            -> On 50\% of the test data this avhieve 2.92266
 
-        3. Add weather data:
-                - Percipitation cannot be added as it is 0.0 for all the provided data so nothing can be learned form it
+        3. Add weather data:vital-hill
+                - Precipitation cannot be added as it is 0.0 for all the provided data so nothing can be learned form it
                 alhtough it probably would be impactful
                 Run Vital Hill -> it's overfitting and performs worse than the model without weather!
                 Model per station - Training data: MAE 0.91045
                 Model per station - Validation data: MAE 2.51165
                 One model - Training data: MAE 1.10876
-                One model - Validation data: MAE 2.87527
+                One model - Validation data: MAE 2.8752
+
+        4. Add is holdiay: astra feather
+                Model per station - Training data: MAE 1.00044
+                Model per station - Validation data: MAE 2.21935
+                One model - Training data: MAE 1.13664
+                One model - Validation data: MAE 2.48154
+                -> better than weather data
+
 
 
         \section{Conclusions}\label{sec:conclusions}
