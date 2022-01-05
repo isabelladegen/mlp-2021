@@ -17,3 +17,4 @@ dependencies:
   - wandb # experiment mgr
   - pytest
   - pyhamcrest
+  - plotly

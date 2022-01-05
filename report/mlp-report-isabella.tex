@@ -66,8 +66,9 @@
         \item [\namedlabel{itm:phase1-step1}{Step 1}] Analyse and investigate station's test data and Decide on what problem it is. Classification (binary, multi label), Regression, ...
         \item [\namedlabel{itm:phase1-step2}{Step 2}] Experiment with a few models using approach a (training model per station)
         \item [\namedlabel{itm:phase1-step3}{Step 3}] Experiment with a few models using approach b (training one model for all station)
-        \item [\namedlabel{itm:phase1-step4}{Step 4}] Tune the more promising potential solutions
-        \item [\namedlabel{itm:phase1-step5}{Step 5}] Submit results
+        \item [\namedlabel{itm:phase1-step4}{Step 4}] Do more feature investigation and engineering
+        \item [\namedlabel{itm:phase1-step5}{Step 5}] Tune the more promising potential solutions
+        \item [\namedlabel{itm:phase1-step6}{Step 6}] Submit results
     \end{description}
 
     \subsection*{\label{phs:two}{Phase 2}}
@@ -157,6 +158,14 @@
         the data to be split per station
     - also calculate mae for each station as well as overall both for both approaches
 
+    Simple Regression - Random Forest
+    - introduce Random Forest model with default configuration
+    - pulled the similar code between PoisssonModel and RandomForestRegressorModel into Model class
+    - instead of instatiating the model in the run function, pass the class name and and instantiate from that (no more code had to be written)
+    - write tests and create smaller test set to be able to test a run (RandomForest takes significantly longer to train)
+    - working with the same data and no addtional features choosen yet
+
+
 
     \section{Experiment Setup}\label{sec:experiment-setup}
     Overall: I'm using IDEs for coding and running: JetBrains DataSpell for Notebooks and PyCharm for pure Python. Both IDEs offer
@@ -187,7 +196,7 @@
         - have a script to do this split and it's tested two, I don't rerun it unless I want a new set
         - reuse data reading from Random Guessing
         - unlabelled rows are removed
-        - ending up with 50220 samples for taining and 5580 samples for validation for development
+        - ending up with 50220 samples for training and 5580 samples for validation for development
         - for nan values in bikes_3h_ago the df column type was changed to be categorical and  used a Simple imputer
         with the most frequent value for that column to replace none zeros
 
@@ -202,6 +211,24 @@
 
         Random Forest Regressor
         - Reuse all the previous code but implement new parameters
+        - Run with bikes_3h_ago as well as that plus number of docks
+        - default all parameters
+
+        \subsubsection*{\nameref{itm:phase1-step4}
+        Poisson & Random Forest Use More features
+        Features avavailable are:
+        - things specific about the station, e.g num dockss, where it is (longitude, latiduate) -> these are expected to be more important
+        for an overal model, less for a per station model as they stay the same
+        - things specific about bike demand in general, e.g weather, what day it is, what time it is -> they might change the demand
+        for some stations more than for others
+
+        -> Use location, num docks for the one model but not per station
+        -> Use weather features and time  -> hour of the week
+
+        For each feature added decide what to do with Nan and make sure the feature gets preprocessed
+        Initially add all new features accross the board before making more decisions
+
+        For location: just add the station id, given that lat and long mean nothing, there's no nan can be directly added
 
         \section{Results}\label{sec:results}
         Results achieved

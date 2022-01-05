@@ -79,7 +79,8 @@ class Configuration:
     poisson_warm_start: bool = False
 
     # Random Forest Regressor
-    random_forest_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value, Columns.num_docks.value])
+    random_forest_features: [str] = field(
+        default_factory=lambda: [Columns.station, Columns.data_3h_ago.value, Columns.num_docks.value])
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"
     random_forest_max_depth: int = None
