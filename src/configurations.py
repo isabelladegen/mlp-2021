@@ -71,6 +71,7 @@ class Configuration:
                                  Columns.data_3h_ago.value: 'category',
                                  Columns.num_docks.value: 'category',
                                  Columns.week_hour.value: 'category',
+                                 Columns.is_holiday.value: 'category',
                                  Columns.wind_mean_speed.value: 'float64',
                                  Columns.wind_direction.value: 'float64',
                                  Columns.rel_humidity.value: 'float64',
@@ -91,10 +92,7 @@ class Configuration:
                                  Columns.data_3h_ago.value,
                                  Columns.num_docks.value,
                                  Columns.week_hour.value,
-                                 Columns.wind_mean_speed.value,
-                                 Columns.wind_direction.value,
-                                 Columns.rel_humidity.value,
-                                 Columns.air_pressure.value
+                                 Columns.is_holiday.value
                                  ])
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"

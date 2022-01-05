@@ -248,6 +248,7 @@
             - using only one of the wind speed (going for mean)
             - using 'windMeanSpeed.m.s', 'windDirection.grades', 'relHumidity.HR', 'airPressure.mb' -> they all have overlapping values
             in test and training data set
+            -> Run name is vital-hill-32
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -361,6 +362,12 @@
         3. Add weather data:
                 - Percipitation cannot be added as it is 0.0 for all the provided data so nothing can be learned form it
                 alhtough it probably would be impactful
+                Run Vital Hill -> it's overfitting and performs worse than the model without weather!
+                Model per station - Training data: MAE 0.91045
+                Model per station - Validation data: MAE 2.51165
+                One model - Training data: MAE 1.10876
+                One model - Validation data: MAE 2.87527
+
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.

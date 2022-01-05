@@ -13,6 +13,7 @@ class Columns(enum.Enum):
     bikes = 'bikes'
     data_3h_ago = 'bikes_3h_ago'
     week_hour = 'weekhour'
+    is_holiday = 'isHoliday'
     wind_mean_speed = 'windMeanSpeed.m.s'
     wind_direction = 'windDirection.grades'
     rel_humidity = 'relHumidity.HR'
