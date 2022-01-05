@@ -12,6 +12,7 @@ class Columns(enum.Enum):
     num_docks = 'numDocks'
     bikes = 'bikes'
     data_3h_ago = 'bikes_3h_ago'
+    weekhour = 'weekhour'
 
 
 class Data:

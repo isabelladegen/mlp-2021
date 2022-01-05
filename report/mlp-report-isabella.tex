@@ -165,7 +165,23 @@
     - write tests and create smaller test set to be able to test a run (RandomForest takes significantly longer to train)
     - working with the same data and no addtional features choosen yet
 
+    \subsubsection*{\nameref{itm:phase1-step4}
+    Poisson & Random Forest Use More features
+    Features avavailable are:
+    - things specific about the station, e.g num dockss, where it is (longitude, latiduate) -> these are expected to be more important
+    for an overal model, less for a per station model as they stay the same
+    - things specific about bike demand in general, e.g weather, what day it is, what time it is -> they might change the demand
+    for some stations more than for others
+    -> Use location, num docks for the one model but not per station
+    -> Use weather features and time  -> hour of the week
+    For each feature added decide what to do with Nan and make sure the feature gets preprocessed
+    Initially add all new features accross the board before making more decisions
 
+    Start adding feature by feature, decide how to fill nan, run, quick evaluate and add more if not deterimental
+        1. Add station ID (instead of long and lat) - this is expected to help the one model
+        2. Add hour of week (this should be weekday and time of day encoded)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     \section{Experiment Setup}\label{sec:experiment-setup}
     Overall: I'm using IDEs for coding and running: JetBrains DataSpell for Notebooks and PyCharm for pure Python. Both IDEs offer
@@ -215,20 +231,13 @@
         - default all parameters
 
         \subsubsection*{\nameref{itm:phase1-step4}
-        Poisson & Random Forest Use More features
-        Features avavailable are:
-        - things specific about the station, e.g num dockss, where it is (longitude, latiduate) -> these are expected to be more important
-        for an overal model, less for a per station model as they stay the same
-        - things specific about bike demand in general, e.g weather, what day it is, what time it is -> they might change the demand
-        for some stations more than for others
-
-        -> Use location, num docks for the one model but not per station
-        -> Use weather features and time  -> hour of the week
-
-        For each feature added decide what to do with Nan and make sure the feature gets preprocessed
-        Initially add all new features accross the board before making more decisions
-
         For location: just add the station id, given that lat and long mean nothing, there's no nan can be directly added
+        as categorical data
+            (run wobbly hill)
+
+        For hour of week: all station have the week hour no nan, can be directly added like location again categorical data
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         \section{Results}\label{sec:results}
         Results achieved
@@ -313,6 +322,18 @@
 
         For multiple models these trends are the same (the numbers are slightly different)
         - Multiple models perform slightly better (see weave)
+
+            \subsubsection*{\nameref{itm:phase1-step4}
+        Poisson & Random Forest Use More features
+        wobbly-hill-run -> include station
+        Model per station - Training data: MAE 2.90737
+        Model per station - Validation data: MAE 3.14606
+        One model - Training data: MAE 2.91782
+        One model - Validation data: MAE 3.14946
+            -> this had the wished effect that the difference between using a model per station and using just one model
+            becomes way smaller
+            -> However it does not necessarily hold true for the validation dataset
+
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.
