@@ -14,6 +14,7 @@ class Columns(enum.Enum):
     data_3h_ago = 'bikes_3h_ago'
     week_hour = 'weekhour'
     is_holiday = 'isHoliday'
+    temperature = 'temperature.C'
     wind_mean_speed = 'windMeanSpeed.m.s'
     wind_direction = 'windDirection.grades'
     rel_humidity = 'relHumidity.HR'

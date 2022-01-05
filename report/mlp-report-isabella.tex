@@ -66,7 +66,7 @@
         \item [\namedlabel{itm:phase1-step1}{Step 1}] Analyse and investigate station's test data and Decide on what problem it is. Classification (binary, multi label), Regression, ...
         \item [\namedlabel{itm:phase1-step2}{Step 2}] Experiment with a few models using approach a (training model per station)
         \item [\namedlabel{itm:phase1-step3}{Step 3}] Experiment with a few models using approach b (training one model for all station)
-        \item [\namedlabel{itm:phase1-step4}{Step 4}] Do more feature investigation and engineering
+        \item [\namedlabel{itm:phase1-step4}{Step 4}] Do more feature investigation and engineering - (still not used bike features)
         \item [\namedlabel{itm:phase1-step5}{Step 5}] Tune the more promising potential solutions
         \item [\namedlabel{itm:phase1-step6}{Step 6}] Submit results
     \end{description}
@@ -370,12 +370,18 @@
                 One model - Training data: MAE 1.10876
                 One model - Validation data: MAE 2.8752
 
-        4. Add is holdiay: astra feather
+        4. Add is holiday: astra feather
                 Model per station - Training data: MAE 1.00044
                 Model per station - Validation data: MAE 2.21935
                 One model - Training data: MAE 1.13664
                 One model - Validation data: MAE 2.48154
                 -> better than weather data
+
+        5. Add air pressure back: driven cosmos - overfitting starts again
+                Model per station - Training data: MAE 0.8418
+                Model per station - Validation data: MAE 2.27939
+                One model - Training data: MAE 1.04464
+                One model - Validation data: MAE 2.67455
 
 
 
