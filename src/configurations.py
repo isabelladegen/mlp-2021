@@ -57,6 +57,11 @@ class Configuration:
     val_data_filename: str = 'validation.csv'
     dev_validation_data_split: int = 10  # take 10% of the labelled rows away for validation during development
 
+    # Sweep data
+    sweep_training_path: str = '../data/Dev/Sweeping/dev.csv'
+    sweep_validation_path: str = '../data/Dev/Sweeping/val.csv'
+    sweep_data_percentage: int = 10  # only take 10% of the labelled for training and validation for a sweep
+
     # data processing
     no_nan_in_bikes: bool = True  # removes rows that don't have a label, e.g for means square calculations
 
