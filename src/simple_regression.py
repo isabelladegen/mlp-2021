@@ -2,7 +2,7 @@ import wandb
 
 from src.configurations import Configuration, WandbLogs, RunResults
 from src.Data import Data
-from src.models.ExtraTreeRegressorModel import ExtraTreesRegressorModel
+from src.models.ExtraTreesRegressorModel import ExtraTreesRegressorModel
 from src.models.PerStationModel import PerStationModel
 from src.models.PoissonModel import PoissonModel
 from src.models.RandomForestRegressorModel import RandomForestRegressorModel
@@ -78,7 +78,7 @@ def log_per_station_mae_to_wand(key: str, per_station_values: {}):  # {station:m
 
 
 def main():
-    run(ExtraTreesRegressorModel, Configuration())
+    run(RandomForestRegressorModel, Configuration())
 
 
 if __name__ == "__main__":
