@@ -115,9 +115,9 @@ class Configuration:
     random_forest_min_samples_split: int = 2
     random_forest_min_samples_leaf: int = 1
     random_forest_min_weight_fraction_leaf: float = 0.0
-    random_forest_max_features: str = "sqrt"  # auto did worst
+    random_forest_max_features: str = "auto"  # auto did worst
     random_forest_max_leaf_nodes: int = None
-    random_forest_min_impurity_decrease: float = 0.02  # 0 trains better but validates worse
+    random_forest_min_impurity_decrease: float = 0  # 0 in theory trains better but validates worse
     random_forest_bootstrap: bool = True
     random_forest_oob_score: bool = False
     random_forest_n_jobs: int = 5
