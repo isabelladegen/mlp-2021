@@ -7,6 +7,7 @@ from src.models.MultiLayerPerceptronRegressorModel import MultiLayerPerceptronRe
 from src.models.PerStationModel import PerStationModel
 from src.models.PoissonModel import PoissonModel
 from src.models.RandomForestRegressorModel import RandomForestRegressorModel
+from src.models.StochasticGradientDescentModel import StochasticGradientDescentModel
 from src.run_utils import LogKeys, train_predict_evaluate_log_for_model_and_data
 
 
@@ -14,7 +15,7 @@ def run(model_class, config: Configuration = Configuration()):
     wandb_run = wandb.init(project=config.wandb_project_name,
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
-                           notes="Perceptron - both one model and per station",
+                           notes="Stochastic Gradient Descent - both one model and per station",
                            tags=[str(model_class).split('.')[-1].replace('>\'', ''), 'one model', 'model per station'],
                            config=config.as_dict())
 
@@ -79,7 +80,7 @@ def log_per_station_mae_to_wand(key: str, per_station_values: {}):  # {station:m
 
 
 def main():
-    run(MultiLayerPerceptronRegressorModel, Configuration())
+    run(RandomForestRegressorModel, Configuration())
 
 
 if __name__ == "__main__":

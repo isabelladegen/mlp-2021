@@ -17,7 +17,7 @@ class MultiLayerPerceptronRegressorModel(Model):
             learning_rate="constant",
             learning_rate_init=0.001,
             power_t=0.5,
-            max_iter=200,
+            max_iter=300, # upped max iterations
             shuffle=True,
             random_state=None,
             tol=1e-4,

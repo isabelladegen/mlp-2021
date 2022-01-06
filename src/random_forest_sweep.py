@@ -71,12 +71,17 @@ if __name__ == '__main__':
         },
         'random_forest_features': {
             'values': [
-                [Columns.station.value,  # best features for default setting
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 ],
+                # [Columns.station.value,  # best features for default setting
+                #  Columns.data_3h_ago.value,
+                #  Columns.num_docks.value,
+                #  Columns.week_hour.value,
+                #  Columns.is_holiday.value,
+                #  ],
+                # [Columns.station.value,
+                #  Columns.data_3h_ago.value,
+                #  Columns.num_docks.value,
+                #  Columns.week_hour.value,
+                #  ],
                 [Columns.station.value,  # with full profiles
                  Columns.data_3h_ago.value,
                  Columns.num_docks.value,
@@ -120,21 +125,21 @@ if __name__ == '__main__':
                  Columns.rel_humidity.value,
                  Columns.wind_mean_speed.value
                  ],
-                [Columns.station.value,  # All features
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value,
-                 Columns.wind_direction.value,
-                 Columns.temperature.value
-                 ],
+                # [Columns.station.value,  # All features
+                #  Columns.data_3h_ago.value,
+                #  Columns.num_docks.value,
+                #  Columns.week_hour.value,
+                #  Columns.is_holiday.value,
+                #  Columns.full_profile_bikes.value,
+                #  Columns.full_profile_3h_diff_bikes.value,
+                #  Columns.short_profile_3h_diff_bikes.value,
+                #  Columns.short_profile_bikes.value,
+                #  Columns.air_pressure.value,
+                #  Columns.rel_humidity.value,
+                #  Columns.wind_mean_speed.value,
+                #  Columns.wind_direction.value,
+                #  Columns.temperature.value
+                #  ],
                 [Columns.data_3h_ago.value,
                  Columns.week_hour.value,
                  Columns.is_holiday.value,
@@ -146,28 +151,28 @@ if __name__ == '__main__':
                  Columns.short_profile_bikes.value,
                  Columns.short_profile_3h_diff_bikes.value
                  ],
-                [Columns.data_3h_ago.value,  # some features from the given models
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.air_pressure.value
-                 ],
-                [Columns.data_3h_ago.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 Columns.air_pressure.value
-                 ],
-                [Columns.data_3h_ago.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value
-                 ],
+                # [Columns.data_3h_ago.value,  # some features from the given models
+                #  Columns.full_profile_bikes.value,
+                #  Columns.full_profile_3h_diff_bikes.value,
+                #  Columns.air_pressure.value
+                #  ],
+                # [Columns.data_3h_ago.value,
+                #  Columns.short_profile_bikes.value,
+                #  Columns.short_profile_3h_diff_bikes.value,
+                #  Columns.air_pressure.value
+                #  ],
+                # [Columns.data_3h_ago.value,
+                #  Columns.full_profile_bikes.value,
+                #  Columns.full_profile_3h_diff_bikes.value,
+                #  Columns.short_profile_bikes.value,
+                #  Columns.short_profile_3h_diff_bikes.value
+                #  ],
             ]
         }
     }
 
     sweep_config_grid = {
-        'name': 'Random forest sweep 4',
+        'name': 'Random forest sweep 5',
         'method': 'grid',
         'parameters': parameters_to_try
     }
