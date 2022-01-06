@@ -108,8 +108,11 @@ class Configuration:
                                  Columns.num_docks.value,
                                  Columns.week_hour.value,
                                  Columns.is_holiday.value,
-                                 # Columns.full_profile_bikes.value,
-                                 # Columns.full_profile_3h_diff_bikes.value
+                                 Columns.full_profile_bikes.value,
+                                 Columns.full_profile_3h_diff_bikes.value,
+                                 Columns.air_pressure.value,
+                                 Columns.rel_humidity.value,
+                                 Columns.wind_mean_speed
                                  ])
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"
@@ -119,7 +122,7 @@ class Configuration:
     random_forest_min_weight_fraction_leaf: float = 0.0
     random_forest_max_features: str = "auto"  # auto did worst
     random_forest_max_leaf_nodes: int = None
-    random_forest_min_impurity_decrease: float = 0  # 0 in theory trains better but validates worse
+    random_forest_min_impurity_decrease: float = 0.001  # 0 in theory trains better but validates worse
     random_forest_bootstrap: bool = True
     random_forest_oob_score: bool = False
     random_forest_n_jobs: int = 5
