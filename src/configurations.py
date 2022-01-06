@@ -57,18 +57,21 @@ class Configuration:
     val_data_filename: str = 'validation.csv'
     dev_validation_data_split: int = 10  # take 10% of the labelled rows away for validation during development
 
+    # Run
+    run_one_model: bool = False
+    run_model_per_station: bool = True
+    log_predictions_to_wandb: bool = True
+    run_test_predictions: bool = True
+
     # Sweep
     sweep_training_path: str = '../data/Dev/Sweeping/dev.csv'
     sweep_validation_path: str = '../data/Dev/Sweeping/val.csv'
     sweep_data_percentage: int = 30  # only take x% of the labelled for training and validation for a sweep
-    sweep_one_model: bool = False
-    sweep_model_per_station: bool = True
 
     # data processing
     no_nan_in_bikes: bool = True  # removes rows that don't have a label, e.g for means square calculations
 
     # results
-    log_predictions: bool = True
     write_predictions_to_path: str = '../experiment-results/'
     write_results_start_name: str = 'predictions_'
 
@@ -107,7 +110,7 @@ class Configuration:
                                  # Columns.full_profile_3h_diff_bikes.value
                                  ])
     random_forest_n_estimators: int = 100
-    random_forest_criterion: str = "squared_error"
+    random_forest_criterion: str = "absolute_error"
     random_forest_max_depth: int = None
     random_forest_min_samples_split: int = 2
     random_forest_min_samples_leaf: int = 1
@@ -115,13 +118,13 @@ class Configuration:
     random_forest_max_features: str = "auto"
     random_forest_max_leaf_nodes: int = None
     random_forest_min_impurity_decrease: float = 0.0
-    random_forest_bootstrap: bool = False
+    random_forest_bootstrap: bool = True
     random_forest_oob_score: bool = False
     random_forest_n_jobs: int = 5
     random_forest_random_state: int = None
     random_forest_verbose: int = 0
     random_forest_warm_start: bool = False
-    random_forest_ccp_alpha: float = 0.05  # 0 no # 0 no pruning
+    random_forest_ccp_alpha: float = 0.001  # 0 no pruning
     random_forest_max_samples: int = None
 
     def as_dict(self):
@@ -136,8 +139,13 @@ class TestConfiguration(Configuration):
     # Development data
     development_data_path: str = ''  # write files into test folder for testing
 
+    # Run
+    run_one_model: bool = True
+    run_model_per_station: bool = True
+    log_predictions_to_wandb: bool = True
+    run_test_predictions: bool = False
+
     # Results
-    log_predictions: bool = False
     write_results_start_name: str = 'testing_predictions_'
 
     # Models  the default model values will change and we don't want flaky tests

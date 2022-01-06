@@ -32,7 +32,7 @@ def run(config: Configuration):
     results[RunResults.wandb] = wandb
 
     # Write predictions to csv
-    if configuration.log_predictions:
+    if configuration.run_test_predictions:
         csv_filename = random_predictions.write_to_csv('', configuration)
 
         # Log predictions to wandb
