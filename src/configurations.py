@@ -133,7 +133,19 @@ class Configuration:
     random_forest_ccp_alpha: float = 0.001  # small value seems to do better than 0 which is no pruning
     random_forest_max_samples: int = None
 
-    # MLP
+    # MLP Regressor
+    mlp_features: [str] = field(
+        default_factory=lambda: [Columns.station.value,
+                                 Columns.data_3h_ago.value,
+                                 Columns.num_docks.value,
+                                 Columns.week_hour.value,
+                                 Columns.is_holiday.value,
+                                 Columns.full_profile_bikes.value,
+                                 Columns.full_profile_3h_diff_bikes.value,
+                                 Columns.air_pressure.value,
+                                 Columns.rel_humidity.value,
+                                 Columns.wind_mean_speed.value
+                                 ])
     mlp_hidden_layer_sizes: tuple = (100,)
     mlp_activation: str = 'relu'  # ‘identity’, ‘logistic’, ‘tanh’, ‘relu’
     mlp_solver: str = 'adam'  # ‘lbfgs’, ‘sgd’, ‘adam’ - adam default

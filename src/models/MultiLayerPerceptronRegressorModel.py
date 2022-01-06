@@ -7,7 +7,7 @@ from src.models.Model import Model
 
 class MultiLayerPerceptronRegressorModel(Model):
     def __init__(self, config: Configuration, training_data: Data):
-        features = config.random_forest_features
+        features = config.mlp_features
         model = MLPRegressor(
             hidden_layer_sizes=config.mlp_hidden_layer_sizes,
             activation=config.mlp_activation,
