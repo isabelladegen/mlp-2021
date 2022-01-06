@@ -19,8 +19,8 @@ def sweep():
     wandb.init(project=non_sweep_config.wandb_project_name,
                entity=non_sweep_config.wandb_entity,
                mode=non_sweep_config.wandb_mode,
-               notes="feature testing, temperature and is holiday, avoiding over-fitting",
-               tags=['RandomForrest', 'one model', 'model per station'],
+               notes="feature testing, avoiding over-fitting",
+               tags=['RandomForrest', 'model per station'],
                config=non_sweep_config.as_dict())
 
     sweeped_config = Configuration(**wandb.config)
