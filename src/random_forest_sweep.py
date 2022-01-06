@@ -67,7 +67,7 @@ def sweep():
 if __name__ == '__main__':
     parameters_to_try = {
         'random_forest_min_impurity_decrease': {
-            'values': [0.0, 0.001, 0.008, 0.01]  # try 0.0, 0.0001, 0.0005, 0.0009, 0.002 with best features
+            'values': [0.0, 0.0001, 0.0004, 0.0009, 0.002, 0.0008]
         },
         'random_forest_features': {
             'values': [
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     }
 
     sweep_config_grid = {
-        'name': 'Random forest sweep 5',
+        'name': 'Random forest sweep 6',
         'method': 'grid',
         'parameters': parameters_to_try
     }
