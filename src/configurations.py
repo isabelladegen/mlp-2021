@@ -112,7 +112,7 @@ class Configuration:
                                  Columns.full_profile_3h_diff_bikes.value,
                                  Columns.air_pressure.value,
                                  Columns.rel_humidity.value,
-                                 Columns.wind_mean_speed
+                                 Columns.wind_mean_speed.value
                                  ])
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"

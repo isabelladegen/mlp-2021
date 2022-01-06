@@ -334,7 +334,8 @@
         Sweep 3:
             - try some other pruning methods
 
-
+        Sweep 4: Features and Hyperparmetes including feature combination used in the given models
+            - use full data for sweeping as runtime is low at the momemnt
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         \section{Results}\label{sec:results}
@@ -528,6 +529,18 @@
                             Model per station - Training data: MAE 1.00787
                             Model per station - Validation data: MAE 2.20771
                 (good thread on the different parameters: https://stackoverflow.com/questions/20463281/how-do-i-solve-overfitting-in-random-forest-of-python-sklearn)
+
+         Sweep 3:
+         - Impurity did not result in better performance for the real dataset
+         - also setting random to 0 makes the runs reproducible
+
+         Sweep 4: Features and Hyperparmetes
+         - Impurity in combination with more features create a better result which could be confimred with floral-pine
+            Model per station - Training data: MAE 0.89522
+            Model per station - Validation data: MAE 2.20609
+         -> For the random forest model the features used in the given models do not perform as well
+
+
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.
