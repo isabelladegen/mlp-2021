@@ -78,5 +78,6 @@ def main():
     create_sweep_data_set()
 
 
+# be careful before you run this as it will overwrite existing files, you might want to back them up first
 if __name__ == "__main__":
     main()

@@ -68,7 +68,7 @@
         \item [\namedlabel{itm:phase1-step3}{Step 3}] Experiment with a few models using approach b (training one model for all station)
         \item [\namedlabel{itm:phase1-step4}{Step 4}] Do more feature investigation and engineering - (still not used bike features)
         \item [\namedlabel{itm:phase1-step5}{Step 5}] Tune the more promising potential solutions
-        \item [\namedlabel{itm:phase1-step6}{Step 6}] Submit results
+        \item [\namedlabel{itm:phase1-step6}{Step 6}] Submit results - did for step 4
     \end{description}
 
     \subsection*{\label{phs:two}{Phase 2}}
@@ -186,6 +186,11 @@
         6. Add temerature instead of airpressure (worse)
         7. Bike profile features (first full) - I still don't know what it means
 
+        \subsubsection*{\nameref{itm:phase1-step5}
+        Use weight and biases sweep ability. Define a few different hyperparameters, make a smaller data set (runtime!) and
+        sweep through the parameters to learn which ones have what effect. Iterate multiple times with what works and
+        see if the results from the default configuration can be imporved.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     \section{Experiment Setup}\label{sec:experiment-setup}
@@ -255,6 +260,73 @@
             -> Run name is vital-hill-32
 
         Is Holiday (without weather): Run astral-feather
+
+
+        \subsubsection*{\nameref{itm:phase1-step5}
+
+        1. Sweep just with a few hyper parameters and 10\% of the dev and val data (dev-sweep1, val-sweep1).
+        - Only sweep one model as it's quicker
+        - Results of sweep in Random Forest Sweep 1 https://wandb.ai/idegen/mlp-2021/sweeps/ylvvcigm?workspace=user-idegen
+        - method: grid
+            name: Random forest sweep 1
+            parameters:
+              random_forest_bootstrap:
+                values:
+                - false
+              random_forest_ccp_alpha:
+                values:
+                - 0
+                - 0.05
+                - 0.1
+                - 0.3
+              random_forest_criterion:
+                values:
+                - squared_error
+                - poisson
+              random_forest_max_depth:
+                values:
+                - null
+                - 10
+                - 50
+              random_forest_min_samples_split:
+                values:
+                - 2
+                - 4
+              random_forest_n_estimators:
+                values:
+                - 50
+                - 100
+                - 120
+        -> For the best sweep result re-run the full model:
+        Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
+        -> Best sweep result
+        Features:
+        ["station","bikes_3h_ago","numDocks","weekhour","isHoliday","full_profile_bikes","full_profile_3h_diff_bikes"]
+        Differnce in hyperparams:
+        random_forest_max_depth: 50
+        random_forest_n_estimators: 50
+        random_forest_ccp_alpha: 0.05
+        random_forest_criterion: squared_error
+
+        Breezy Sound: https://wandb.ai/idegen/mlp-2021/runs/12p54n9c/overview?workspace=user-idegen
+            -> New parameters but features as current best run with default configuration
+            Features: ["station","bikes_3h_ago","numDocks","weekhour","isHoliday"]
+            random_forest_max_depth: 50
+            random_forest_n_estimators: 50
+            random_forest_ccp_alpha - 0.05
+            random_forest_criterion: squared_error
+
+        Stoic Sun: https://wandb.ai/idegen/mlp-2021/runs/12zlftk6/overview?workspace=user-idegen
+            -> Features from best run squared error and ccp from sweep, max depth and n estimator from best run
+            random_forest_features
+            Features: ["station","bikes_3h_ago","numDocks","weekhour","isHoliday"]
+            random_forest_max_depth: Default
+            random_forest_n_estimators: 100
+            random_forest_ccp_alpha - 0.05
+            random_forest_criterion: squared_error
+
+        Sweep 2:
+            - 30\% of training data
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -402,6 +474,46 @@
             One model - Validation data: MAE 2.419
                 -> not as good as astral feather but not as overfitting as the weather!
 
+
+        \subsubsection*{\nameref{itm:phase1-step5}}
+
+        Random Forest Sweep 1:
+        - Show most influential parameter
+        - Show graphs
+        Parameters:
+        - random_forest_n_estimators:  [50, 100, 120] # made no difference
+        - random_forest_criterion: ['squared_error', 'absolute_error']  # squared_error better than poisson, try absolute error
+        - random_forest_max_depth: [None, 10, 50]  # 50 better than 100!
+        - random_forest_min_samples_split: [2, 4] # made no difference
+        - random_forest_ccp_alpha: [0.0, 0.05, 0.1, 0.3]  # unclear but 0.05 did well
+        -> criterion squared_error speeds up the training significantly (not to sure yet how it impacts the performance)
+        -> The difference in MAE between training and validation however was reduced, this did not impact the overal outcome though
+
+        Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
+        -> Best sweep result does not compete with default configurations
+
+                Model per station - Training data: MAE 1.393
+                Model per station - Validation data: MAE 2.72
+                One model - Training data: MAE: 2.918
+                One model - Validation data: MAE 2.947
+
+        Breezy Sound: https://wandb.ai/idegen/mlp-2021/runs/12p54n9c/overview?workspace=user-idegen
+            -> New parameters but features as current best run with default configuration
+
+            Model per station - Training data: MAE 1.514
+            Model per station - Validation data: MAE 2.432
+            One model - Training data: MAE 3.273
+            One model - Validation data: MAE 3.394
+
+        Stoic Sun: https://wandb.ai/idegen/mlp-2021/runs/12zlftk6/overview?workspace=user-idegen
+            -> Features from best run squared error and ccp from sweep, max depth and n estimator from best run (exactelly the same!?)
+            Worse then astral feathers
+            Model per station - Training data: MAE: 1.514
+            Model per station - Validation data: MAE: 2.432
+            One model - Training data: MAE: 3.273
+            One model - Validation data: MAE: 3.394
+
+        -> More sweeping with more data, model per station instead of one model, smaller ccp's
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.

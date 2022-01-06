@@ -11,7 +11,7 @@ def run(model_class, config: Configuration = Configuration()):
     wandb_run = wandb.init(project=config.wandb_project_name,
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
-                           notes="feature testing, is holiday and bike profile, tweaked with sweep avid-sweep",
+                           notes="feature testing, is holiday, tweaked with sweep avid-sweep",
                            tags=[str(model_class).split('.')[-1], 'one model', 'model per station', 'avid sweep', 'no bikes'],
                            config=config.as_dict())
     # Reload the Configuration (to allow for sweeps)
