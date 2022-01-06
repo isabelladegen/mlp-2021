@@ -133,6 +133,29 @@ class Configuration:
     random_forest_ccp_alpha: float = 0.001  # small value seems to do better than 0 which is no pruning
     random_forest_max_samples: int = None
 
+    # MLP
+    mlp_hidden_layer_sizes: tuple = (100,)
+    mlp_activation: str = 'relu'  # ‘identity’, ‘logistic’, ‘tanh’, ‘relu’
+    mlp_solver: str = 'adam'  # ‘lbfgs’, ‘sgd’, ‘adam’ - adam default
+    mlp_alpha: float = 0.0001  # L2 penalty
+    mlp_batch_size: int = 'auto'
+    mlp_learning_rate: str = 'adaptive'  # ‘adaptive’, ‘invscaling’, ‘adaptive’  - constant default
+    mlp_learning_rate_init: float = 0.001  # Only used when solver=’sgd’ or ‘adam’.
+    mlp_power_t: float = 0.5  # Only used when solver=’sgd’.
+    mlp_max_iter: int = 300  # upped max iterations
+    mlp_shuffle: bool = True  # Only used when solver=’sgd’ or ‘adam’.
+    mlp_random_state: int = None
+    mlp_tol: float = 1e-4
+    mlp_momentum: float = 0.9  # Should be between 0 and 1. Only used when solver=’sgd’.
+    mlp_nesterovs_momentum: bool = True  # Only used when solver=’sgd’ and momentum > 0.
+    mlp_early_stopping: bool = False  # only effective when solver=’sgd’ or ‘adam’.
+    mlp_validation_fraction: float = 0.1  # Only used if early_stopping is True.
+    mlp_beta_1: float = 0.9  # should be in [0, 1). Only used when solver=’adam’
+    mlp_beta_2: float = 0.999  # should be in [0, 1). Only used when solver=’adam’.
+    mlp_epsilon: float = 1e-8  # Only used when solver=’adam’.
+    mlp_n_iter_no_change: int = 10  # Only effective when solver=’sgd’ or ‘adam’.
+    mlp_max_fun: int = 15000  # Only used when solver=’lbfgs’. Maximum number of function calls
+
     def as_dict(self):
         return asdict(self)
 
