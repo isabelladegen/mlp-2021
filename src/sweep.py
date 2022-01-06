@@ -176,10 +176,10 @@ def random_forest_sweep_params():
 
 def mlp_sweep_params():
     sweep_params = {
+        'mlp_max_iter': {
+            'values': [100, 300, 500]
+        },
         'mlp_features': {
-            'mlp_max_iter': {
-                'values': [100, 300, 500]
-            },
             'values': [
                 [Columns.station.value,  # best features for default setting
                  Columns.data_3h_ago.value,
