@@ -88,7 +88,9 @@ class Configuration:
                                  Columns.air_pressure.value: 'float64',
                                  Columns.temperature.value: 'float64',
                                  Columns.full_profile_bikes.value: 'float64',
-                                 Columns.full_profile_3h_diff_bikes.value: 'float64'
+                                 Columns.full_profile_3h_diff_bikes.value: 'float64',
+                                 Columns.short_profile_bikes.value: 'float64',
+                                 Columns.short_profile_3h_diff_bikes.value: 'float64'
                                  })
     # Poisson Regressor
     poisson_features: [str] = field(default_factory=lambda: [Columns.data_3h_ago.value])

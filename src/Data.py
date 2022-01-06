@@ -21,6 +21,8 @@ class Columns(enum.Enum):
     air_pressure = 'airPressure.mb'
     full_profile_3h_diff_bikes = 'full_profile_3h_diff_bikes'
     full_profile_bikes = 'full_profile_bikes'
+    short_profile_bikes = 'short_profile_bikes'
+    short_profile_3h_diff_bikes = 'short_profile_3h_diff_bikes'
 
 
 class Data:
