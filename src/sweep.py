@@ -175,8 +175,11 @@ def random_forest_sweep_params():
 
 
 def mlp_sweep_params():
-    parameters_to_try = {
-        'random_forest_features': {
+    sweep_params = {
+        'mlp_features': {
+            'mlp_max_iter': {
+                'values': [100, 300, 500]
+            },
             'values': [
                 [Columns.station.value,  # best features for default setting
                  Columns.data_3h_ago.value,
@@ -277,16 +280,16 @@ def mlp_sweep_params():
             ]
         }
     }
-    return parameters_to_try
+    return sweep_params
 
 
 if __name__ == '__main__':
-    parameters_to_try = mlp_sweep_params()
+    sweep_params = mlp_sweep_params()
 
     sweep_config_grid = {
         'name': 'MLP Sweep 1 (7)',
         'method': 'grid',
-        'parameters': parameters_to_try
+        'parameters': sweep_params
     }
     sweep_id = wandb.sweep(sweep_config_grid, project=Configuration().wandb_project_name)
     wandb.agent(sweep_id, function=lambda: sweep(MultiLayerPerceptronRegressorModel))
