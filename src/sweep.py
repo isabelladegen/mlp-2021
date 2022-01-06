@@ -179,20 +179,12 @@ def mlp_sweep_params():
         'mlp_max_iter': {
             'values': [100, 300, 500]
         },
+        'mlp_hidden_layer_sizes': {
+            'values': [(100,), (50,), (200,)]
+        },
         'mlp_features': {
             'values': [
-                [Columns.station.value,  # best features for default setting
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 ],
-                [Columns.station.value,
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 ],
-                [Columns.station.value,  # with full profiles
+                [Columns.station.value,  # station, full profile
                  Columns.data_3h_ago.value,
                  Columns.num_docks.value,
                  Columns.week_hour.value,
@@ -200,7 +192,7 @@ def mlp_sweep_params():
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value
                  ],
-                [Columns.station.value,  # with profiles and weather
+                [Columns.station.value,  # station, full profiles, weather
                  Columns.data_3h_ago.value,
                  Columns.num_docks.value,
                  Columns.week_hour.value,
@@ -211,7 +203,7 @@ def mlp_sweep_params():
                  Columns.rel_humidity.value,
                  Columns.wind_mean_speed.value
                  ],
-                [Columns.station.value,  # with profiles and weather
+                [Columns.station.value,  # station, full and short profiles, weather
                  Columns.data_3h_ago.value,
                  Columns.num_docks.value,
                  Columns.week_hour.value,
@@ -224,33 +216,7 @@ def mlp_sweep_params():
                  Columns.rel_humidity.value,
                  Columns.wind_mean_speed.value
                  ],
-                [Columns.station.value,  # with profiles and weather
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value
-                 ],
-                [Columns.station.value,  # All features
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value,
-                 Columns.wind_direction.value,
-                 Columns.temperature.value
-                 ],
-                [Columns.data_3h_ago.value,
+                [Columns.data_3h_ago.value,  # no station, full and short profiles, weather
                  Columns.week_hour.value,
                  Columns.is_holiday.value,
                  Columns.air_pressure.value,
@@ -261,17 +227,16 @@ def mlp_sweep_params():
                  Columns.short_profile_bikes.value,
                  Columns.short_profile_3h_diff_bikes.value
                  ],
-                [Columns.data_3h_ago.value,  # some features from the given models
-                 Columns.full_profile_bikes.value,
+                [Columns.data_3h_ago.value,  # no station, full, weather
+                 Columns.week_hour.value,
+                 Columns.is_holiday.value,
+                 Columns.air_pressure.value,
+                 Columns.rel_humidity.value,
+                 Columns.wind_mean_speed.value,
                  Columns.full_profile_3h_diff_bikes.value,
-                 Columns.air_pressure.value
+                 Columns.full_profile_bikes.value,
                  ],
-                [Columns.data_3h_ago.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 Columns.air_pressure.value
-                 ],
-                [Columns.data_3h_ago.value,
+                [Columns.data_3h_ago.value,  # no station, full and short profile
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
                  Columns.short_profile_bikes.value,
@@ -287,7 +252,7 @@ if __name__ == '__main__':
     sweep_params = mlp_sweep_params()
 
     sweep_config_grid = {
-        'name': 'MLP Sweep 1 (7)',
+        'name': 'MLP Sweep 2 (8)',
         'method': 'grid',
         'parameters': sweep_params
     }

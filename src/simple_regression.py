@@ -15,7 +15,7 @@ def run(model_class, config: Configuration = Configuration()):
     wandb_run = wandb.init(project=config.wandb_project_name,
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
-                           notes="Stochastic Gradient Descent - both one model and per station",
+                           notes="MLP - both one model and per station",
                            tags=[str(model_class).split('.')[-1].replace('>\'', ''), 'one model', 'model per station'],
                            config=config.as_dict())
 

@@ -58,7 +58,7 @@ class Configuration:
     dev_validation_data_split: int = 10  # take 10% of the labelled rows away for validation during development
 
     # Run
-    run_one_model: bool = False
+    run_one_model: bool = True
     run_model_per_station: bool = True
     log_predictions_to_wandb: bool = True
     run_test_predictions: bool = True
@@ -135,18 +135,14 @@ class Configuration:
 
     # MLP Regressor
     mlp_features: [str] = field(
-        default_factory=lambda: [Columns.station.value,
+        default_factory=lambda: [
                                  Columns.data_3h_ago.value,
-                                 Columns.num_docks.value,
-                                 Columns.week_hour.value,
-                                 Columns.is_holiday.value,
                                  Columns.full_profile_bikes.value,
                                  Columns.full_profile_3h_diff_bikes.value,
-                                 Columns.air_pressure.value,
-                                 Columns.rel_humidity.value,
-                                 Columns.wind_mean_speed.value
+                                 Columns.short_profile_bikes.value,
+                                 Columns.short_profile_3h_diff_bikes.value,
                                  ])
-    mlp_hidden_layer_sizes: tuple = (100,)
+    mlp_hidden_layer_sizes: tuple = (200,)
     mlp_activation: str = 'relu'  # ‘identity’, ‘logistic’, ‘tanh’, ‘relu’
     mlp_solver: str = 'adam'  # ‘lbfgs’, ‘sgd’, ‘adam’ - adam default
     mlp_alpha: float = 0.0001  # L2 penalty
