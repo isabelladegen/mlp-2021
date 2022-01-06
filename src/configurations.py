@@ -110,12 +110,11 @@ class Configuration:
                                  Columns.is_holiday.value,
                                  Columns.full_profile_bikes.value,
                                  Columns.full_profile_3h_diff_bikes.value,
-                                 Columns.short_profile_bikes.value,
-                                 Columns.short_profile_3h_diff_bikes.value,
                                  Columns.air_pressure.value,
                                  Columns.rel_humidity.value,
                                  Columns.wind_mean_speed.value
                                  ])
+
     random_forest_n_estimators: int = 100
     random_forest_criterion: str = "absolute_error"
     random_forest_max_depth: int = None
