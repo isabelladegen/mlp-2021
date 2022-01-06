@@ -12,8 +12,8 @@ def run(model_class, config: Configuration = Configuration()):
     wandb_run = wandb.init(project=config.wandb_project_name,
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
-                           notes="feature testing, is holiday, tweaked with legendary-sweep ccp 0.001 otherwise like astral feather",
-                           tags=[str(model_class).split('.')[-1], 'model per station'],
+                           notes="hyper paraemeter testing, with impurity and max features",
+                           tags=[str(model_class).split('.')[-1], 'model per station', 'impurity', 'max features'],
                            config=config.as_dict())
 
     # Reload the Configuration (to allow for sweeps)

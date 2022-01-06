@@ -329,6 +329,10 @@
             - 30\% of training data
             - Model per station
             - Different features, ccp
+            -> lead to an improval on astral feather with zesty field
+
+        Sweep 3:
+            - try some other pruning methods
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -516,6 +520,14 @@
             One model - Validation data: MAE: 3.394
 
         -> More sweeping with more data, model per station instead of one model, smaller ccp's
+
+         Sweep 2:
+                - ?
+                -> decision try astral feather with ccp of 0.001
+                -> Result is zesty field on per station only which is better
+                            Model per station - Training data: MAE 1.00787
+                            Model per station - Validation data: MAE 2.20771
+                (good thread on the different parameters: https://stackoverflow.com/questions/20463281/how-do-i-solve-overfitting-in-random-forest-of-python-sklearn)
 
         \section{Conclusions}\label{sec:conclusions}
         share any insights you gained about how the system works.

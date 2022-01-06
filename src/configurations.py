@@ -115,16 +115,16 @@ class Configuration:
     random_forest_min_samples_split: int = 2
     random_forest_min_samples_leaf: int = 1
     random_forest_min_weight_fraction_leaf: float = 0.0
-    random_forest_max_features: str = "auto"
+    random_forest_max_features: str = "sqrt"  # auto did worst
     random_forest_max_leaf_nodes: int = None
-    random_forest_min_impurity_decrease: float = 0.0
+    random_forest_min_impurity_decrease: float = 0.02  # 0 trains better but validates worse
     random_forest_bootstrap: bool = True
     random_forest_oob_score: bool = False
     random_forest_n_jobs: int = 5
-    random_forest_random_state: int = None
+    random_forest_random_state: int = 0  # attempt to reproduce
     random_forest_verbose: int = 0
     random_forest_warm_start: bool = False
-    random_forest_ccp_alpha: float = 0.001  # 0 no pruning
+    random_forest_ccp_alpha: float = 0.001  # small value seems to do better than 0 which is no pruning
     random_forest_max_samples: int = None
 
     def as_dict(self):

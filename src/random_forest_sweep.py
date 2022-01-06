@@ -1,6 +1,6 @@
 import wandb
 
-from src.Data import Data, Columns
+from src.Data import Data
 from src.configurations import Configuration, WandbLogs
 from src.models.PerStationModel import PerStationModel
 from src.models.RandomForestRegressorModel import RandomForestRegressorModel
@@ -46,6 +46,7 @@ def sweep():
 
 
 # Not sweeped
+# random_forest_criterion -> absolute seems best but also takes longest to run
 # random_forest_min_samples_split
 # random_forest_max_depth
 # random_forest_min_samples_leaf,
@@ -63,58 +64,54 @@ def sweep():
 
 if __name__ == '__main__':
     parameters_to_try = {
-        'random_forest_n_estimators': {
-            'values': [50, 100, 120]  # made no difference
+        'random_forest_max_features': {
+            'values': ['auto', 'sqrt', 'log2']
         },
-        'random_forest_criterion': {
-            'values': ['squared_error', 'absolute_error']
-            # squared_error better than poisson, compare to absolute error
+        'random_forest_min_impurity_decrease': {
+            'values': [0.0, 0.001, 0.01, 0.02, 0.03]
         },
-        'random_forest_ccp_alpha': {
-            'values': [0.0, 0.001, 0.01, 0.02, 0.005]  # unclear but 0.05 did well
-        },
-        'random_forest_features': {
-            'values': [
-                [Columns.station.value,  # best features for default setting
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 ],
-                [Columns.station.value,  # with full profiles
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value
-                 ],
-                [Columns.station.value,  # with profiles and weather
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value
-                 ],
-                [Columns.station.value,  # with weather
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value
-                 ]
-            ]
-        }
+        # 'random_forest_features': {
+        #     'values': [
+        #         [Columns.station.value,  # best features for default setting
+        #          Columns.data_3h_ago.value,
+        #          Columns.num_docks.value,
+        #          Columns.week_hour.value,
+        #          Columns.is_holiday.value,
+        #          ],
+        #         [Columns.station.value,  # with full profiles
+        #          Columns.data_3h_ago.value,
+        #          Columns.num_docks.value,
+        #          Columns.week_hour.value,
+        #          Columns.is_holiday.value,
+        #          Columns.full_profile_bikes.value,
+        #          Columns.full_profile_3h_diff_bikes.value
+        #          ],
+        #         [Columns.station.value,  # with profiles and weather
+        #          Columns.data_3h_ago.value,
+        #          Columns.num_docks.value,
+        #          Columns.week_hour.value,
+        #          Columns.is_holiday.value,
+        #          Columns.full_profile_bikes.value,
+        #          Columns.full_profile_3h_diff_bikes.value,
+        #          Columns.air_pressure.value,
+        #          Columns.rel_humidity.value,
+        #          Columns.wind_mean_speed.value
+        #          ],
+        #         [Columns.station.value,  # with weather
+        #          Columns.data_3h_ago.value,
+        #          Columns.num_docks.value,
+        #          Columns.week_hour.value,
+        #          Columns.is_holiday.value,
+        #          Columns.air_pressure.value,
+        #          Columns.rel_humidity.value,
+        #          Columns.wind_mean_speed.value
+        #          ]
+        #     ]
+        # }
     }
 
     sweep_config_grid = {
-        'name': 'Random forest sweep test',
+        'name': 'Random forest sweep 3',
         'method': 'grid',
         'parameters': parameters_to_try
     }
