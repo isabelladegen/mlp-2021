@@ -5,7 +5,7 @@ from src.configurations import Configuration
 from src.models.Model import Model
 
 
-class MultiLayerPerceptronRegressor(Model):
+class MultiLayerPerceptronRegressorModel(Model):
     def __init__(self, config: Configuration, training_data: Data):
         features = config.random_forest_features
         model = MLPRegressor(

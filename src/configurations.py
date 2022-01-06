@@ -58,7 +58,7 @@ class Configuration:
     dev_validation_data_split: int = 10  # take 10% of the labelled rows away for validation during development
 
     # Run
-    run_one_model: bool = False
+    run_one_model: bool = True
     run_model_per_station: bool = True
     log_predictions_to_wandb: bool = True
     run_test_predictions: bool = True
