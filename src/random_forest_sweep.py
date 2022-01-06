@@ -129,19 +129,19 @@ if __name__ == '__main__':
                  Columns.is_holiday.value,
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
-                 Columns.air_pressure,
-                 Columns.rel_humidity,
-                 Columns.wind_mean_speed,
+                 Columns.air_pressure.value,
+                 Columns.rel_humidity.value,
+                 Columns.wind_mean_speed.value
                  ],
                 [Columns.station.value,  # with weather
                  Columns.data_3h_ago.value,
                  Columns.num_docks.value,
                  Columns.week_hour.value,
                  Columns.is_holiday.value,
-                 Columns.air_pressure,
-                 Columns.rel_humidity,
-                 Columns.wind_mean_speed,
-                 ],
+                 Columns.air_pressure.value,
+                 Columns.rel_humidity.value,
+                 Columns.wind_mean_speed.value
+                 ]
             ]
         }
     }
