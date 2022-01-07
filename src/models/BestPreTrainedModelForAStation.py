@@ -52,10 +52,11 @@ class BestPreTrainedModelForAStation:
         # calculate dot product, which is of shape (samples x models)
         # -> each column is the predicted y for that model
         predictions = x_with_intercept.dot(weights_vector_or_matrix)
-        # rounding: #maybe I shouldn't round
-        with np.nditer(predictions, op_flags=['readwrite']) as it:
-            for x in it:
-                x[...] = Model.round_half_up(x)
+
+        if self.config.intermediate_rounding:  # optional rounding
+            with np.nditer(predictions, op_flags=['readwrite']) as it:
+                for x in it:
+                    x[...] = Model.round_half_up(x)
         # replace negative predictions with 0 (station cannot have negative bikes)
         predictions = np.where(predictions < 0, 0, predictions)
         return predictions

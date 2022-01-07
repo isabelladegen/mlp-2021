@@ -6,7 +6,7 @@ from src.configurations import Configuration, WandbLogs
 from src.models.BestPreTrainedModelForAStation import BestPreTrainedModelForAStation
 from src.models.MultiLayerPerceptronRegressorModel import MultiLayerPerceptronRegressorModel
 from src.models.PerStationModel import PerStationModel
-from src.run_utils import LogKeys, train_predict_evaluate_log_for_model_and_data, log_per_station_mae_to_wand
+from src.run_utils import LogKeys, log_per_station_mae_to_wand
 
 
 def run(config: Configuration = Configuration()):
@@ -14,7 +14,7 @@ def run(config: Configuration = Configuration()):
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
                            notes="Combination of my model and the best trained",
-                           tags=['Best trained model', 'MLP', 'model per station'],
+                           tags=['Best trained model', 'MLP', 'model per station', 'only rounding at the end'],
                            config=config.as_dict())
 
     # Reload the Configuration (to allow for sweeps)

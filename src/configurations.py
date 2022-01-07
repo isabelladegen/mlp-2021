@@ -189,6 +189,9 @@ class TestConfiguration(Configuration):
     log_predictions_to_wandb: bool = True
     run_test_predictions: bool = False
 
+    # Round
+    intermediate_rounding: bool = True
+
     # Results
     write_results_start_name: str = 'testing_predictions_'
 
