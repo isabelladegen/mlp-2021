@@ -14,7 +14,7 @@ def run(config: Configuration = Configuration()):
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
                            notes="Combination of my model and the best trained",
-                           tags=['Best trained model', 'MLP', 'model per station', 'only rounding at the end'],
+                           tags=['Best trained model', 'MLP', 'model per station', 'no rounding at the end', 'mode'],
                            config=config.as_dict())
 
     # Reload the Configuration (to allow for sweeps)

@@ -177,79 +177,62 @@ def random_forest_sweep_params():
 def mlp_sweep_params():
     sweep_params = {
         'mlp_max_iter': {
-            'values': [300, 400, 600]
+            'values': [500, 600, 700]
         },
         'mlp_hidden_layer_sizes': {
             'values': [(100,), (200,)]
         },
         'mlp_features': {
             'values': [
-                [Columns.station.value,  # station, full profile
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value
-                 ],
-                [Columns.station.value,  # station, full profiles, weather
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value
-                 ],
-                [Columns.station.value,  # station, full and short profiles, weather
-                 Columns.data_3h_ago.value,
-                 Columns.num_docks.value,
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value
-                 ],
-                [Columns.data_3h_ago.value,  # no station, full and short profiles, weather
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value
-                 ],
-                [Columns.data_3h_ago.value,  # no station, full, weather
-                 Columns.week_hour.value,
-                 Columns.is_holiday.value,
-                 Columns.air_pressure.value,
-                 Columns.rel_humidity.value,
-                 Columns.wind_mean_speed.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.full_profile_bikes.value,
-                 ],
                 [Columns.data_3h_ago.value,  # no station, full and short profile
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
                  Columns.short_profile_bikes.value,
                  Columns.short_profile_3h_diff_bikes.value
                  ],
-                [Columns.data_3h_ago.value,  # no station, full and short, temp profile
+                [Columns.week_hour.value,  # week hour, full and short profile
+                 Columns.data_3h_ago.value,
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
                  Columns.short_profile_bikes.value,
                  Columns.short_profile_3h_diff_bikes.value,
-                 Columns.rel_humidity.value
                  ],
-                [Columns.week_hour.value,  # week hour, full and short profile
+                [Columns.station.value,  # station, full and short profile
+                 Columns.data_3h_ago.value,
+                 Columns.full_profile_bikes.value,
+                 Columns.full_profile_3h_diff_bikes.value,
+                 Columns.short_profile_bikes.value,
+                 Columns.short_profile_3h_diff_bikes.value,
+                 ],
+                [Columns.num_docks.value,  # station, full and short profile
+                 Columns.data_3h_ago.value,
+                 Columns.full_profile_bikes.value,
+                 Columns.full_profile_3h_diff_bikes.value,
+                 Columns.short_profile_bikes.value,
+                 Columns.short_profile_3h_diff_bikes.value,
+                 ],
+                [Columns.air_pressure.value,  # station, full and short profile
+                 Columns.data_3h_ago.value,
+                 Columns.full_profile_bikes.value,
+                 Columns.full_profile_3h_diff_bikes.value,
+                 Columns.short_profile_bikes.value,
+                 Columns.short_profile_3h_diff_bikes.value,
+                 ],
+                [Columns.rel_humidity.value,  # station, full and short profile
+                 Columns.data_3h_ago.value,
+                 Columns.full_profile_bikes.value,
+                 Columns.full_profile_3h_diff_bikes.value,
+                 Columns.short_profile_bikes.value,
+                 Columns.short_profile_3h_diff_bikes.value,
+                 ],
+                [Columns.temperature.value,  # station, full and short profile
+                 Columns.data_3h_ago.value,
+                 Columns.full_profile_bikes.value,
+                 Columns.full_profile_3h_diff_bikes.value,
+                 Columns.short_profile_bikes.value,
+                 Columns.short_profile_3h_diff_bikes.value,
+                 ],
+                [Columns.is_holiday.value,  # station, full and short profile
                  Columns.data_3h_ago.value,
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
@@ -266,7 +249,7 @@ if __name__ == '__main__':
     sweep_params = mlp_sweep_params()
 
     sweep_config_grid = {
-        'name': 'MLP Sweep 3 (9)',
+        'name': 'MLP Sweep 4 (10)',
         'method': 'grid',
         'parameters': sweep_params
     }

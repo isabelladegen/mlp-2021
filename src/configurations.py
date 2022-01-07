@@ -67,7 +67,7 @@ class Configuration:
     run_test_predictions: bool = True
 
     # Round
-    intermediate_rounding: bool = False
+    intermediate_rounding: bool = True
 
     # Sweep
     sweep_training_path: str = '../data/Dev/Sweeping/dev.csv'

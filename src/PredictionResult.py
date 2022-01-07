@@ -28,8 +28,10 @@ class PredictionResult:
                               on=[ResultsColumns.id.value, ResultsColumns.station.value,
                                   ResultsColumns.true_values.value],
                               how='outer')
+            # TODO: make configurable
             merged[ResultsColumns.predictions.value] = list(merged[['predictions_x', 'predictions_y']].mean(axis=1))
-            merged[ResultsColumns.predictions.value].apply(self.round_half_up)
+            # merged[ResultsColumns.predictions.value] = list(merged[['predictions_x', 'predictions_y']].median(axis=1))
+            # merged[ResultsColumns.predictions.value].apply(self.round_half_up)
             self.results_df = merged.sort_values(by=[ResultsColumns.id.value], ignore_index=True)
         elif all(isinstance(item, PredictionResult) for item in ids_or_prediction_results):
             df = pd.concat([result.results_df for result in ids_or_prediction_results], ignore_index=True)
