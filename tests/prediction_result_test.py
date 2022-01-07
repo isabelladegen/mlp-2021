@@ -103,13 +103,30 @@ def test_can_calculate_mean_absolute_error_per_station():
 
 
 def test_calculates_mean_prediction_result_of_two_predictions():
-    df1 = pd.DataFrame([[0, 7, 201], [1, 0, 203]], columns=['Id', 'Predictions', 'station'])
-    df2 = pd.DataFrame([[0, 10, 201], [2, 0, 203]], columns=['Id', 'Predictions', 'station'])
-    merged = pd.merge(df1, df2, on=['Id', 'station'], how='outer')
+    predictions1 = [10, 4, 12]
+    ids1 = [1, 2, 3]
+    stations1 = [201, 202, 203]
+    true_values1 = [10, 10, 10]
+    result1 = PredictionResult(ids1)
+    result1.add_predictions(predictions1)
+    result1.add_stations(stations1)
+    result1.add_true_values(true_values1)
 
-    merged['mean predictions'] = merged[['Predictions_x', 'Predictions_y']].mean(axis=1)
-    # round
-    print(merged)
+    predictions2 = [8, 2, 3]
+    ids2 = [1, 2, 4]
+    stations2 = [201, 202, 203]
+    true_values2 = [10, 10, 10]
+    result2 = PredictionResult(ids2)
+    result2.add_predictions(predictions2)
+    result2.add_stations(stations2)
+    result2.add_true_values(true_values2)
+
+    combined_result = PredictionResult([result1, result2], calculate_mean=True)
+
+    df = combined_result.results_df
+    assert_that(df.shape, equal_to((4, 6)))
+    assert_that(list(df[ResultsColumns.predictions.value]), equal_to([9.0, 3.0, 12.0, 3.0]))
+    assert_that(combined_result.mean_absolute_error(), equal_to(17 / 4))
 
 
 def cleanup_files():

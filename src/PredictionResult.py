@@ -1,3 +1,5 @@
+import math
+
 from sklearn.metrics import mean_absolute_error
 from datetime import datetime
 import os
@@ -18,8 +20,18 @@ class ResultsColumns(enum.Enum):
 
 
 class PredictionResult:
-    def __init__(self, ids_or_prediction_results: []):
-        if all(isinstance(item, PredictionResult) for item in ids_or_prediction_results):
+    def __init__(self, ids_or_prediction_results: [], calculate_mean=False):
+        if calculate_mean and all(isinstance(item, PredictionResult) for item in
+                                  ids_or_prediction_results):  # only works for two Prediction Results
+            merged = pd.merge(ids_or_prediction_results[0].results_df,
+                              ids_or_prediction_results[1].results_df,
+                              on=[ResultsColumns.id.value, ResultsColumns.station.value,
+                                  ResultsColumns.true_values.value],
+                              how='outer')
+            merged[ResultsColumns.predictions.value] = list(merged[['predictions_x', 'predictions_y']].mean(axis=1))
+            merged[ResultsColumns.predictions.value].apply(self.round_half_up)
+            self.results_df = merged.sort_values(by=[ResultsColumns.id.value], ignore_index=True)
+        elif all(isinstance(item, PredictionResult) for item in ids_or_prediction_results):
             df = pd.concat([result.results_df for result in ids_or_prediction_results], ignore_index=True)
             self.results_df = df.sort_values(by=[ResultsColumns.id.value], ignore_index=True)
         else:
@@ -59,3 +71,7 @@ class PredictionResult:
 
         CsvWriter.write_csv(submission_df, filename)
         return filename
+
+    def round_half_up(self, n, decimals=0):
+        multiplier = 10 ** decimals
+        return math.floor(n * multiplier + 0.5) / multiplier

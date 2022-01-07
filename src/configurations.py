@@ -66,6 +66,9 @@ class Configuration:
     log_predictions_to_wandb: bool = True
     run_test_predictions: bool = True
 
+    # Round
+    intermediate_rounding: bool = False
+
     # Sweep
     sweep_training_path: str = '../data/Dev/Sweeping/dev.csv'
     sweep_validation_path: str = '../data/Dev/Sweeping/val.csv'
