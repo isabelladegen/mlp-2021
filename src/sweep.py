@@ -180,7 +180,7 @@ def mlp_sweep_params():
             'values': [300, 400, 600]
         },
         'mlp_hidden_layer_sizes': {
-            'values': [(100,), (50,), (200,)]
+            'values': [(100,), (200,)]
         },
         'mlp_features': {
             'values': [
@@ -242,6 +242,20 @@ def mlp_sweep_params():
                  Columns.short_profile_bikes.value,
                  Columns.short_profile_3h_diff_bikes.value
                  ],
+                [Columns.data_3h_ago.value,  # no station, full and short, temp profile
+                 Columns.full_profile_bikes.value,
+                 Columns.full_profile_3h_diff_bikes.value,
+                 Columns.short_profile_bikes.value,
+                 Columns.short_profile_3h_diff_bikes.value,
+                 Columns.rel_humidity.value
+                 ],
+                [Columns.week_hour.value,  # week hour, full and short profile
+                 Columns.data_3h_ago.value,
+                 Columns.full_profile_bikes.value,
+                 Columns.full_profile_3h_diff_bikes.value,
+                 Columns.short_profile_bikes.value,
+                 Columns.short_profile_3h_diff_bikes.value,
+                 ],
             ]
         }
     }
@@ -252,7 +266,7 @@ if __name__ == '__main__':
     sweep_params = mlp_sweep_params()
 
     sweep_config_grid = {
-        'name': 'MLP Sweep 2 (8)',
+        'name': 'MLP Sweep 3 (9)',
         'method': 'grid',
         'parameters': sweep_params
     }

@@ -102,6 +102,16 @@ def test_can_calculate_mean_absolute_error_per_station():
     assert_that(mae_per_station[2], equal_to(10.0))
 
 
+def test_calculates_mean_prediction_result_of_two_predictions():
+    df1 = pd.DataFrame([[0, 7, 201], [1, 0, 203]], columns=['Id', 'Predictions', 'station'])
+    df2 = pd.DataFrame([[0, 10, 201], [2, 0, 203]], columns=['Id', 'Predictions', 'station'])
+    merged = pd.merge(df1, df2, on=['Id', 'station'], how='outer')
+
+    merged['mean predictions'] = merged[['Predictions_x', 'Predictions_y']].mean(axis=1)
+    # round
+    print(merged)
+
+
 def cleanup_files():
     config = TestConfiguration()
     for filename in glob.glob(os.path.join(config.write_predictions_to_path + config.write_results_start_name + "*")):
