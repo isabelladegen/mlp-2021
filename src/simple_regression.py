@@ -80,7 +80,7 @@ def log_per_station_mae_to_wand(key: str, per_station_values: {}):  # {station:m
 
 
 def main():
-    run(RandomForestRegressorModel, Configuration())
+    run(MultiLayerPerceptronRegressorModel, Configuration())
 
 
 if __name__ == "__main__":

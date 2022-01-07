@@ -177,7 +177,7 @@ def random_forest_sweep_params():
 def mlp_sweep_params():
     sweep_params = {
         'mlp_max_iter': {
-            'values': [100, 300, 500]
+            'values': [300, 400, 600]
         },
         'mlp_hidden_layer_sizes': {
             'values': [(100,), (50,), (200,)]

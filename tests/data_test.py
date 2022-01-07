@@ -1,7 +1,11 @@
 from hamcrest import *
 import numpy as np
+import pandas as pd
+from sklearn.metrics import mean_absolute_error
+
 from src.configurations import TestConfiguration
 from src.Data import *
+from src.models.Model import Model
 
 
 def test_loads_data_from_specified_csv_file():
@@ -202,3 +206,12 @@ def test_returns_stations_for_data():
     assert_that(len(set(stations)), equal_to(75))
     assert_that(stations[0], equal_to(201))
     assert_that(stations[len(stations) - 1], equal_to(275))
+
+
+def tests_loads_all_pretrained_models_into_matrix_of_feature_weights_x_model():
+    configuration = TestConfiguration()
+    trained_models = PretrainedLinearModels(configuration.pretrained_models_path)
+
+    assert_that(trained_models.weights_matrix.shape, equal_to((7, 1200)))
+    assert_that(len(trained_models.features), equal_to(6))
+    assert_that(trained_models.features[0], equal_to('bikes_3h_ago'))

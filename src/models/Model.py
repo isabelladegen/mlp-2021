@@ -24,7 +24,7 @@ class Model:
 
         rounded_predictions = []
         for prediction in predictions:
-            rounded_predictions.append(self.__round_half_up(prediction))
+            rounded_predictions.append(self.round_half_up(prediction))
 
         y = data.get_y()
         result = PredictionResult(data.get_ids())
@@ -34,6 +34,6 @@ class Model:
         return result
 
     @staticmethod
-    def __round_half_up(n, decimals=0):
+    def round_half_up(n, decimals=0):
         multiplier = 10 ** decimals
         return math.floor(n * multiplier + 0.5) / multiplier

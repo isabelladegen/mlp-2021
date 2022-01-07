@@ -25,17 +25,21 @@ class Columns(enum.Enum):
     short_profile_3h_diff_bikes = 'short_profile_3h_diff_bikes'
 
 
-def read_pre_trained_models():
-    data_path = '../data/Models/'
-    if not os.path.exists(data_path):
-        raise "ERROR: Path: " + data_path + " does not exist!"
-    for csv in glob.glob(os.path.join(data_path, "*.csv")):
-        station = csv.split('_')[2]
-
-
-class ModelData:
+class PretrainedLinearModels:
     def __init__(self, data_path):
-        print('implement')
+        if not os.path.exists(data_path):
+            raise "ERROR: Path: " + data_path + " does not exist!"
+        result = pd.DataFrame()
+        # this is a very slow way to do it, would be better to concat lists but no time right now
+        for file_name in glob.glob(os.path.join(data_path, "*.csv")):
+            df = pd.read_csv(file_name, header=0).set_index('feature').transpose().reset_index()
+            df = df.drop('index', axis=1)
+            df.insert(0, 'model', os.path.basename(file_name))
+            result = result.append(df, ignore_index=True)
+        self.models_df = result.set_index('model')
+        self.weights_matrix = self.models_df.to_numpy(na_value=0).transpose()  # weights x models matrix
+        # same feature for each model as weight will just be set to 0 if feature not used in model
+        self.features = list(self.models_df.columns.drop('(Intercept)'))
 
 
 class Data:

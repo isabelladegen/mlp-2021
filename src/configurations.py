@@ -57,6 +57,9 @@ class Configuration:
     val_data_filename: str = 'validation.csv'
     dev_validation_data_split: int = 10  # take 10% of the labelled rows away for validation during development
 
+    # Pretrained models
+    pretrained_models_path: str = '../data/Models/'
+
     # Run
     run_one_model: bool = True
     run_model_per_station: bool = True

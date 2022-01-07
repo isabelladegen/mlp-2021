@@ -1,22 +1,27 @@
-from src.Data import Data
+from src.Data import Data, PretrainedLinearModels
 from src.PredictionResult import PredictionResult
 from src.configurations import Configuration
 
 
 class PerStationModel:
-    def __init__(self, config: Configuration, all_stations_training_data: Data, model_class):
+    def __init__(self, config: Configuration, all_stations_training_data: Data, model_class,
+                 use_pretrained_model: bool = False):
         self.configuration = config
         self.training_data_all_stations = all_stations_training_data
 
         # get data per station
         self.training_data_per_station = self.training_data_all_stations.get_data_per_station()
-        result = self.__instantiate_model_per_station(config, model_class)
+        result = self.__instantiate_model_per_station(config, model_class, use_pretrained_model)
         self.model_per_station = result
 
-    def __instantiate_model_per_station(self, config, model_class):
+    def __instantiate_model_per_station(self, config, model_class, use_pretrained_model):
         result = {}
+        trained_models = PretrainedLinearModels(self.configuration.pretrained_models_path)
         for station, station_data in self.training_data_per_station.items():
-            model = model_class(config, station_data)
+            if use_pretrained_model:
+                model = model_class(self.configuration, station_data, trained_models)
+            else:
+                model = model_class(config, station_data)
             result[station] = model
         return result
 
