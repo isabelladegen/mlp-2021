@@ -12,6 +12,7 @@ class Columns(enum.Enum):
     num_docks = 'numDocks'
     bikes = 'bikes'
     data_3h_ago = 'bikes_3h_ago'
+    weekday = "weekday"
     week_hour = 'weekhour'
     is_holiday = 'isHoliday'
     temperature = 'temperature.C'
@@ -58,6 +59,14 @@ class Data:
 
         if self.no_nan_in_bikes:
             self.__remove_nan_rows_in_bikes()
+
+        self.raw_pd_df.replace(to_replace={'Monday': '0',
+                                           'Tuesday': '1',
+                                           'Wednesday': '2',
+                                           'Thursday': '3',
+                                           'Friday': '4',
+                                           'Saturday': '5',
+                                           'Sunday': '6'}, inplace=True)
 
     def __instantiate_from_path(self, data_path):
         if not os.path.exists(data_path):

@@ -177,48 +177,24 @@ def random_forest_sweep_params():
 def mlp_sweep_params():
     sweep_params = {
         'mlp_max_iter': {
-            'values': [500, 600, 700]
+            'values': [500, 550, 600]
         },
         'mlp_hidden_layer_sizes': {
-            'values': [(100,), (200,)]
+            'values': [(100,), (150), (200,)]
+        },
+        'mlp_activation': {
+            'values': ['identity', 'logistic', 'tanh', 'relu']
         },
         'mlp_features': {
             'values': [
-                [Columns.data_3h_ago.value,  # no station, full and short profile
+                [Columns.weekday.value,
+                 Columns.data_3h_ago.value,
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
                  Columns.short_profile_bikes.value,
                  Columns.short_profile_3h_diff_bikes.value
                  ],
                 [Columns.week_hour.value,  # week hour, full and short profile
-                 Columns.data_3h_ago.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 ],
-                [Columns.station.value,  # station, full and short profile
-                 Columns.data_3h_ago.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 ],
-                [Columns.num_docks.value,  # station, full and short profile
-                 Columns.data_3h_ago.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 ],
-                [Columns.air_pressure.value,  # station, full and short profile
-                 Columns.data_3h_ago.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 ],
-                [Columns.rel_humidity.value,  # station, full and short profile
                  Columns.data_3h_ago.value,
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
