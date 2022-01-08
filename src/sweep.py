@@ -180,20 +180,16 @@ def mlp_sweep_params():
             'values': [500, 550, 600]
         },
         'mlp_hidden_layer_sizes': {
-            'values': [(100,), (150,), (200,)]
+            'values': [(200,), (200, 200,), (100, 100, 100,)]
         },
         'mlp_activation': {
-            'values': ['identity', 'logistic', 'tanh', 'relu']
+            'values': ['tanh', 'relu']
+        },
+        'mlp_solver': {
+            'values': ['adam', 'lbfgs']
         },
         'mlp_features': {
             'values': [
-                [Columns.weekday.value,
-                 Columns.data_3h_ago.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value
-                 ],
                 [Columns.week_hour.value,  # week hour, full and short profile
                  Columns.data_3h_ago.value,
                  Columns.full_profile_bikes.value,
@@ -202,13 +198,6 @@ def mlp_sweep_params():
                  Columns.short_profile_3h_diff_bikes.value,
                  ],
                 [Columns.temperature.value,  # station, full and short profile
-                 Columns.data_3h_ago.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 ],
-                [Columns.is_holiday.value,  # station, full and short profile
                  Columns.data_3h_ago.value,
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
