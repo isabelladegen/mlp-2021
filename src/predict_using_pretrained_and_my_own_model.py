@@ -13,9 +13,9 @@ def run(config: Configuration = Configuration()):
     wandb_run = wandb.init(project=config.wandb_project_name,
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
-                           notes="Combination of my model and the best trained amber sweep",
-                           tags=['Best trained model', 'MLP', 'model per station', 'no rounding at the end', 'mode',
-                                 'Sweep 10'],
+                           notes="Combination of my model and MLP fearless yogurt",
+                           tags=['Best trained model', 'MLP', 'model per station', 'no rounding at the end',
+                                 'no feature scaling', '2 layers'],
                            config=config.as_dict())
 
     # Reload the Configuration (to allow for sweeps)

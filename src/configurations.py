@@ -80,7 +80,7 @@ class Configuration:
 
     # Models
     intermediate_rounding: bool = True
-    feature_scaling: bool = True  # does feature scaling for models that are sensitive, e.g MLP
+    feature_scaling: bool = False  # does feature scaling for models that are sensitive, e.g MLP
     features_data_type: {} = field(
         default_factory=lambda: {Columns.station.value: 'category',
                                  Columns.data_3h_ago.value: 'category',

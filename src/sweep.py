@@ -177,32 +177,43 @@ def random_forest_sweep_params():
 def mlp_sweep_params():
     sweep_params = {
         'mlp_max_iter': {
-            'values': [500, 550, 600]
+            'values': [500, 550, 700]
         },
         'mlp_hidden_layer_sizes': {
-            'values': [(200,), (200, 200,), (100, 100, 100,)]
-        },
-        'mlp_activation': {
-            'values': ['tanh', 'relu']
-        },
-        'mlp_solver': {
-            'values': ['adam', 'lbfgs']
+            'values': [(200,), (200, 200,), (100, 200,), (200, 100,)]
         },
         'mlp_features': {
             'values': [
-                [Columns.week_hour.value,  # week hour, full and short profile
-                 Columns.data_3h_ago.value,
-                 Columns.full_profile_bikes.value,
-                 Columns.full_profile_3h_diff_bikes.value,
-                 Columns.short_profile_bikes.value,
-                 Columns.short_profile_3h_diff_bikes.value,
-                 ],
+                # [Columns.week_hour.value,  # week hour, full and short profile
+                #  Columns.data_3h_ago.value,
+                #  Columns.full_profile_bikes.value,
+                #  Columns.full_profile_3h_diff_bikes.value,
+                #  Columns.short_profile_bikes.value,
+                #  Columns.short_profile_3h_diff_bikes.value,
+                #  ],
                 [Columns.temperature.value,  # station, full and short profile
                  Columns.data_3h_ago.value,
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
                  Columns.short_profile_bikes.value,
                  Columns.short_profile_3h_diff_bikes.value,
+                 ],
+                # [Columns.week_hour.value,  # station, full and short profile
+                #  Columns.data_3h_ago.value,
+                #  Columns.full_profile_bikes.value,
+                #  Columns.full_profile_3h_diff_bikes.value,
+                #  Columns.short_profile_bikes.value,
+                #  Columns.short_profile_3h_diff_bikes.value,
+                #  Columns.temperature.value
+                #  ],
+                [Columns.data_3h_ago.value, # just weather
+                 Columns.full_profile_bikes.value,
+                 Columns.full_profile_3h_diff_bikes.value,
+                 Columns.short_profile_bikes.value,
+                 Columns.short_profile_3h_diff_bikes.value,
+                 Columns.wind_mean_speed.value,
+                 Columns.rel_humidity.value,
+                 Columns.air_pressure.value
                  ],
             ]
         }
@@ -214,7 +225,7 @@ if __name__ == '__main__':
     sweep_params = mlp_sweep_params()
 
     sweep_config_grid = {
-        'name': 'MLP Sweep 6 (12)',
+        'name': 'MLP Sweep 7 (13) Scaling',
         'method': 'grid',
         'parameters': sweep_params
     }
