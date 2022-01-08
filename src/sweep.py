@@ -214,7 +214,7 @@ if __name__ == '__main__':
     sweep_params = mlp_sweep_params()
 
     sweep_config_grid = {
-        'name': 'MLP Sweep 5 (11)',
+        'name': 'MLP Sweep 6 (12)',
         'method': 'grid',
         'parameters': sweep_params
     }

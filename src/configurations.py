@@ -66,9 +66,6 @@ class Configuration:
     log_predictions_to_wandb: bool = True
     run_test_predictions: bool = True
 
-    # Round
-    intermediate_rounding: bool = True
-
     # Sweep
     sweep_training_path: str = '../data/Dev/Sweeping/dev.csv'
     sweep_validation_path: str = '../data/Dev/Sweeping/val.csv'
@@ -82,6 +79,8 @@ class Configuration:
     write_results_start_name: str = 'predictions_'
 
     # Models
+    intermediate_rounding: bool = True
+    feature_scaling: bool = True  # does feature scaling for models that are sensitive, e.g MLP
     features_data_type: {} = field(
         default_factory=lambda: {Columns.station.value: 'category',
                                  Columns.data_3h_ago.value: 'category',
@@ -143,13 +142,13 @@ class Configuration:
     # MLP Regressor
     mlp_features: [str] = field(
         default_factory=lambda: [
-                                 Columns.week_hour.value,
-                                 Columns.data_3h_ago.value,
-                                 Columns.full_profile_bikes.value,
-                                 Columns.full_profile_3h_diff_bikes.value,
-                                 Columns.short_profile_bikes.value,
-                                 Columns.short_profile_3h_diff_bikes.value,
-                                 ])
+            Columns.week_hour.value,
+            Columns.data_3h_ago.value,
+            Columns.full_profile_bikes.value,
+            Columns.full_profile_3h_diff_bikes.value,
+            Columns.short_profile_bikes.value,
+            Columns.short_profile_3h_diff_bikes.value,
+        ])
     mlp_hidden_layer_sizes: tuple = (100,)
     mlp_activation: str = 'relu'  # ‘identity’, ‘logistic’, ‘tanh’, ‘relu’
     mlp_solver: str = 'adam'  # ‘lbfgs’, ‘sgd’, ‘adam’ - adam default

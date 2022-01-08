@@ -32,4 +32,4 @@ class MultiLayerPerceptronRegressorModel(Model):
             epsilon=config.mlp_epsilon,
             n_iter_no_change=config.mlp_n_iter_no_change,
             max_fun=config.mlp_max_fun)
-        Model.__init__(self, config, training_data, features, model)
+        Model.__init__(self, config, training_data, features, model, feature_scaling=config.feature_scaling)
