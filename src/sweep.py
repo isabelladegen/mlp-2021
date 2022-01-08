@@ -180,7 +180,7 @@ def mlp_sweep_params():
             'values': [500, 550, 600]
         },
         'mlp_hidden_layer_sizes': {
-            'values': [(100,), (150), (200,)]
+            'values': [(100,), (150,), (200,)]
         },
         'mlp_activation': {
             'values': ['identity', 'logistic', 'tanh', 'relu']
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     sweep_params = mlp_sweep_params()
 
     sweep_config_grid = {
-        'name': 'MLP Sweep 4 (10)',
+        'name': 'MLP Sweep 5 (11)',
         'method': 'grid',
         'parameters': sweep_params
     }

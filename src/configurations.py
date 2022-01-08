@@ -143,7 +143,7 @@ class Configuration:
     # MLP Regressor
     mlp_features: [str] = field(
         default_factory=lambda: [
-                                 Columns.week_hour.value,
+                                 Columns.temperature.value,
                                  Columns.data_3h_ago.value,
                                  Columns.full_profile_bikes.value,
                                  Columns.full_profile_3h_diff_bikes.value,
@@ -151,7 +151,7 @@ class Configuration:
                                  Columns.short_profile_3h_diff_bikes.value,
                                  ])
     mlp_hidden_layer_sizes: tuple = (200,)
-    mlp_activation: str = 'relu'  # ‘identity’, ‘logistic’, ‘tanh’, ‘relu’
+    mlp_activation: str = 'tanh'  # ‘identity’, ‘logistic’, ‘tanh’, ‘relu’
     mlp_solver: str = 'adam'  # ‘lbfgs’, ‘sgd’, ‘adam’ - adam default
     mlp_alpha: float = 0.0001  # L2 penalty
     mlp_batch_size: int = 'auto'
