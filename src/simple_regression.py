@@ -15,8 +15,8 @@ def run(model_class, config: Configuration = Configuration()):
     wandb_run = wandb.init(project=config.wandb_project_name,
                            entity=config.wandb_entity,
                            mode=config.wandb_mode,
-                           notes="MLP - repeat amber sweep",
-                           tags=[str(model_class).split('.')[-1].replace('>\'', ''), 'one model', 'model per station'],
+                           notes="MLP - repeat best sweep but with feature scaling",
+                           tags=[str(model_class).split('.')[-1].replace('>\'', ''), 'model per station'],
                            config=config.as_dict())
 
     # Reload the Configuration (to allow for sweeps)

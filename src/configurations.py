@@ -149,15 +149,15 @@ class Configuration:
             Columns.short_profile_bikes.value,
             Columns.short_profile_3h_diff_bikes.value,
         ])
-    mlp_hidden_layer_sizes: tuple = (100,)
-    mlp_activation: str = 'relu'  # ‘identity’, ‘logistic’, ‘tanh’, ‘relu’
+    mlp_hidden_layer_sizes: tuple = (200,200)
+    mlp_activation: str = 'tanh'  # ‘identity’, ‘logistic’, ‘tanh’, ‘relu’
     mlp_solver: str = 'adam'  # ‘lbfgs’, ‘sgd’, ‘adam’ - adam default
     mlp_alpha: float = 0.0001  # L2 penalty
     mlp_batch_size: int = 'auto'
     mlp_learning_rate: str = 'adaptive'  # ‘adaptive’, ‘invscaling’, ‘adaptive’  - constant default
     mlp_learning_rate_init: float = 0.001  # Only used when solver=’sgd’ or ‘adam’.
     mlp_power_t: float = 0.5  # Only used when solver=’sgd’.
-    mlp_max_iter: int = 500  # upped max iterations
+    mlp_max_iter: int = 550  # upped max iterations
     mlp_shuffle: bool = True  # Only used when solver=’sgd’ or ‘adam’.
     mlp_random_state: int = None
     mlp_tol: float = 1e-4
