@@ -1,8 +1,8 @@
 %! Author = idegen
 %! Date = 26/11/2021
 
-\documentclass{article}
-\usepackage[a4paper, total={6in, 8in}]{geometry}
+\documentclass[a4paper]{article}
+\usepackage[margin=1in]{geometry}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
@@ -27,6 +27,7 @@
 \usepackage{outlines}
 \usepackage{tabularx}
 \usepackage{enumitem}
+\usepackage[T1]{fontenc}
 \graphicspath{ {./images/} }
 \makeatletter
 \def\namedlabel#1#2{\begingroup
@@ -97,12 +98,12 @@
     \begin{description}
         \item [\namedlabel{itm:phase3-step1}{Step 3.1}] Create an end to end pipeline for the combining the models from \nameref{phs:one} and \nameref{phs:two}
         \item [\namedlabel{itm:phase3-step2}{Step 3.2}] Tune promising setups
-        \item [\namedlabel{itm:phase3-step4}{Step 3.4}] Investigate the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}
+        \item [\namedlabel{itm:phase3-step3}{Step 3.3}] Investigate the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}
     \end{description}
-    
+
     I keep referring back to these steps in the sections \nameref{sec:technical-background}, \nameref{sec:method}, \nameref{sec:experiment-setup} and
     \nameref{sec:results}. The \nameref{sec:conclusions} sections gives a summary of my overall learnings and conclusions.
-    
+
     The code for this coursework is available from my GitHub \href{https://github.com/isabelladegen/mlp-2021}{mlp-2021} repository and
     all of the tracked runs are available on my \href{https://wandb.ai/idegen/mlp-2021}{Weights \& Biases - MLP 2021 workspace}.
 
@@ -142,445 +143,496 @@
 
     \section{Method}\label{sec:method}
 
-    In this section I describe the method for each of the steps as listed in the \nameref{sec:introduction}.
+    In this section I describe the method used for each of the steps listed in the \nameref{sec:introduction}.
 
     \subsection*{\nameref{phs:one}}
 
-    Overall I'm using the training data for testing and feature engineering, and the test data to make submission.
-    However, given there's no true no number of bikes provided for the test data I also take 10\% of the training data away
-    for validation purposes.
-
-    Development:
-    For development I'm implemeting all code that is not pure experimentation in a test driven way. Further more all parameters are defined in a configurations class. This avoids magic nubmers and
-    strings, ensures these values get logged in W&B which helps with reproducibility for each experiment even at this early stage.
-
-    Quite a bit of iteration between step 1 and 2 - I didn't wanted to learn more about the data than I needed to
+    For this coursework we were given a dataset for stations 201-275 with 744 labelled samples per station
+    resulting in a total 55800 labelled samples. While we were also given a test dataset, the test dataset had no labels
+    and therefore could not be used to validate my models during development of the system. For that reason I randomly
+    took 10\% of samples away from the 55800 labelled samples. I call the resulting dataset of 5580 labelled data the validation
+    dataset and the remaining dataset of 50220 labelled samples the training or dev dataset. All the models are only
+    trained on the training dataset. This setup allowed me to verifiy my models performance on unseen data.
 
     \subsubsection*{\nameref{itm:phase1-step1}}
-    - Goal is to decide what sort of problem it is (see results)
-    - Goal is to find out what's similar and what's different between the different station
-    - Can I understand what the data means? What the different columns are by firstly understanding what data I've been given
-    (see results for interpretation of the data)
-    - Iterating back to this step as I'm building the model and need to understand more about the data
+    The goal for this step is to gain a better idea of what sort of problem we've been given. For this I looked at the
+    given dataset on a very high level. I wanted to know how much data we were given, what type of data we were given and
+    generally understand
+    a bit more what the data means. As I moved to \nameref{itm:phase1-step2} I continued to come back to this step
+    to understand more about how many data points were nan to decide how to best pre-process the data for a new column.
 
 
-    \subsubsection*{\nameref{itm:phase1-step2}
-    Setup
-    I wanted to not decide on an algorithm from the get go but instead create a pipeline that let me easily try out and evaluate
-    a few models before spending time making one of them good. For this I setup pure Python pipeline:
-    : load data, predict random numbers, calculate mean average error, log results both in csv file and to W&B
+    \subsubsection*{\nameref{itm:phase1-step2}}
+    As described in \nameref{sec:conclusions} I create a \texit{pipeline} setup where I didn't needed to decide
+    on an algorithm and that let me easily experiment and evaluate different models, features and ways of data processing.
 
-    Random Guessing
-    Firstly, I created a baseline by randomly guessing the number of bikes for each sample porvided in the training data a few
-    times.
+    I also wanted to create a baseline. For this I wrote a random estimator that returns a random number of bikes between
+    0 and the number of docks for the station.
 
-    Simple regression - one model for all stations
-    - Goal: input variable X = number of bikes 3h ago -> predict number of bikes now
-    - Second experiment is do a simple regression based on just one feature bikes 3h ago
-    - Remove a further random 10\% of the Training data into a valdiation data set so I have some labelled validation data
-    - now I have a development and a validation dataset that's labelled
-    - 300 rows don/t hve bikes from 3 hours ago, decide what to do, e.g just drop, put to average bikes at station number, put to
-    previos bikes 3h ago...
-    - Set nan to the most common number for that column (experiment) - see get feature matrix in Data.py
+    Following from that, I created a model for all stations as well as a model per station using the PoissonRegressor from
+    scikit-learn \cite{scikit-learn}. The difference between approach a) and b) was a simpler wrapper class that split the
+    overall dataframe of all stations back into the data per station and that managed the multiple models. The results
+    two can both deal with per station results, overall results and report on per station mean absolut error or
+    overall absolute error.
 
-    Simple Regression - model per station
-    - same as above but train a different model for each station
-    - using the same model class (PoissonModel) but having another class that can be given whatever model and that manages
-    the data to be split per station
-    - also calculate mae for each station as well as overall both for both approaches
+    For both I used bikes\_3h\_ago as feature matrix X. Given 300 rows have this value as nan I had to decide what to do
+    with a nan value. Possibilities I thought of were: just drop those samples, use the mean number of bikes. I didn't wanted
+    to drop 300 samples as I was invevitably going to drop a lot more samples with that strategy when adding more features.
+    I decided to put the nan values to the most frequent value. For the per station data that meant to the most frequent for
+    the station, for the one model for all stations that meant to the most frequent value overall.
 
-    Simple Regression - Random Forest
-    - introduce Random Forest model with default configuration
-    - pulled the similar code between PoisssonModel and RandomForestRegressorModel into Model class
-    - instead of instatiating the model in the run function, pass the class name and and instantiate from that (no more code had to be written)
-        - write tests and create smaller test set to be able to test a run (RandomForest takes significantly longer to train)
-        - working with the same data and no addtional features choosen yet
+    Given I wanted to make it super easy to swap models and given the results were not great for the PoissonRegressor
+    I also added a RandomForestRegressor model from scikit-learn. This made me pull the code out of the PoissonModel class
+    into an \texttt{abstract} Model class that is doing the \texttt{fit()} and \texttt{predict()} and creating a result.
+    The only bit of code needed for a specific model was the configuration of that model. I reused the same run script
+    by passing it the name of the class instead of an instance, so it could create the model itself depending on its configuration.
 
-        \subsubsection*{\nameref{itm:phase1-step3}
-        Poisson & Random Forest Use More features
-        Features avavailable are:
-        - things specific about the station, e.g num dockss, where it is (longitude, latiduate) -> these are expected to be more important
-        for an overal model, less for a per station model as they stay the same
-        - things specific about bike demand in general, e.g weather, what day it is, what time it is -> they might change the demand
-        for some stations more than for others
-        -> Use location, num docks for the one model but not per station
-        -> Use weather features and time  -> hour of the week
-        For each feature added decide what to do with Nan and make sure the feature gets preprocessed
-        Initially add all new features accross the board before making more decisions
+    For unit testing of the code I used fake data setup in builder classes as well as a smaller data subset of real data.
 
-        Start adding feature by feature, decide how to fill nan, run, quick evaluate and add more if not deterimental
-        1. Add station ID (instead of long and lat) - this is expected to help the one model
-        2. Add hour of week (this should be weekday and time of day encoded)
-            3. Add weather data - notbook analysis before including in test run
-            4. Add is holdiay (keep)
-            5. Add just airpressure back
-            6. Add temerature instead of airpressure (worse)
-            7. Bike profile features (first full) - I still don't know what it means
+    I ran a wandb experiment for all of these three naive models: random guessing, poisson regressor and random forest
+    regressor with just one feature.
 
-            \subsubsection*{\nameref{itm:phase1-step4}
-            Use weight and biases sweep ability. Define a few different hyperparameters, make a smaller data set (runtime!) and
-            sweep through the parameters to learn which ones have what effect. Iterate multiple times with what works and
-            see if the results from the default configuration can be imporved.
+%    todo log results
+
+
+    \subsubsection*{\nameref{itm:phase1-step3}}
+    Poisson & Random Forest Use More features
+    Features avavailable are:
+    - things specific about the station, e.g num dockss, where it is (longitude, latiduate) -> these are expected to be more important
+    for an overal model, less for a per station model as they stay the same
+    - things specific about bike demand in general, e.g weather, what day it is, what time it is -> they might change the demand
+    for some stations more than for others
+    -> Use location, num docks for the one model but not per station
+    -> Use weather features and time  -> hour of the week
+    For each feature added decide what to do with Nan and make sure the feature gets preprocessed
+    Initially add all new features accross the board before making more decisions
+
+    Start adding feature by feature, decide how to fill nan, run, quick evaluate and add more if not deterimental
+    1. Add station ID (instead of long and lat) - this is expected to help the one model
+    2. Add hour of week (this should be weekday and time of day encoded)
+    3. Add weather data - notbook analysis before including in test run
+    4. Add is holdiay (keep)
+    5. Add just airpressure back
+    6. Add temerature instead of airpressure (worse)
+    7. Bike profile features (first full) - I still don't know what it means
+
+    \subsubsection*{\nameref{itm:phase1-step4}}
+    Use weight and biases sweep ability. Define a few different hyperparameters, make a smaller data set (runtime!) and
+    sweep through the parameters to learn which ones have what effect. Iterate multiple times with what works and
+    see if the results from the default configuration can be imporved.
+
+    \subsection*{\nameref{phs:two}}
+    \subsubsection*{\nameref{itm:phase2-step1}} Analyse the given models
+    \subsubsection*{\nameref{itm:phase2-step2}} Create an end to end pipeline for the given models
+    \subsubsection*{\nameref{itm:phase2-step3}} Investigate the resulting performance and compare to \nameref{phs:one}
+
+    \subsection*{\nameref{phs:three}}
+    \subsubsection*{\nameref{itm:phase3-step1}} Create an end to end pipeline for the combining the models from \nameref{phs:one} and \nameref{phs:two}
+    \subsubsection*{\nameref{itm:phase3-step2}} Tune promising setups
+    \subsubsection*{\nameref{itm:phase3-step3}} Investigate the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-            \section{Experiment Setup}\label{sec:experiment-setup}
-            Overall: I'm using IDEs for coding and running: JetBrains DataSpell for Notebooks and PyCharm for pure Python. Both IDEs offer
-            a rich debugging and runtime environment, test and script execution, advanced refactoring abilities and so forth.
-            - logging everything including configurations, git revision nubmer to weight and biasess
+    \section{Experiment Setup}\label{sec:experiment-setup}
+    Overall: I'm using IDEs for coding and running: JetBrains DataSpell for Notebooks and PyCharm for pure Python. Both IDEs offer
+    a rich debugging and runtime environment, test and script execution, advanced refactoring abilities and so forth.
+    - logging everything including configurations, git revision nubmer to weight and biasess
 
-            \subsection*{\nameref{phs:one}}
+    \subsection*{\nameref{phs:one}}
 
-            \subsubsection*{\nameref{itm:phase1-step1}}
-            Data Experimentation was mostly done in Jupyter notebooks which can be seen on github.
-            Data loaded with Pandas Dataframe
+    \subsubsection*{\nameref{itm:phase1-step1}}
+    I mostly used the
+    \href{https://github.com/isabelladegen/mlp-2021/blob/main/notebooks/ExperimentWithPerStationData.ipynb}{ExperimentWithPerStationData.ipynb}
+    Jupyter notebook and loaded the data into a pandas dataframe \cite{reback2020pandas} which overs various methods
+    to get a quick insights of the data such as: \texttt{info()}, \texttt{describe()} and \texttt{value\_counts()} as well
+    as methods to count nan's.
 
-            \subsubsection*{\nameref{itm:phase1-step2}
-            For this I wrote pure Python. Random guessing is done just picking a random integer between 0 and number of docks
-            for each station (using Pythons random library). I've used skikits mean absolute error calculation function. The result
-            is logged to W&B.
+    \subsubsection*{\nameref{itm:phase1-step2}}
+    For this I wrote pure Python. Random guessing is done just picking a random integer between 0 and number of docks
+    for each station (using Pythons random library). I've used skikits mean absolute error calculation function. The result
+    is logged to W&B.
 
-            Random Guessing
-            - Similar data loading technique from step 1 but in pure Python
-            - Test drive the classes with dummy data to be able to quickly develop the code
-            - Configuration class for real runs and one for testing  (include link to class or appendix)
-                - testing one is not writing to wandb
-                - Keeping the dataframes in memory for speed and because they are small enough
-                -  reads all csv into one big dataframe and ensures that the index is unique (not like it would be by default) - see Data class
+    Random Guessing
+    - Similar data loading technique from step 1 but in pure Python
+    - Test drive the classes with dummy data to be able to quickly develop the code
+    - Configuration class for real runs and one for testing  (include link to class or appendix)
+    - testing one is not writing to wandb
+    - Keeping the dataframes in memory for speed and because they are small enough
+    -  reads all csv into one big dataframe and ensures that the index is unique (not like it would be by default) - see Data class
 
-                Simple Regression - one model for all station
-                - Write dev and validation csv to make loading of those data sets easier
-                - have a script to do this split and it's tested two, I don't rerun it unless I want a new set
-                - reuse data reading from Random Guessing
-                - unlabelled rows are removed
-                - ending up with 50220 samples for training and 5580 samples for validation for development
-                - for nan values in bikes\_3h\_ago the df column type was changed to be categorical and used a Simple imputer
-                with the most frequent value for that column to replace none zeros
+    Simple Regression - one model for all station
+    - Write dev and validation csv to make loading of those data sets easier
+    - have a script to do this split and it's tested two, I don't rerun it unless I want a new set
+    - reuse data reading from Random Guessing
+    - unlabelled rows are removed
+    - ending up with 50220 samples for training and 5580 samples for validation for development
+    - for nan values in bikes\_3h\_ago the df column type was changed to be categorical and used a Simple imputer
+    with the most frequent value for that column to replace none zeros
 
 %    TODO paste code
 
-                Simple Regression - model per station
-                - simple\_regression.py will run both the single model and the model per station training and prediction, the parameters are logged
-                accordingly
-                - adjusted PredictionResults.py to be able to be constructed from multiple (per station results)
-                - log an additional table with mae per station for both one model for all station as well as for the model per station
-                - tried both one and two features: bikes\_3h\_ago, numDocks as well as just bikes\_3h\_ago
+    Simple Regression - model per station
+    - simple\_regression.py will run both the single model and the model per station training and prediction, the parameters are logged
+    accordingly
+    - adjusted PredictionResults.py to be able to be constructed from multiple (per station results)
+    - log an additional table with mae per station for both one model for all station as well as for the model per station
+    - tried both one and two features: bikes\_3h\_ago, numDocks as well as just bikes\_3h\_ago
 
-                Random Forest Regressor
-                - Reuse all the previous code but implement new parameters
-                - Run with bikes\_3h\_ago as well as that plus number of docks
-                - default all parameters
+    Random Forest Regressor
+    - Reuse all the previous code but implement new parameters
+    - Run with bikes\_3h\_ago as well as that plus number of docks
+    - default all parameters
 
-                \subsubsection*{\nameref{itm:phase1-step3}
-                For location: just add the station id, given that lat and long mean nothing, there's no nan can be directly added
-                as categorical data
-                    (run wobbly hill)
+    \subsubsection*{\nameref{itm:phase1-step3}}
+    For location: just add the station id, given that lat and long mean nothing, there's no nan can be directly added
+    as categorical data
+    (run wobbly hill)
 
-                    For hour of week: all station have the week hour no nan, can be directly added like location again categorical data
-                    run name: easy-capybara
+    For hour of week: all station have the week hour no nan, can be directly added like location again categorical data
+    run name: easy-capybara
 
-                    Weather Data:
-                    - Analysis in notebook of the different weather columns: 'windMaxSpeed.m.s', 'windMeanSpeed.m.s', 'windDirection.grades',
-                    'temperature.C', 'relHumidity.HR', 'airPressure.mb', 'precipitation.l.m2'
-                    - they all have 75 data points missing but not all of them the same, so decided to fill nan with most frequent value
-                    - precipitation has no training data so cannot be used
-                    - temperature does not overlap between test and training - leave out for now
-                    - using only one of the wind speed (going for mean)
-                    - using 'windMeanSpeed.m.s', 'windDirection.grades', 'relHumidity.HR', 'airPressure.mb' -> they all have overlapping values
-                    in test and training data set
-                    -> Run name is vital-hill-32
+    Weather Data:
+    - Analysis in notebook of the different weather columns: 'windMaxSpeed.m.s', 'windMeanSpeed.m.s', 'windDirection.grades',
+    'temperature.C', 'relHumidity.HR', 'airPressure.mb', 'precipitation.l.m2'
+    - they all have 75 data points missing but not all of them the same, so decided to fill nan with most frequent value
+    - precipitation has no training data so cannot be used
+    - temperature does not overlap between test and training - leave out for now
+    - using only one of the wind speed (going for mean)
+    - using 'windMeanSpeed.m.s', 'windDirection.grades', 'relHumidity.HR', 'airPressure.mb' -> they all have overlapping values
+    in test and training data set
+    -> Run name is vital-hill-32
 
-                    Is Holiday (without weather): Run astral-feather
+    Is Holiday (without weather): Run astral-feather
 
 
-                    \subsubsection*{\nameref{itm:phase1-step4}
+    \subsubsection*{\nameref{itm:phase1-step4}}
 
-                    1. Sweep just with a few hyper parameters and 10\% of the dev and val data (dev-sweep1, val-sweep1).
-                    - Only sweep one model as it's quicker
-                    - Results of sweep in Random Forest Sweep 1 https://wandb.ai/idegen/mlp-2021/sweeps/ylvvcigm?workspace=user-idegen
-                    - method: grid
-                    name: Random forest sweep 1
-                    parameters:
-                    random\_forest\_bootstrap:
-                    values:
-                    - false
-                    random\_forest\_ccp\_alpha:
-                    values:
-                    - 0
-                    - 0.05
-                    - 0.1
-                    - 0.3
-                    random\_forest\_criterion:
-                    values:
-                    - squared\_error
-                    - poisson
-                    random\_forest\_max\_depth:
-                    values:
-                    - null
-                    - 10
-                    - 50
-                    random\_forest\_min\_samples\_split:
-                    values:
-                    - 2
-                    - 4
-                    random\_forest\_n\_estimators:
-                    values:
-                    - 50
-                    - 100
-                    - 120
-                    -> For the best sweep result re-run the full model:
-                    Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
-                    -> Best sweep result
-                    Features:
-                        ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday","full\_profile\_bikes","full\_profile\_3h\_diff\_bikes"]
-                        Differnce in hyperparams:
-                        random\_forest\_max\_depth: 50
-                        random\_forest\_n\_estimators: 50
-                        random\_forest\_ccp\_alpha: 0.05
-                        random\_forest\_criterion: squared\_error
+    1. Sweep just with a few hyper parameters and 10\% of the dev and val data (dev-sweep1, val-sweep1).
+    - Only sweep one model as it's quicker
+    - Results of sweep in Random Forest Sweep 1 https://wandb.ai/idegen/mlp-2021/sweeps/ylvvcigm?workspace=user-idegen
+    - method: grid
+    name: Random forest sweep 1
+    parameters:
+    random\_forest\_bootstrap:
+    values:
+    - false
+    random\_forest\_ccp\_alpha:
+    values:
+    - 0
+    - 0.05
+    - 0.1
+    - 0.3
+    random\_forest\_criterion:
+    values:
+    - squared\_error
+    - poisson
+    random\_forest\_max\_depth:
+    values:
+    - null
+    - 10
+    - 50
+    random\_forest\_min\_samples\_split:
+    values:
+    - 2
+    - 4
+    random\_forest\_n\_estimators:
+    values:
+    - 50
+    - 100
+    - 120
+    -> For the best sweep result re-run the full model:
+    Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
+    -> Best sweep result
+    Features:
+    ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday","full\_profile\_bikes","full\_profile\_3h\_diff\_bikes"]
+    Differnce in hyperparams:
+    random\_forest\_max\_depth: 50
+    random\_forest\_n\_estimators: 50
+    random\_forest\_ccp\_alpha: 0.05
+    random\_forest\_criterion: squared\_error
 
-                        Breezy Sound: https://wandb.ai/idegen/mlp-2021/runs/12p54n9c/overview?workspace=user-idegen
-                        -> New parameters but features as current best run with default configuration
-                        Features: ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday"]
-                        random\_forest\_max\_depth: 50
-                        random\_forest\_n\_estimators: 50
-                        random\_forest\_ccp\_alpha - 0.05
-                        random\_forest\_criterion: squared\_error
+    Breezy Sound: https://wandb.ai/idegen/mlp-2021/runs/12p54n9c/overview?workspace=user-idegen
+    -> New parameters but features as current best run with default configuration
+    Features: ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday"]
+    random\_forest\_max\_depth: 50
+    random\_forest\_n\_estimators: 50
+    random\_forest\_ccp\_alpha - 0.05
+    random\_forest\_criterion: squared\_error
 
-                        Stoic Sun: https://wandb.ai/idegen/mlp-2021/runs/12zlftk6/overview?workspace=user-idegen
-                        -> Features from best run squared error and ccp from sweep, max depth and n estimator from best run
-                        random\_forest\_features
-                        Features: ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday"]
-                        random\_forest\_max\_depth: Default
-                        random\_forest\_n\_estimators: 100
-                        random\_forest\_ccp\_alpha - 0.05
-                        random\_forest\_criterion: squared\_error
+    Stoic Sun: https://wandb.ai/idegen/mlp-2021/runs/12zlftk6/overview?workspace=user-idegen
+    -> Features from best run squared error and ccp from sweep, max depth and n estimator from best run
+    random\_forest\_features
+    Features: ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday"]
+    random\_forest\_max\_depth: Default
+    random\_forest\_n\_estimators: 100
+    random\_forest\_ccp\_alpha - 0.05
+    random\_forest\_criterion: squared\_error
 
-                        Sweep 2: https://wandb.ai/idegen/mlp-2021/sweeps/79bi8rgn/overview
-                        - 30\% of training data
-                        - Model per station
-                        - Different features, ccp
-                        -> lead to an improval on astral feather with zesty field
+    Sweep 2: https://wandb.ai/idegen/mlp-2021/sweeps/79bi8rgn/overview
+    - 30\% of training data
+    - Model per station
+    - Different features, ccp
+    -> lead to an improval on astral feather with zesty field
 
-                        Sweep 3:
-                        - try some other pruning methods
+    Sweep 3:
+    - try some other pruning methods
 
-                        Sweep 4: Features and Hyperparmetes including feature combination used in the given models
-                        - use full data for sweeping as runtime is low at the momemnt
+    Sweep 4: Features and Hyperparmetes including feature combination used in the given models
+    - use full data for sweeping as runtime is low at the momemnt
+
+
+    \subsection*{\nameref{phs:two}}
+    \subsubsection*{\nameref{itm:phase2-step1}} Analyse the given models
+    \subsubsection*{\nameref{itm:phase2-step2}} Create an end to end pipeline for the given models
+    \subsubsection*{\nameref{itm:phase2-step3}} Investigate the resulting performance and compare to \nameref{phs:one}
+
+    \subsection*{\nameref{phs:three}}
+    \subsubsection*{\nameref{itm:phase3-step1}} Create an end to end pipeline for the combining the models from \nameref{phs:one} and \nameref{phs:two}
+    \subsubsection*{\nameref{itm:phase3-step2}} Tune promising setups
+    \subsubsection*{\nameref{itm:phase3-step3}} Investigate the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-                        \section{Results}\label{sec:results}
-                        Results achieved
+    \section{Results}\label{sec:results}
+    Results achieved
 
-                        \subsection*{\nameref{phs:one}}
-                        Overall:
+    \subsection*{\nameref{phs:one}}
+    Overall:
 
-                        \subsubsection*{\nameref{itm:phase1-step1}}
-                        - There are 55875 labelled samples
-                        - 13275 rows have at least one NanValue -> what to do with nan
-                        - 75 rows don't have a bike prediction - decided to remove these rows for evaluating the performance of my alogrithm
-                        - Some interesting data that I didn't know what it mean
-                        - Describe the columns and what I think they mean
-                        - Not all data types are usefull in it's current format, e.g Weekday would have to be translated into a numerical value as day of week
-                        - 300 examples from training datas don't provide bikes from 3 hours ago
+    \subsubsection*{\nameref{itm:phase1-step1}}
+    The dataset we are given has 55875 samples. 75, exactly one per station, of these samples are missing their label ('bikes'
+    column value null).
+    I decided to simply exclude those rows, meaning I had in total 55800 labelled samples, 744 per station. Furthermore,
+    13275 rows have a least one nan value in other columns. 
+    We've been given various information:
+    \begin{itemize}
+        \item \textbf{Information about the station}: tation (station id), latitude, longitude and 
+        numDocks (number of available bike docks)
+        \item \textbf{Information about the time when the sample was taken}: timestamp, year, month, day, hour, 
+        weekday, weekhour (a combination of weekday and hour), isHoliday (marking public holidays)
+        \item \textbf{Information about the weather}: windMaxSpeed.m.s, windMeanSpeed.m.s,  windDirection.grades, 
+        temperature.C, relHumidity.HR, airPressure.mb, precipitation.l.m2
+        \item \textbf{Information about the bike usage}: bikes\_3h\_ago, full\_profile\_3h\_diff\_bikes,
+          full\_profile\_bikes, short\_profile\_3h\_diff\_bikes, short\_profile\_bikes, bikes
+    \end{itemize}
+   
+    Other than the information about the bike usage, these all made sense. I'm to this day not sure what the columns
+    about the bike usage actually mean other than bikes\_3h\_ago persumably is the number of bikes at the station 3h
+    before the sample was taken and bikes is the number of bikes at the station when the sample was taken. Curiously it
+    is possible for a station to have and record more bikes than the number of docks available.
 
-                        - This is most naturally a multivariate regression problem
-                        - Multivariate Regression to predict a number but could be a classifier if we say the numbers are from a discrete set of numbers
-                        - Supervised learning given we've got labelled data
-                        - Might be worth to do some feature exploring with clustering to learn how the different features relate to each other
-                        - Given that the goal is to predict a number and given I have labelled data for some stations I decided that this could be
-                        well formulated as a regression problem.
+    Not all data types are useful in their raw format. E.g weekday would need to be translated into a numerical value.
+    Other than the weather data the given data was categorical.
 
-                        \subsubsection*{\nameref{itm:phase1-step2}
+    \subsubsection*{\nameref{itm:phase1-step2}}
 
-                        Random Guessing - the same if one model for all stations or not
-                        - for average see wandb, average random guessing had a mean average error of 7.307-7.369
+    Random Guessing - the same if one model for all stations or not
+    - for average see wandb, average random guessing had a mean average error of 7.307-7.369
 
-                        Simple Regression - one model for all stations
-                        - dev dataset is now of size 50220 and validation data set is 5580
-                        - Significantly better than random guessing
+    Simple Regression - one model for all stations
+    - dev dataset is now of size 50220 and validation data set is 5580
+    - Significantly better than random guessing
 
-                        Simple Regression - model per station
-                        - same data set as above
+    Simple Regression - model per station
+    - same data set as above
 
-                        Features = Bikes\_3h\_ago
-                        One model - training data mae = 3.767
-                        One model - validation data mae = 3.812
-                        per station - training data mae = 3.236
-                        per station - validation data mae = 3.327
+    Features = Bikes\_3h\_ago
+    One model - training data mae = 3.767
+    One model - validation data mae = 3.812
+    per station - training data mae = 3.236
+    per station - validation data mae = 3.327
 
-                        Features = Bikes\_3h\_ago & num Docks
-                        One model - training data mae = 3.661
-                        One model - validation data mae = 3.706
-                        per station - training data mae = 3.236
-                        per station - validation data mae = 3.327
+    Features = Bikes\_3h\_ago & num Docks
+    One model - training data mae = 3.661
+    One model - validation data mae = 3.706
+    per station - training data mae = 3.236
+    per station - validation data mae = 3.327
 
-                        -> Model per station performs slightly better with minimal additional time for the single model
-                        -> no difference in features used for model per station
+    -> Model per station performs slightly better with minimal additional time for the single model
+    -> no difference in features used for model per station
 
-                        -> overall the model per station performed better
+    -> overall the model per station performed better
 
-                        Random Forest Regressor:
-                        First run: one feature 3h\_bikes - 4th peach-bird
-                        Model per station - Training data: MAE 2.90715
-                        Model per station - Validation data: MAE 3.14552
-                        One model - Training data: MAE 3.19787
-                        One model - Validation data: MAE 3.28136
+    Random Forest Regressor:
+    First run: one feature 3h\_bikes - 4th peach-bird
+    Model per station - Training data: MAE 2.90715
+    Model per station - Validation data: MAE 3.14552
+    One model - Training data: MAE 3.19787
+    One model - Validation data: MAE 3.28136
 
-                        Second run: 2 features num of Docks and 3h\_bikes - 4th autumn-rain
-                        Model per station - Training data: MAE 2.90709
-                        Model per station - Validation data: MAE 3.14749
-                        One model - Training data: MAE 3.12366
-                        One model - Validation data: MAE 3.26918
+    Second run: 2 features num of Docks and 3h\_bikes - 4th autumn-rain
+    Model per station - Training data: MAE 2.90709
+    Model per station - Validation data: MAE 3.14749
+    One model - Training data: MAE 3.12366
+    One model - Validation data: MAE 3.26918
 
-                        One Model:
-                        Station differences:
-                        -> Random Forest does better for all stations, so far all algorithms struggle with a few stations:
-                        - station 233 - MAE 11.6 for PoissonRegressor (2 features - classic pyramid - training), ~8 for Random Forest * both (particularly in training ata)
-                            - station 249 - MAE 11.25 Poisson (classic pyramid - validation), 8.1 Random Forest (Peach bird - validation),
-                            6.3 (Peach bird - training)
-                            - station 208 - MAE 7.7 Poissn classic pyramid validation, 6.71 Random Forest Peach bird - validation
-                            - station 230 - MAE 7.6 Poisson classic pyramid validation, 7.1 Random Forest (peach bird - validation)
+    One Model:
+    Station differences:
+    -> Random Forest does better for all stations, so far all algorithms struggle with a few stations:
+    - station 233 - MAE 11.6 for PoissonRegressor (2 features - classic pyramid - training), ~8 for Random Forest * both (particularly in training ata)
+    - station 249 - MAE 11.25 Poisson (classic pyramid - validation), 8.1 Random Forest (Peach bird - validation),
+    6.3 (Peach bird - training)
+    - station 208 - MAE 7.7 Poissn classic pyramid validation, 6.71 Random Forest Peach bird - validation
+    - station 230 - MAE 7.6 Poisson classic pyramid validation, 7.1 Random Forest (peach bird - validation)
 
-                            -> A few stations do better than average
-                            - station 209-211, 213, 227, 252, 256-259, 262, 265-270, 272-275 all have MAE around 2 for Random Forest
+    -> A few stations do better than average
+    - station 209-211, 213, 227, 252, 256-259, 262, 265-270, 272-275 all have MAE around 2 for Random Forest
 
-                            Differences in Training and Validation:
-                            - Most stations do worse in validation as expected given the algorithm is trained on the training data, however for station
-                            233 this is not the case it does worse in training (11.6training, 10.4 validation poisson-classic pyramid),
-                            (8.1 training, 7.6 validation peach bird -  random forest)
+    Differences in Training and Validation:
+    - Most stations do worse in validation as expected given the algorithm is trained on the training data, however for station
+    233 this is not the case it does worse in training (11.6training, 10.4 validation poisson-classic pyramid),
+    (8.1 training, 7.6 validation peach bird -  random forest)
 
-                            For multiple models these trends are the same (the numbers are slightly different)
-                            - Multiple models perform slightly better (see weave)
+    For multiple models these trends are the same (the numbers are slightly different)
+    - Multiple models perform slightly better (see weave)
 
-                            \subsubsection*{\nameref{itm:phase1-step3}
-                            Poisson & Random Forest Use More features
-                            1. Station (as location data)
-                                wobbly-hill-run -> include station
-                                Model per station - Training data: MAE 2.90737
-                                Model per station - Validation data: MAE 3.14606
-                                One model - Training data: MAE 2.91782
-                                One model - Validation data: MAE 3.14946
-                                -> this had the wished effect that the difference between using a model per station and using just one model
-                                becomes way smaller
-                                -> However it does not necessarily hold true for the validation dataset
+    \subsubsection*{\nameref{itm:phase1-step3}}
+    Poisson & Random Forest Use More features
+    1. Station (as location data)
+    wobbly-hill-run -> include station
+    Model per station - Training data: MAE 2.90737
+    Model per station - Validation data: MAE 3.14606
+    One model - Training data: MAE 2.91782
+    One model - Validation data: MAE 3.14946
+    -> this had the wished effect that the difference between using a model per station and using just one model
+    becomes way smaller
+    -> However it does not necessarily hold true for the validation dataset
 
-                                2. Add Weekhour (as demand data based on weekday and time of day)
-                                Model per station - Training data: MAE 1.05213
-                                Model per station - Validation data: MAE 2.26165
-                                One model - Training data: MAE 1.18072
-                                One model - Validation data: MAE 2.52993
+    2. Add Weekhour (as demand data based on weekday and time of day)
+    Model per station - Training data: MAE 1.05213
+    Model per station - Validation data: MAE 2.26165
+    One model - Training data: MAE 1.18072
+    One model - Validation data: MAE 2.52993
 
-                                -> this had a profound impact removing the significance of the peaks for the bad stations
-                                -> However it also increased the gap between training data and validation. The start of overfitting
-                                -> On 50\% of the test data this avhieve 2.92266
+    -> this had a profound impact removing the significance of the peaks for the bad stations
+    -> However it also increased the gap between training data and validation. The start of overfitting
+    -> On 50\% of the test data this avhieve 2.92266
 
-                                3. Add weather data:vital-hill
-                                - Precipitation cannot be added as it is 0.0 for all the provided data so nothing can be learned form it
-                                alhtough it probably would be impactful
-                                Run Vital Hill -> it's overfitting and performs worse than the model without weather!
-                                Model per station - Training data: MAE 0.91045
-                                Model per station - Validation data: MAE 2.51165
-                                One model - Training data: MAE 1.10876
-                                One model - Validation data: MAE 2.8752
+    3. Add weather data:vital-hill
+    - Precipitation cannot be added as it is 0.0 for all the provided data so nothing can be learned form it
+    alhtough it probably would be impactful
+    Run Vital Hill -> it's overfitting and performs worse than the model without weather!
+    Model per station - Training data: MAE 0.91045
+    Model per station - Validation data: MAE 2.51165
+    One model - Training data: MAE 1.10876
+    One model - Validation data: MAE 2.8752
 
-                                4. Add is holiday: astra feather
-                                Model per station - Training data: MAE 1.00044
-                                Model per station - Validation data: MAE 2.21935
-                                One model - Training data: MAE 1.13664
-                                One model - Validation data: MAE 2.48154
-                                -> better than weather data
+    4. Add is holiday: astra feather
+    Model per station - Training data: MAE 1.00044
+    Model per station - Validation data: MAE 2.21935
+    One model - Training data: MAE 1.13664
+    One model - Validation data: MAE 2.48154
+    -> better than weather data
 
-                                5. Add air pressure back: driven cosmos - overfitting starts again
-                                Model per station - Training data: MAE 0.8418
-                                Model per station - Validation data: MAE 2.27939
-                                One model - Training data: MAE 1.04464
-                                One model - Validation data: MAE 2.67455
-
-
-                                6. Replace air pressure with temperature -> soft deluge
-                                Model per station - Training data: MAE 0.91617
-                                Model per station - Validation data: MAE 2.40878
-                                One model - Training data: MAE 1.09112
-                                One model - Validation data: MAE 2.73405
-                                -> as predicted this overfitts worse, temperature is not a good parameter
-
-                                7. Use full Bike profiles -> Dauntless wood
-                                Model per station - Training data: MAE 0.83188
-                                Model per station - Validation data: MAE 2.31577
-                                One model - Training data: MAE 0.92461
-                                One model - Validation data: MAE 2.419
-                                -> not as good as astral feather but not as overfitting as the weather!
+    5. Add air pressure back: driven cosmos - overfitting starts again
+    Model per station - Training data: MAE 0.8418
+    Model per station - Validation data: MAE 2.27939
+    One model - Training data: MAE 1.04464
+    One model - Validation data: MAE 2.67455
 
 
-                                \subsubsection*{\nameref{itm:phase1-step4}}
+    6. Replace air pressure with temperature -> soft deluge
+    Model per station - Training data: MAE 0.91617
+    Model per station - Validation data: MAE 2.40878
+    One model - Training data: MAE 1.09112
+    One model - Validation data: MAE 2.73405
+    -> as predicted this overfitts worse, temperature is not a good parameter
 
-                                Random Forest Sweep 1:
-                                - Show most influential parameter
-                                - Show graphs
-                                Parameters:
-                                - random\_forest\_n\_estimators:  [50, 100, 120] # made no difference
-                                - random\_forest\_criterion: ['squared\_error', 'absolute\_error']  # squared\_error better than poisson, try absolute error
-                                - random\_forest\_max\_depth: [None, 10, 50]  # 50 better than 100!
-                                - random\_forest\_min\_samples\_split: [2, 4] # made no difference
-                                - random\_forest\_ccp\_alpha: [0.0, 0.05, 0.1, 0.3]  # unclear but 0.05 did well
-                                -> criterion squared\_error speeds up the training significantly (not to sure yet how it impacts the performance)
-                                -> The difference in MAE between training and validation however was reduced, this did not impact the overal outcome though
-
-                                Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
-                                -> Best sweep result does not compete with default configurations
-
-                                Model per station - Training data: MAE 1.393
-                                Model per station - Validation data: MAE 2.72
-                                One model - Training data: MAE: 2.918
-                                One model - Validation data: MAE 2.947
-
-                                Breezy Sound: https://wandb.ai/idegen/mlp-2021/runs/12p54n9c/overview?workspace=user-idegen
-                                -> New parameters but features as current best run with default configuration
-
-                                Model per station - Training data: MAE 1.514
-                                Model per station - Validation data: MAE 2.432
-                                One model - Training data: MAE 3.273
-                                One model - Validation data: MAE 3.394
-
-                                Stoic Sun: https://wandb.ai/idegen/mlp-2021/runs/12zlftk6/overview?workspace=user-idegen
-                                -> Features from best run squared error and ccp from sweep, max depth and n estimator from best run (exactelly the same!?)
-                                Worse then astral feathers
-                                Model per station - Training data: MAE: 1.514
-                                Model per station - Validation data: MAE: 2.432
-                                One model - Training data: MAE: 3.273
-                                One model - Validation data: MAE: 3.394
-
-                                -> More sweeping with more data, model per station instead of one model, smaller ccp's
-
-                                Sweep 2:
-                                - ?
-                                -> decision try astral feather with ccp of 0.001
-                                -> Result is zesty field on per station only which is better
-                                Model per station - Training data: MAE 1.00787
-                                Model per station - Validation data: MAE 2.20771
-                                (good thread on the different parameters: https://stackoverflow.com/questions/20463281/how-do-i-solve-overfitting-in-random-forest-of-python-sklearn)
-
-                                Sweep 3:
-                                - Impurity did not result in better performance for the real dataset
-                                - also setting random to 0 makes the runs reproducible
-
-                                Sweep 4: Features and Hyperparmetes
-                                - Impurity in combination with more features create a better result which could be confimred with floral-pine
-                                Model per station - Training data: MAE 0.89522
-                                Model per station - Validation data: MAE 2.20609
-                                -> For the random forest model the features used in the given models do not perform as well
+    7. Use full Bike profiles -> Dauntless wood
+    Model per station - Training data: MAE 0.83188
+    Model per station - Validation data: MAE 2.31577
+    One model - Training data: MAE 0.92461
+    One model - Validation data: MAE 2.419
+    -> not as good as astral feather but not as overfitting as the weather!
 
 
-                                \section{Conclusions}\label{sec:conclusions}
-                                share any insights you gained about how the system works.
+    \subsubsection*{\nameref{itm:phase1-step4}}
+
+    Random Forest Sweep 1:
+    - Show most influential parameter
+    - Show graphs
+    Parameters:
+    - random\_forest\_n\_estimators:  [50, 100, 120] # made no difference
+    - random\_forest\_criterion: ['squared\_error', 'absolute\_error']  # squared\_error better than poisson, try absolute error
+    - random\_forest\_max\_depth: [None, 10, 50]  # 50 better than 100!
+    - random\_forest\_min\_samples\_split: [2, 4] # made no difference
+    - random\_forest\_ccp\_alpha: [0.0, 0.05, 0.1, 0.3]  # unclear but 0.05 did well
+    -> criterion squared\_error speeds up the training significantly (not to sure yet how it impacts the performance)
+    -> The difference in MAE between training and validation however was reduced, this did not impact the overal outcome though
+
+    Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
+    -> Best sweep result does not compete with default configurations
+
+    Model per station - Training data: MAE 1.393
+    Model per station - Validation data: MAE 2.72
+    One model - Training data: MAE: 2.918
+    One model - Validation data: MAE 2.947
+
+    Breezy Sound: https://wandb.ai/idegen/mlp-2021/runs/12p54n9c/overview?workspace=user-idegen
+    -> New parameters but features as current best run with default configuration
+
+    Model per station - Training data: MAE 1.514
+    Model per station - Validation data: MAE 2.432
+    One model - Training data: MAE 3.273
+    One model - Validation data: MAE 3.394
+
+    Stoic Sun: https://wandb.ai/idegen/mlp-2021/runs/12zlftk6/overview?workspace=user-idegen
+    -> Features from best run squared error and ccp from sweep, max depth and n estimator from best run (exactelly the same!?)
+    Worse then astral feathers
+    Model per station - Training data: MAE: 1.514
+    Model per station - Validation data: MAE: 2.432
+    One model - Training data: MAE: 3.273
+    One model - Validation data: MAE: 3.394
+
+    -> More sweeping with more data, model per station instead of one model, smaller ccp's
+
+    Sweep 2:
+    - ?
+    -> decision try astral feather with ccp of 0.001
+    -> Result is zesty field on per station only which is better
+    Model per station - Training data: MAE 1.00787
+    Model per station - Validation data: MAE 2.20771
+    (good thread on the different parameters: https://stackoverflow.com/questions/20463281/how-do-i-solve-overfitting-in-random-forest-of-python-sklearn)
+
+    Sweep 3:
+    - Impurity did not result in better performance for the real dataset
+    - also setting random to 0 makes the runs reproducible
+
+    Sweep 4: Features and Hyperparmetes
+    - Impurity in combination with more features create a better result which could be confimred with floral-pine
+    Model per station - Training data: MAE 0.89522
+    Model per station - Validation data: MAE 2.20609
+    -> For the random forest model the features used in the given models do not perform as well
+
+    \subsection*{\nameref{phs:two}}
+    \subsubsection*{\nameref{itm:phase2-step1}} Analyse the given models
+    \subsubsection*{\nameref{itm:phase2-step2}} Create an end to end pipeline for the given models
+    \subsubsection*{\nameref{itm:phase2-step3}} Investigate the resulting performance and compare to \nameref{phs:one}
+
+    \subsection*{\nameref{phs:three}}
+    \subsubsection*{\nameref{itm:phase3-step1}} Create an end to end pipeline for the combining the models from \nameref{phs:one} and \nameref{phs:two}
+    \subsubsection*{\nameref{itm:phase3-step2}} Tune promising setups
+    \subsubsection*{\nameref{itm:phase3-step3}} Investigate the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}
 
 
-                                \section*{Acknowledgements}
+    \section{Conclusions}\label{sec:conclusions}
+    share any insights you gained about how the system works.
 
-                                \bibliographystyle{plain}
-                                \bibliography{bibliography}
+    \subsection*{\nameref{phs:one}}
+    \subsubsection*{\nameref{itm:phase1-step1}}
+    From the data given I decided that this problem was most naturally a multivariate regression problem where I had to
+    predict for each hour of the day the number of bikes a the station. I could perhaps also use a classifier given that
+    the number I had to predict was from a discrete set of numbers. It's a supervised learning problem given I have 55800
+    in total respectively 744 per station labelled data samples. I could do more feature exploring with clustering to
+    learn how the different features relate to each other. However, I decided to first build an end to end pipeline using
+    just the bikes\_3h\_ago as feature and building the ability to easily change the model and features as well as their
+    pre-processing used.
+
+    \section*{Acknowledgements}
+
+    \bibliographystyle{plain}
+    \bibliography{bibliography}
 %TODO reference the varsious medium articles for software engineering
 \end{document}
