@@ -23,12 +23,12 @@
     citecolor=RoyalBlue
 }
 \usepackage{graphicx}
+\graphicspath{ {./images/} }
 \usepackage{textcomp}
 \usepackage{outlines}
 \usepackage{tabularx}
-\usepackage{enumitem}
 \usepackage[T1]{fontenc}
-\graphicspath{ {./images/} }
+\usepackage{scrextend}
 \makeatletter
 \def\namedlabel#1#2{\begingroup
 #2%
@@ -63,11 +63,10 @@
 
     I followed the steps on \href{https://www.kaggle.com/c/morebikes2021/overview/description}{Kaggle}. I wrote a solution
     for both approaches:
-    \begin{enumerate}
-        [label=(\alph*)]
-        \item separate model for each station
-        \item single model for all stations together
-    \end{enumerate}
+    \begin{itemize}
+        \item[(a)] separate model for each station
+        \item[(b)] single model for all stations together
+    \end{itemize}
 
     The way I setup my scripts made it a simple change of configuration to train a model for all stations or one model
     or either one of them using any ML algorithm.
@@ -163,7 +162,7 @@
 
 
     \subsubsection*{\nameref{itm:phase1-step2}}
-    As described in \nameref{sec:conclusions} I create a \texit{pipeline} setup where I didn't needed to decide
+    As described in \nameref{sec:conclusions} I create a \textit{pipeline} setup where I didn't needed to decide
     on an algorithm and that let me easily experiment and evaluate different models, features and ways of data processing.
 
     I also wanted to create a baseline. For this I wrote a random estimator that returns a random number of bikes between
@@ -175,7 +174,7 @@
     two can both deal with per station results, overall results and report on per station mean absolut error or
     overall absolute error.
 
-    For both I used bikes\_3h\_ago as feature matrix X. Given 300 rows have this value as nan I had to decide what to do
+    For both I used bikes\_3h\_ago as feature matrix X. Given 300 rows are missing this value I had to decide what to do
     with a nan value. Possibilities I thought of were: just drop those samples, use the mean number of bikes. I didn't wanted
     to drop 300 samples as I was invevitably going to drop a lot more samples with that strategy when adding more features.
     I decided to put the nan values to the most frequent value. For the per station data that meant to the most frequent for
@@ -196,7 +195,7 @@
 
 
     \subsubsection*{\nameref{itm:phase1-step3}}
-    Poisson & Random Forest Use More features
+    Poisson \& Random Forest Use More features
     Features avavailable are:
     - things specific about the station, e.g num dockss, where it is (longitude, latiduate) -> these are expected to be more important
     for an overal model, less for a per station model as they stay the same
@@ -235,9 +234,8 @@
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}
-    Overall: I'm using IDEs for coding and running: JetBrains DataSpell for Notebooks and PyCharm for pure Python. Both IDEs offer
-    a rich debugging and runtime environment, test and script execution, advanced refactoring abilities and so forth.
-    - logging everything including configurations, git revision nubmer to weight and biasess
+    I'm using the JetBrains DataSpell IDE for working with Notebooks and PyCharm IDE for working with Python. Both IDEs offer
+    a rich debugging and runtime environment, test and script execution and advanced refactoring abilities.
 
     \subsection*{\nameref{phs:one}}
 
@@ -249,40 +247,58 @@
     as methods to count nan's.
 
     \subsubsection*{\nameref{itm:phase1-step2}}
-    For this I wrote pure Python. Random guessing is done just picking a random integer between 0 and number of docks
-    for each station (using Pythons random library). I've used skikits mean absolute error calculation function. The result
-    is logged to W&B.
+    All the code for the pipeline is just pure Python and can be found in the
+    \href{https://github.com/isabelladegen/mlp-2021/tree/main/src}{src} folder on GitHub. There are two
+    scripts to run either the random estimator or a model based estimator:
+    \begin{enumerate}
+        \item \href{https://github.com/isabelladegen/mlp-2021/blob/main/src/random_predictions.py}{random\_predictions.py}:
+        It uses the \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/src/models/RandomEstimator.py}{RandomEstimator}
+        class to estimate a random number of bikes
+        \item \href{https://github.com/isabelladegen/mlp-2021/blob/main/src/simple_regression.py}{simple\_regression.py}: It creates
+        an instance of the \href{https://github.com/isabelladegen/mlp-2021/blob/main/src/models/Model.py}{Model} class given, which
+        can be either for this experiment was either the \href{https://github.com/isabelladegen/mlp-2021/blob/main/src/models/PoissonModel.py}{PoissonModel}
+        or the \href{https://github.com/isabelladegen/mlp-2021/blob/main/src/models/RandomForestRegressorModel.py}{RandomForestRegressorModel}.
+    \end{enumerate}
 
-    Random Guessing
-    - Similar data loading technique from step 1 but in pure Python
-    - Test drive the classes with dummy data to be able to quickly develop the code
-    - Configuration class for real runs and one for testing  (include link to class or appendix)
-    - testing one is not writing to wandb
-    - Keeping the dataframes in memory for speed and because they are small enough
-    -  reads all csv into one big dataframe and ensures that the index is unique (not like it would be by default) - see Data class
+    Each model implements \texttt{predict()} which returns a  \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/src/PredictionResult.py}{PredictionResult}
+    class that is used for evaluation of the model. It calculates the overall mean absolute error (MAE) using \texttt{mean\_absolute\_error}
+    from scikit-learn, as well as the the MAE for each station. Furthermore the result also implements the
+    \texttt{write\_to\_csv()} function that writes the predictions to a csv file using the format required for the Kaggle submissions.
 
-    Simple Regression - one model for all station
-    - Write dev and validation csv to make loading of those data sets easier
-    - have a script to do this split and it's tested two, I don't rerun it unless I want a new set
-    - reuse data reading from Random Guessing
-    - unlabelled rows are removed
-    - ending up with 50220 samples for training and 5580 samples for validation for development
-    - for nan values in bikes\_3h\_ago the df column type was changed to be categorical and used a Simple imputer
-    with the most frequent value for that column to replace none zeros
+    The \texttt{run} script calls \texttt{wandb.init(...)} to start the experiment tracking, loads the training data using the required data,
+    creates both a single model and a model per station depending on the configuration, trains the model calling \texttt{fit()},
+    predicts the number of bikes for the training, validation and test data sets calling the different models \texttt{predict(...)}
+    functions which each return a prediction result, which is then called to log the overall MAE as well as the per
+    station MAE for the training and validation dataset, this is logged to wanddb using \texttt{wandb.log(...)} and finally
+    the script creates a csv for a Kaggle submission. All the rest of the experiment is automatically tracked by wandb
+    and the results can be visualised on there.
 
-%    TODO paste code
+    The \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/src/Data.py}{Data} class
+    is used to load all the data and also does all of the pre-processing based on configuration values. It encapsulates
+    a pandas dataframe and provides easy access function to get the feature matrix X and the labelled data y. It's further
+    capable of operating on all data or of returning a Data class for each station. The Data class is loading the
+    bikes\_3h\_ago column as pandas \texttt{category} type and is using the
+    \texttt{SimpleImputer(strategy="most\_frequent")} from scikit-learn to fill the nan values for bikes\_3h\_ago.
 
-    Simple Regression - model per station
-    - simple\_regression.py will run both the single model and the model per station training and prediction, the parameters are logged
-    accordingly
-    - adjusted PredictionResults.py to be able to be constructed from multiple (per station results)
-    - log an additional table with mae per station for both one model for all station as well as for the model per station
-    - tried both one and two features: bikes\_3h\_ago, numDocks as well as just bikes\_3h\_ago
+    Finally all the configurations are stored in the Configurations dataclass defined in
+    \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/src/configurations.py}{configurations.py}.
+    This script also provides a TestConfiguration class that disables the upload to wandb for unit testing purposes but
+    still ensures the calls are syntactically correct. At this stage both the PoissonRegressor as well as the RandomForestRegressor
+    were using their default configurations. However,
+    I've already made these hyper parameters configurable so that they automatically get logged in wandb.
 
-    Random Forest Regressor
-    - Reuse all the previous code but implement new parameters
-    - Run with bikes\_3h\_ago as well as that plus number of docks
-    - default all parameters
+    Finally, I wrote a helper \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/src/create_dev_and_validation_csv.py}{script}
+    to create the training and validation dataset and write them as .csv files in my local
+    data folder. Each experiment is using the same training and validation datasets, loading them from these .csv files.
+
+    The code as evolved since this experiment, the hashes listed below can be used to get the versions at the time of
+    these first simple experiment runs:
+
+    \begin{itemize}
+        \item \textbf{Random Prediction}: \\git checkout -b "classic-sun-10"\footnote{\label{fn:wand-db-name}wandb run name} c22db5e7b461cfd7ba7e7af81460d93b984b2e14
+        \item \textbf{Poisson Regressor}: \\git checkout -b "chocolate-serenity-19"\footref{fn:wand-db-name} e1c7158a2f41568b7781d00cc0d5330982edc398
+        \item \textbf{Random Forest Regressor}: \\git checkout -b "peach-bird-23"\footref{fn:wand-db-name} e6e86614d7e62a3f09bd635c8125f479c0d4e971
+    \end{itemize}
 
     \subsubsection*{\nameref{itm:phase1-step3}}
     For location: just add the station id, given that lat and long mean nothing, there's no nan can be directly added
@@ -405,19 +421,19 @@
     The dataset we are given has 55875 samples. 75, exactly one per station, of these samples are missing their label ('bikes'
     column value null).
     I decided to simply exclude those rows, meaning I had in total 55800 labelled samples, 744 per station. Furthermore,
-    13275 rows have a least one nan value in other columns. 
+    13275 rows have a least one nan value in other columns.
     We've been given various information:
     \begin{itemize}
-        \item \textbf{Information about the station}: tation (station id), latitude, longitude and 
+        \item \textbf{Information about the station}: tation (station id), latitude, longitude and
         numDocks (number of available bike docks)
-        \item \textbf{Information about the time when the sample was taken}: timestamp, year, month, day, hour, 
+        \item \textbf{Information about the time when the sample was taken}: timestamp, year, month, day, hour,
         weekday, weekhour (a combination of weekday and hour), isHoliday (marking public holidays)
-        \item \textbf{Information about the weather}: windMaxSpeed.m.s, windMeanSpeed.m.s,  windDirection.grades, 
+        \item \textbf{Information about the weather}: windMaxSpeed.m.s, windMeanSpeed.m.s,  windDirection.grades,
         temperature.C, relHumidity.HR, airPressure.mb, precipitation.l.m2
         \item \textbf{Information about the bike usage}: bikes\_3h\_ago, full\_profile\_3h\_diff\_bikes,
-          full\_profile\_bikes, short\_profile\_3h\_diff\_bikes, short\_profile\_bikes, bikes
+        full\_profile\_bikes, short\_profile\_3h\_diff\_bikes, short\_profile\_bikes, bikes
     \end{itemize}
-   
+
     Other than the information about the bike usage, these all made sense. I'm to this day not sure what the columns
     about the bike usage actually mean other than bikes\_3h\_ago persumably is the number of bikes at the station 3h
     before the sample was taken and bikes is the number of bikes at the station when the sample was taken. Curiously it
@@ -444,7 +460,7 @@
     per station - training data mae = 3.236
     per station - validation data mae = 3.327
 
-    Features = Bikes\_3h\_ago & num Docks
+    Features = Bikes\_3h\_ago \& num Docks
     One model - training data mae = 3.661
     One model - validation data mae = 3.706
     per station - training data mae = 3.236
@@ -489,7 +505,7 @@
     - Multiple models perform slightly better (see weave)
 
     \subsubsection*{\nameref{itm:phase1-step3}}
-    Poisson & Random Forest Use More features
+    Poisson \& Random Forest Use More features
     1. Station (as location data)
     wobbly-hill-run -> include station
     Model per station - Training data: MAE 2.90737
@@ -554,11 +570,11 @@
     - Show most influential parameter
     - Show graphs
     Parameters:
-    - random\_forest\_n\_estimators:  [50, 100, 120] # made no difference
-    - random\_forest\_criterion: ['squared\_error', 'absolute\_error']  # squared\_error better than poisson, try absolute error
-    - random\_forest\_max\_depth: [None, 10, 50]  # 50 better than 100!
-    - random\_forest\_min\_samples\_split: [2, 4] # made no difference
-    - random\_forest\_ccp\_alpha: [0.0, 0.05, 0.1, 0.3]  # unclear but 0.05 did well
+    - random\_forest\_n\_estimators:  [50, 100, 120] \# made no difference
+    - random\_forest\_criterion: ['squared\_error', 'absolute\_error']  \# squared\_error better than poisson, try absolute error
+    - random\_forest\_max\_depth: [None, 10, 50]  \# 50 better than 100!
+    - random\_forest\_min\_samples\_split: [2, 4] \# made no difference
+    - random\_forest\_ccp\_alpha: [0.0, 0.05, 0.1, 0.3]  \# unclear but 0.05 did well
     -> criterion squared\_error speeds up the training significantly (not to sure yet how it impacts the performance)
     -> The difference in MAE between training and validation however was reduced, this did not impact the overal outcome though
 
@@ -629,6 +645,13 @@
     learn how the different features relate to each other. However, I decided to first build an end to end pipeline using
     just the bikes\_3h\_ago as feature and building the ability to easily change the model and features as well as their
     pre-processing used.
+
+    \subsubsection*{\nameref{itm:phase1-step2}}
+    Use sckikit-learn pipeline next time
+    Log model too
+    Keep configuration better organised
+    For a bigger project the data could not be held in memory and some caching/streaming solution should be used
+
 
     \section*{Acknowledgements}
 
