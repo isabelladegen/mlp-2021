@@ -23,12 +23,15 @@
     citecolor=RoyalBlue
 }
 \usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 \graphicspath{ {./images/} }
 \usepackage{textcomp}
 \usepackage{outlines}
 \usepackage{tabularx}
 \usepackage[T1]{fontenc}
 \usepackage{scrextend}
+\usepackage{multirow}
 \makeatletter
 \def\namedlabel#1#2{\begingroup
 #2%
@@ -191,29 +194,28 @@
     I ran a wandb experiment for all of these three naive models: random guessing, poisson regressor and random forest
     regressor with just one feature.
 
-%    todo log results
-
-
     \subsubsection*{\nameref{itm:phase1-step3}}
-    Poisson \& Random Forest Use More features
-    Features avavailable are:
-    - things specific about the station, e.g num dockss, where it is (longitude, latiduate) -> these are expected to be more important
-    for an overal model, less for a per station model as they stay the same
-    - things specific about bike demand in general, e.g weather, what day it is, what time it is -> they might change the demand
-    for some stations more than for others
-    -> Use location, num docks for the one model but not per station
-    -> Use weather features and time  -> hour of the week
-    For each feature added decide what to do with Nan and make sure the feature gets preprocessed
-    Initially add all new features accross the board before making more decisions
+    At this point I wanted to include more features into the training to see if I could reduce the prediction error
+    especially for the stations that are performing much worse than others. I was still continuing to test both approaches:
+    a model per station as well as one model for all stations. However I decided to work with the RandomForestRegressor
+    as it was performing better than the PoissonRegressor. I also decided to play with features that I could understand
+    what they meant and so I left out the bike profile features (which in hindsight was a mistake).
 
-    Start adding feature by feature, decide how to fill nan, run, quick evaluate and add more if not deterimental
-    1. Add station ID (instead of long and lat) - this is expected to help the one model
-    2. Add hour of week (this should be weekday and time of day encoded)
-    3. Add weather data - notbook analysis before including in test run
-    4. Add is holdiay (keep)
-    5. Add just airpressure back
-    6. Add temerature instead of airpressure (worse)
-    7. Bike profile features (first full) - I still don't know what it means
+    Features I wanted to investigate were:
+    \begin{itemize}
+        \item \textbf{Weather Data}: I'm assuming this is similar across the different stations but could have an impact on
+        if people are using more or less motorbikes.
+        \item \textbf{Station Data}: For the one model for all station approach it could be beneficial to including station specific data such as longitude
+        and latitude, number of docks - bigger stations might be at busier locations than smaller stations, or even just the station id.
+        \item \textbf{Situational data}: Weekhour could help help with changes in demand for different times of the day and different days of the week.
+        Similarly isHoliday could perhaps help to distinguish between times that have very different demands.
+        \item \textbf{}
+        \item \textbf{}
+        \item \textbf{}
+    \end{itemize}
+
+    For each features I needed to decide what pre-processing steps were needed and if and how I could sensibly fill the nan values
+    for the feature.
 
     \subsubsection*{\nameref{itm:phase1-step4}}
     Use weight and biases sweep ability. Define a few different hyperparameters, make a smaller data set (runtime!) and
@@ -301,25 +303,36 @@
     \end{itemize}
 
     \subsubsection*{\nameref{itm:phase1-step3}}
-    For location: just add the station id, given that lat and long mean nothing, there's no nan can be directly added
-    as categorical data
-    (run wobbly hill)
+    The underlying infrastructure was in place by from the previous step. All I needed to do is change the configurations
+    and decide what to do with the nan values. I used the
+    \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/notebooks/TestAndTrainingDataForFeatureSelection.ipynb}{TestAndTrainingDataForFeatureSelection.ipynb}
+    Jupyter notebook to find get some high level statistics about the features I was about to add. I decided early
+    on (and mistakenly) not to include the bike profile features due to the many nan values. The location feature investigation is
+    in the \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/notebooks/InvestigateFeatures.ipynb}{InvestigateFeatures.ipynb}
+    Jupyter notebook.
 
-    For hour of week: all station have the week hour no nan, can be directly added like location again categorical data
-    run name: easy-capybara
+    I mostly used the RandomForestRegressor for this investigation. Table \ref{tbl:feature-exploration-overview} gives an
+    overview of the different
+    features explored as well as a link to the wandb logs for each of the relevant run. While analysing the
+    weather data I noticed that precipitation had no training data at all and was therefore not going to be useful for training and
+    the ranges of temperature between the training and the test dataset did not overlap well so I decided to leave that out
+    for now too.
 
-    Weather Data:
-    - Analysis in notebook of the different weather columns: 'windMaxSpeed.m.s', 'windMeanSpeed.m.s', 'windDirection.grades',
-    'temperature.C', 'relHumidity.HR', 'airPressure.mb', 'precipitation.l.m2'
-    - they all have 75 data points missing but not all of them the same, so decided to fill nan with most frequent value
-    - precipitation has no training data so cannot be used
-    - temperature does not overlap between test and training - leave out for now
-    - using only one of the wind speed (going for mean)
-    - using 'windMeanSpeed.m.s', 'windDirection.grades', 'relHumidity.HR', 'airPressure.mb' -> they all have overlapping values
-    in test and training data set
-    -> Run name is vital-hill-32
+    \begin{table}[h]
+        \centering
+        \begin{tabularx}{\textwidth}{|X|X|X|X|}
+            \hline
+            \textbf{Feature (s)}                                                    & \textbf{\#nan}                                                  & \textbf{Type} & \textbf{Experiment Id}                                                                                            \\ \hline
+            numDocks                                                                & no nan                                                          & category      & \href{https://wandb.ai/idegen/mlp-2021/runs/185f8iiz?workspace=user-idegen}{autumn-rain-25}    \\ \hline
+            station                                                                 & no nan                                                          & category      & \href{https://wandb.ai/idegen/mlp-2021/runs/3ikbmzvm?workspace=user-idegen}{wobbly-hill-29}    \\ \hline
+            weekhour                                                                & no nan                                                          & category      & \href{https://wandb.ai/idegen/mlp-2021/runs/36vs3wjd?workspace=user-idegen}{easy-capybara-30}  \\ \hline
+            windMeanSpeed.m.s, windDirection.grades, relHumidity.HR, airPressure.mb & all each had the same 75 samples with nan, fill with mean value & float         & \href{https://wandb.ai/idegen/mlp-2021/runs/2ncnkrj2?workspace=user-idegen}{vital-hill-32}     \\ \hline
+            isHoliday                                                               & 75 nan, fill with most frequent value                           & category      & \href{https://wandb.ai/idegen/mlp-2021/runs/140v0dji?workspace=user-idegen}{astral-feather-33} \\ \hline
+        \end{tabularx}
+        \caption{Overview of features explored, strategy for how to fill nan and link to the experiment on wanddb.}
+        \label{tbl:feature-exploration-overview}
+    \end{table}
 
-    Is Holiday (without weather): Run astral-feather
 
 
     \subsubsection*{\nameref{itm:phase1-step4}}
@@ -444,21 +457,53 @@
 
     \subsubsection*{\nameref{itm:phase1-step2}}
 
-    Random Guessing - the same if one model for all stations or not
-    - for average see wandb, average random guessing had a mean average error of 7.307-7.369
+    I ran multiple experiments for Random Guessing, basic Poisson Regressor and Random Forest Regressor, however
+    representative runs on wandb are listed below as reference for the results and configurations used, further runs can
+    be found e.g using tags:
+    \begin{itemize}
+        \item \href{https://wandb.ai/idegen/mlp-2021/runs/3k64fgcw/overview?workspace=user-idegen}{Random Guessing} - classic-sun-10
+        \item \href{https://wandb.ai/idegen/mlp-2021/runs/1iyx8zmh/overview?workspace=user-idegen}{Poisson Regressor} - chocolate-serenity-19
+        \item \href{https://wandb.ai/idegen/mlp-2021/runs/25zvoihx/overview?workspace=user-idegen}{Random Forest Regressor} -peach-bird-23
+    \end{itemize}
 
-    Simple Regression - one model for all stations
-    - dev dataset is now of size 50220 and validation data set is 5580
-    - Significantly better than random guessing
+    Table \ref{tbl:phase1-step2-simple-model-mae} shows that random guessing is in average 7 bikes off, while both ML models
+    outperformed random guessing and were only around 3 bikes off. The random forest regressor performed slightly better and
+    for both ML models the model per station peformed better than a single model for all stations. All models
+    were reasonable quick to train and run: random guessing took 8s, 1m 55s and the Random Forest Regressor took 11m 7s.
+    These timings are to be taken with a pinch of salt as the experiment was run on my machine with many other applications
+    running at the same time. They can only be used to get a general feeling. If of interest, wandb does
+    also log CPU, memory and disk utilisation. For the two ML models the time includes both training of the single model
+    as well as training of a model per station.
 
-    Simple Regression - model per station
-    - same data set as above
+    \begin{table}[h]
+        \centering
+        \begin{tabularx}{\textwidth}{|X|XX|XX|XX|}
+            \hline
+            \multirow{2}{*}{MAE} & \multicolumn{1}{l|}{Random Guessing} & & \multicolumn{2}{l|}{Poisson Regressor} & \multicolumn{2}{l|}{Random Forest Regressor} \\ \cline{2-7}
+            & \multicolumn{1}{l|}{Training} & Validation & \multicolumn{1}{l|}{Training} & Validation & \multicolumn{1}{l|}{Training} & Validation \\ \hline
+            a) Model per station & \multicolumn{2}{l|}{\multirow{2}{*}{7.369}} & \multicolumn{1}{l|}{3.236}    & 3.327      & \multicolumn{1}{l|}{2.907}    & 3.146      \\ \cline{1-1} \cline{4-7}
+            b) One Model & \multicolumn{2}{l|}{} & \multicolumn{1}{l|}{3.767} & 3.812 & \multicolumn{1}{l|}{3.198}    & 3.281      \\ \hline
+        \end{tabularx}
+        \caption{MAE for Random Guessing, Poisson Regressor and Random Forest Regressor. Last two using default configuration and one feature bikes\_3h\_ago. For
+        Random Guessing the dataset was used as one Training \& Validation as nothing is learned from the data.}
+        \label{tbl:phase1-step2-simple-model-mae}
+    \end{table}
 
-    Features = Bikes\_3h\_ago
-    One model - training data mae = 3.767
-    One model - validation data mae = 3.812
-    per station - training data mae = 3.236
-    per station - validation data mae = 3.327
+    Figure \ref{fig:simple-pr-rfr-mae-perstation} shows the MAE results for both the Poisson Regressor as well as the
+    Random Forest Regressor. Both models do better on the training data then the validation data and both models do
+    better for a model per station compared to one model. Station 233 performs the worst and has an MAE of 10 for the
+    Poisson Regressor and 7.9 for the Random Forest Regressor for a per station model. The error is even bigger with the
+    one model approach for both algorithms.
+
+    \begin{figure}[h]
+        \includegraphics[width=0.5\textwidth]{mae-pr-perstation}\hfill
+        \includegraphics[width=0.5\textwidth]{mae-rfr-comparison}
+        \caption{MAE per station for training and validation dataset for both both model per station and a single model}
+        \label{fig:simple-pr-rfr-mae-perstation}
+    \end{figure}
+
+
+    Poisson:
 
     Features = Bikes\_3h\_ago \& num Docks
     One model - training data mae = 3.661
@@ -647,11 +692,28 @@
     pre-processing used.
 
     \subsubsection*{\nameref{itm:phase1-step2}}
-    Use sckikit-learn pipeline next time
-    Log model too
-    Keep configuration better organised
-    For a bigger project the data could not be held in memory and some caching/streaming solution should be used
+    The design for the codebase and wandb worked out much better than what I initially did for the Dialogue and Narrative
+    course work. The configuration got quite big and messy in the end and will need a bit more thought to
+    keep more seperated between different models and experiments. Furthermore for a bigger project it definitely would
+    make sense to store the model and save it too, both for
+    reproducibility as well as saving time. Most of the model I played with have some randomness injected that is
+    beneficial to the model's performance but which makes it impossible to exactly reproduce an experiment. Furthermore
+    keeping the data in memory only works for a small dataset like the one we've been given. For a bigger dataset I
+    would need to avoid keeping all data in memory at all time and use a disk/database streaming solution.
 
+    I was suprpised how well the Poisson Regressor worked. It was considerable faster than the Random Forest Regressor
+    and depending on I could see it being good enough to be able to estimate bikes within an error of $\pm$4 bikes.
+    Figure \ref{fig:simple-pr-rfr-mae-perstation} shows however that for some station the error is bigger
+    than the overall MAE and the pattern between which stations do well and which stations do badly is the same between the
+    two models. However, the error for these stations is smaller for the Random Forest Regressor.
+
+    While I didn't wanted to make a call at this point on which approach is better, the per station model did consistently
+    perform better.
+
+    \subsubsection*{\nameref{itm:phase1-step3}}
+    - not enough exprimentation with nan values and the impact of my decision
+    - sweep earlier and for features too
+    - don't humanise about features these alorithm see different patterns
 
     \section*{Acknowledgements}
 
