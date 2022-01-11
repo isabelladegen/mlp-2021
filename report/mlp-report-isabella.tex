@@ -6,7 +6,7 @@
 \usepackage[dvipsnames]{xcolor}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
-\usepackage[default,oldstyle,scale=0.95]{opensans}
+\usepackage[sfdefault]{roboto}
 \usepackage[]{amsthm}
 \usepackage[]{amssymb}
 \usepackage{placeins}
@@ -322,7 +322,7 @@
         \centering
         \begin{tabularx}{\textwidth}{|X|X|X|X|}
             \hline
-            \textbf{Feature (s)}                                                    & \textbf{\#nan}                                                  & \textbf{Type} & \textbf{Experiment Id}                                                                                            \\ \hline
+            \textbf{Feature (s)}                                                    & \textbf{\#nan}                                                  & \textbf{Type} & \textbf{Experiment Id}                                                                         \\ \hline
             numDocks                                                                & no nan                                                          & category      & \href{https://wandb.ai/idegen/mlp-2021/runs/185f8iiz?workspace=user-idegen}{autumn-rain-25}    \\ \hline
             station                                                                 & no nan                                                          & category      & \href{https://wandb.ai/idegen/mlp-2021/runs/3ikbmzvm?workspace=user-idegen}{wobbly-hill-29}    \\ \hline
             weekhour                                                                & no nan                                                          & category      & \href{https://wandb.ai/idegen/mlp-2021/runs/36vs3wjd?workspace=user-idegen}{easy-capybara-30}  \\ \hline
@@ -425,11 +425,7 @@
 
 
     \section{Results}\label{sec:results}
-    Results achieved
-
     \subsection*{\nameref{phs:one}}
-    Overall:
-
     \subsubsection*{\nameref{itm:phase1-step1}}
     The dataset we are given has 55875 samples. 75, exactly one per station, of these samples are missing their label ('bikes'
     column value null).
@@ -493,120 +489,118 @@
     Random Forest Regressor. Both models do better on the training data then the validation data and both models do
     better for a model per station compared to one model. Station 233 performs the worst and has an MAE of 10 for the
     Poisson Regressor and 7.9 for the Random Forest Regressor for a per station model. The error is even bigger with the
-    one model approach for both algorithms.
+    one model approach for both algorithms. And there are stations that are doing better than average: 209-211, 213, 227,
+    252, 256-259, 262, 265-270, 272-275 and have an MAE around 2 for the Random Forest Regressor.
+
+    The stations that perform consistently the worst are:
+    \begin{itemize}
+        \item Station 233: PoissonRegressor run classic-pyramid-22 - MAE 11.6
+        \item Station 249: PoissonRegressor run classic-pyramid-22 - MAE 11.25
+        \item Station 208: PoissonRegressor run classic-pyramid-22 - MAE 7.7
+        \item Station 230: PoissonRegressor run classic-pyramid-22 - MAE 7.6
+    \end{itemize}
 
     \begin{figure}[h]
         \includegraphics[width=0.5\textwidth]{mae-pr-perstation}\hfill
         \includegraphics[width=0.5\textwidth]{mae-rfr-comparison}
-        \caption{MAE per station for training and validation dataset for both both model per station and a single model}
+        \caption{MAE per station for training and validation dataset for both model per station and a single model}
         \label{fig:simple-pr-rfr-mae-perstation}
     \end{figure}
 
 
-    Poisson:
-
-    Features = Bikes\_3h\_ago \& num Docks
-    One model - training data mae = 3.661
-    One model - validation data mae = 3.706
-    per station - training data mae = 3.236
-    per station - validation data mae = 3.327
-
-    -> Model per station performs slightly better with minimal additional time for the single model
-    -> no difference in features used for model per station
-
-    -> overall the model per station performed better
-
-    Random Forest Regressor:
-    First run: one feature 3h\_bikes - 4th peach-bird
-    Model per station - Training data: MAE 2.90715
-    Model per station - Validation data: MAE 3.14552
-    One model - Training data: MAE 3.19787
-    One model - Validation data: MAE 3.28136
-
-    Second run: 2 features num of Docks and 3h\_bikes - 4th autumn-rain
-    Model per station - Training data: MAE 2.90709
-    Model per station - Validation data: MAE 3.14749
-    One model - Training data: MAE 3.12366
-    One model - Validation data: MAE 3.26918
-
-    One Model:
-    Station differences:
-    -> Random Forest does better for all stations, so far all algorithms struggle with a few stations:
-    - station 233 - MAE 11.6 for PoissonRegressor (2 features - classic pyramid - training), ~8 for Random Forest * both (particularly in training ata)
-    - station 249 - MAE 11.25 Poisson (classic pyramid - validation), 8.1 Random Forest (Peach bird - validation),
-    6.3 (Peach bird - training)
-    - station 208 - MAE 7.7 Poissn classic pyramid validation, 6.71 Random Forest Peach bird - validation
-    - station 230 - MAE 7.6 Poisson classic pyramid validation, 7.1 Random Forest (peach bird - validation)
-
-    -> A few stations do better than average
-    - station 209-211, 213, 227, 252, 256-259, 262, 265-270, 272-275 all have MAE around 2 for Random Forest
-
-    Differences in Training and Validation:
-    - Most stations do worse in validation as expected given the algorithm is trained on the training data, however for station
-    233 this is not the case it does worse in training (11.6training, 10.4 validation poisson-classic pyramid),
-    (8.1 training, 7.6 validation peach bird -  random forest)
-
-    For multiple models these trends are the same (the numbers are slightly different)
-    - Multiple models perform slightly better (see weave)
-
     \subsubsection*{\nameref{itm:phase1-step3}}
-    Poisson \& Random Forest Use More features
-    1. Station (as location data)
-    wobbly-hill-run -> include station
-    Model per station - Training data: MAE 2.90737
-    Model per station - Validation data: MAE 3.14606
-    One model - Training data: MAE 2.91782
-    One model - Validation data: MAE 3.14946
-    -> this had the wished effect that the difference between using a model per station and using just one model
-    becomes way smaller
-    -> However it does not necessarily hold true for the validation dataset
 
-    2. Add Weekhour (as demand data based on weekday and time of day)
-    Model per station - Training data: MAE 1.05213
-    Model per station - Validation data: MAE 2.26165
-    One model - Training data: MAE 1.18072
-    One model - Validation data: MAE 2.52993
+    Table \ref{tbl:phase1-step3-runs-mae} shows the MAEs for the RandomForestRegressor with different features, for more
+    details follow the link to the experiment on wandb.
 
-    -> this had a profound impact removing the significance of the peaks for the bad stations
-    -> However it also increased the gap between training data and validation. The start of overfitting
-    -> On 50\% of the test data this avhieve 2.92266
+    Effects of the different features were as following:
+    \begin{itemize}
+        \item  Adding the number of docks as expected made a difference for
+        the one model for all stations but made the model per station perform less well.
+        \item Adding the station made the one model for all stations perform even better but did as expected not improve
+        the model per station. The effect was better for the training dataset but not necessarily for the validation.
+        \item Adding the weekhour had a big impact on both approaches for the training dataset almost halved the MAE.
+        The impact on the validation dataset was also significant but not quite as pronounced and this is the start of the
+        increase in different MAEs for the training dataset and validation dataset
+        \item Adding the different weather features improved the MAE for the training dataset but worsened it for the validation
+        dataset. The model seems to start to overfit to the training data.
+        \item Removing the weather data but adding isHoliday was a further improvement on adding weekhour but only for the Model
+        per station. For the one model, while doing better on the training dataset it performed worse on the validation dataset
+        than only using weekhour.
+    \end{itemize}
 
-    3. Add weather data:vital-hill
-    - Precipitation cannot be added as it is 0.0 for all the provided data so nothing can be learned form it
-    alhtough it probably would be impactful
-    Run Vital Hill -> it's overfitting and performs worse than the model without weather!
-    Model per station - Training data: MAE 0.91045
-    Model per station - Validation data: MAE 2.51165
-    One model - Training data: MAE 1.10876
-    One model - Validation data: MAE 2.8752
+    \begin{table}[h]
+        \begin{tabularx}{\textwidth}{|X|p{0.3\textwidth}|XXX|XX|}
+            \hline
+            \multirow{2}{*}{Run} &
+            \multirow{2}{*}{Features} &
+            \multicolumn{3}{l|}{a) Model per station} &
+            \multicolumn{2}{l|}{b) One Model} \\ \cline{3-7}
+            &
+            &
+            \multicolumn{1}{l|}{Training} &
+            \multicolumn{1}{l|}{Validation} &
+            Test &
+            \multicolumn{1}{l|}{Training} &
+            Validation \\ \hline
+            \href{https://wandb.ai/idegen/mlp-2021/runs/185f8iiz?workspace=user-idegen}{autumn-rain-25} &
+            bikes\_3h\_ago, numDocks &
+            \multicolumn{1}{l|}{2.907} &
+            \multicolumn{1}{l|}{3.147} &
+            - &
+            \multicolumn{1}{l|}{3.124} &
+            3.269 \\ \hline
+            \href{https://wandb.ai/idegen/mlp-2021/runs/3ikbmzvm?workspace=user-idegen}{wobbly-hill-29} &
+            station, bikes\_3h\_ago, numDocks &
+            \multicolumn{1}{l|}{2.907} &
+            \multicolumn{1}{l|}{3.146} &
+            - &
+            \multicolumn{1}{l|}{2.918} &
+            3.149 \\ \hline
+            \href{https://wandb.ai/idegen/mlp-2021/runs/36vs3wjd?workspace=user-idegen}{easy-capybara-30} &
+            station, bikes\_3h\_ago, numDocks, weekhour &
+            \multicolumn{1}{l|}{1.052} &
+            \multicolumn{1}{l|}{2.262} &
+            2.923 &
+            \multicolumn{1}{l|}{1.181} &
+            2.53 \\ \hline
+            \href{https://wandb.ai/idegen/mlp-2021/runs/2ncnkrj2?workspace=user-idegen}{vital-hill-32} &
+            station, bikes\_3h\_ago, numDocks, weekhour, windMeanSpeed.m.s, windDirection.grades, relHumidity.HR, airPressure.mb &
+            \multicolumn{1}{l|}{0.9105} &
+            \multicolumn{1}{l|}{2.512} &
+            - &
+            \multicolumn{1}{l|}{1.109} &
+            2.875 \\ \hline
+            \href{https://wandb.ai/idegen/mlp-2021/runs/140v0dji?workspace=user-idegen}{astral-feather-33} &
+            station, bikes\_3h\_ago, numDocks, weekhour, isHoliday &
+            \multicolumn{1}{l|}{1} &
+            \multicolumn{1}{l|}{2.219} &
+            2.885 &
+            \multicolumn{1}{l|}{1.137} &
+            2.482 \\ \hline
+        \end{tabularx}
+        \caption{MAE for the Random Forest Regressor with different features}
+        \label{tbl:phase1-step3-runs-mae}
+    \end{table}
 
-    4. Add is holiday: astra feather
-    Model per station - Training data: MAE 1.00044
-    Model per station - Validation data: MAE 2.21935
-    One model - Training data: MAE 1.13664
-    One model - Validation data: MAE 2.48154
-    -> better than weather data
+    \begin{figure}[h]
+        \includegraphics[width=0.5\textwidth]{mae-step3}\hfill
+        \includegraphics[width=0.5\textwidth]{mae-one-model-step3}
+        \caption{MAE for Random Forest Regressor with more features for approach a) and b)}
+        \label{fig:step3-mae}
+    \end{figure}
 
-    5. Add air pressure back: driven cosmos - overfitting starts again
-    Model per station - Training data: MAE 0.8418
-    Model per station - Validation data: MAE 2.27939
-    One model - Training data: MAE 1.04464
-    One model - Validation data: MAE 2.67455
-
-
-    6. Replace air pressure with temperature -> soft deluge
-    Model per station - Training data: MAE 0.91617
-    Model per station - Validation data: MAE 2.40878
-    One model - Training data: MAE 1.09112
-    One model - Validation data: MAE 2.73405
-    -> as predicted this overfitts worse, temperature is not a good parameter
-
-    7. Use full Bike profiles -> Dauntless wood
-    Model per station - Training data: MAE 0.83188
-    Model per station - Validation data: MAE 2.31577
-    One model - Training data: MAE 0.92461
-    One model - Validation data: MAE 2.419
-    -> not as good as astral feather but not as overfitting as the weather!
+    I also tried a few other feature combinations and they can be looked at in details on wandb. None of these outperformed
+    the best ones described in more detail in this section. As expected temperature was not a good feature nor was just one
+    of the bike profiles:
+    \begin{itemize}
+        \item \href{https://wandb.ai/idegen/mlp-2021/runs/2ft9d86n?workspace=user-idegen}{dauntless-wood-36} -
+        features: station, bikes\_3h\_ago, numDocks, weekhour, isHoliday, full\_profile\_bikes, full\_profile\_3h\_diff\_bikes
+        \item \href{https://wandb.ai/idegen/mlp-2021/runs/1shg15eq?workspace=user-idegen}{soft-deluge-35} -
+        features: station, bikes\_3h\_ago, numDocks, weekhour, isHoliday, temperature.C
+        \item \href{https://wandb.ai/idegen/mlp-2021/runs/1tsar458?workspace=user-idegen}{driven-cosmos-34} -
+        features: station, bikes\_3h\_ago, numDocks, weekhour, isHoliday, airPressure.mb
+    \end{itemize}
 
 
     \subsubsection*{\nameref{itm:phase1-step4}}
@@ -711,13 +705,12 @@
     perform better.
 
     \subsubsection*{\nameref{itm:phase1-step3}}
-    - not enough exprimentation with nan values and the impact of my decision
-    - sweep earlier and for features too
-    - don't humanise about features these alorithm see different patterns
-
-    \section*{Acknowledgements}
+    Adding more features as expected helped to lower MAE for both approaches. For all runs approach a) was
+    doing better than approach b). In hindsight I should have perhaps experimented a bit more with nan values and
+    done more investigation as why some stations were performing significantly worse than the average station. I'm also
+    no longer sure why I didn't just do a sweep of different features combination I did for later models.
+    I decided to first look into the impact that the models hyper parameters had on the outcome.
 
     \bibliographystyle{plain}
     \bibliography{bibliography}
-%TODO reference the varsious medium articles for software engineering
 \end{document}
