@@ -191,7 +191,7 @@ def mlp_sweep_params():
                 #  Columns.short_profile_bikes.value,
                 #  Columns.short_profile_3h_diff_bikes.value,
                 #  ],
-                [Columns.temperature.value,  # station, full and short profile
+                [Columns.week_hour.value,  # station, full and short profile
                  Columns.data_3h_ago.value,
                  Columns.full_profile_bikes.value,
                  Columns.full_profile_3h_diff_bikes.value,
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     sweep_params = mlp_sweep_params()
 
     sweep_config_grid = {
-        'name': 'MLP Sweep 7 (13) Scaling',
+        'name': 'MLP Sweep 8 (14) Scaling',
         'method': 'grid',
         'parameters': sweep_params
     }

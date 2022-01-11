@@ -3,6 +3,7 @@ data/
 testingdata/
 experiment-results/
 wandb/
+report/out/
 
 #jetbrains
 .idea/
