@@ -113,10 +113,10 @@
     simple ML system can get messy. It's
     easy to spend endless time analysing the data in Jupyter Notebooks, running a few experiments, seeing promising results,
     forgetting what the exact setup for those were and then never be able to reproduce them again. Learning from this
-    experience I decided to do use hopefully better engineering practices for this coursework. This meant
-    that I decided to write all the experiments that went beyond poking around in the data in pure Python. I used test
+    experience I decided to use better engineering practices for this coursework. I wrote all the experiments that went
+    beyond poking around in the data in pure Python. I used test
     driven development to implement the scripts and classes. While the tests are not exhaustive they are touching every
-    part of the module and allowed me to find countless mistakes I inevitably made. They also serve as a nice and living
+    part of the module and allowed me to find countless mistakes I made. They also serve as a living
     documentation how to use the different classes and scripts.
 
     To keep track of the configuration and results for different experiments I used the
@@ -124,15 +124,15 @@
     I shall refer to the Weights \& Biases platform from now on by its Python package name \textit{wandb}. To make full
     use of wandb's capabilities to track experiments I made sure that all hyper parameters,
     conditional processing logic and other magical numbers and strings in the codebase were kept in a configuration
-    dataclass that was logged as \texttt{wandb.config}. While initially the purpose for the configuration's dataclass was for experiment
+    dataclass that was logged as \texttt{wandb.config}. While the initial purpose for the configurations dataclass was for experiment
     tracking, it also enabled me to quickly change the setup, run sweeps to tune hyper parameters and other model setups.
 
-    I created a mlp-2021 conda environment on my mac \cite{conda-forge} which can be built and updated using the
+    I created a mlp-2021 conda environment \cite{conda-forge} on my mac which can be built and updated using the
     \href{https://github.com/isabelladegen/mlp-2021/blob/main/conda.yml}{conda.yml} file. I only fix the version of Python to 3.9,
-    for the other libraries I want to use their newest version. Wandb automatically produces a \texttt{requirements.txt}
+    for the other libraries I wanted to use their newest version. Wandb automatically produces a \texttt{requirements.txt}
     as well as a \texttt{environment.yml} file for each run which lists the exact version of all the libaries an their
-    dependencies. This should allow to recreate the exact Python setup used while also making it easy to keep working with
-    the newest version unless their should be a reason to fix to a specific version, which I've not come accross for this coursework.
+    dependencies. This should make it possible to recreate the exact same Python setup used while also making it easy to keep working with
+    the newest versions unless their should be a reason to fix to a specific version, which I've not found for this coursework.
 
     The \href{https://github.com/isabelladegen/mlp-2021}{Readme} on Github describes how to setup the environment as well
     as how to run the various experiments which can also be seen on on my \href{https://wandb.ai/idegen/mlp-2021}{Wandb - MLP 2021 workspace}.
@@ -150,32 +150,33 @@
     resulting in a total 55800 labelled samples. While we were also given a test dataset, the test dataset had no labels
     and therefore could not be used to validate my models during development of the system. For that reason I randomly
     took 10\% of samples away from the 55800 labelled samples. I call the resulting dataset of 5580 labelled data the validation
-    dataset and the remaining dataset of 50220 labelled samples the training or dev dataset. All the models are only
-    trained on the training dataset. This setup allowed me to verifiy my models performance on unseen data.
+    dataset and the remaining dataset of 50220 labelled samples the training dataset. All the models are only
+    trained on the training dataset. This setup allowed me to verifiy my models performance on unseen data to assess
+    overfitting and variance.
 
     \subsubsection*{\nameref{itm:phase1-step1}}
     The goal for this step is to gain a better idea of what sort of problem we've been given. For this I looked at the
     given dataset on a very high level. I wanted to know how much data we were given, what type of data we were given and
     generally understand
-    a bit more what the data means. As I moved to \nameref{itm:phase1-step2} I continued to come back to this step
+    a bit more about what the data means. As I moved to \nameref{itm:phase1-step2} I continued to come back to this step
     to understand more about how many data points were nan to decide how to best pre-process the data for a new column.
 
 
     \subsubsection*{\nameref{itm:phase1-step2}}
-    As described in \nameref{sec:conclusions} I create a \textit{pipeline} setup where I didn't needed to decide
-    on an algorithm and that let me easily experiment and evaluate different models, features and ways of data processing.
+    I create a \textit{pipeline} setup that allowed me to easily experiment and evaluate different models, features and
+    ways of data processing.
 
     I also wanted to create a baseline. For this I wrote a random estimator that returns a random number of bikes between
     0 and the number of docks for the station.
 
     Following from that, I created a model for all stations as well as a model per station using the PoissonRegressor from
-    scikit-learn \cite{scikit-learn}. The difference between approach a) and b) was a simpler wrapper class that split the
+    scikit-learn \cite{scikit-learn}. The difference between approach a) and b) was a simple wrapper class that split the
     overall dataframe of all stations back into the data per station and that managed the multiple models. The results
-    two can both deal with per station results, overall results and report on per station mean absolut error or
-    overall absolute error.
+    can either be dealt with on a per station level or overall. The wrapper reports the per station mean absolut errors
+    as well as the overall mean absolute error.
 
-    For both I used bikes\_3h\_ago as feature matrix X. Given 300 rows are missing this value I had to decide what to do
-    with a nan value. Possibilities I thought of were: just drop those samples, use the mean number of bikes. I didn't wanted
+    I used bikes\_3h\_ago as feature matrix X for both approach a) and b). Given 300 rows are missing for this value I had to decide what to do
+    with a nan values. Possibilities I thought of were: just drop those samples or use the mean number of bikes. I didn't wanted
     to drop 300 samples as I was invevitably going to drop a lot more samples with that strategy when adding more features.
     I decided to put the nan values to the most frequent value. For the per station data that meant to the most frequent for
     the station, for the one model for all stations that meant to the most frequent value overall.
@@ -193,82 +194,85 @@
 
     \subsubsection*{\nameref{itm:phase1-step3}}
     At this point I wanted to include more features into the training to see if I could reduce the prediction error
-    especially for the stations that are performing much worse than others. I was still continuing to test both approaches:
+    especially for the stations that were performing much worse than others. I was still continuing to test both approaches:
     a model per station as well as one model for all stations. However I decided to work with the RandomForestRegressor
     as it was performing better than the PoissonRegressor. I also decided to play with features that I could understand
     what they meant and so I left out the bike profile features (which in hindsight was a mistake).
 
     Features I wanted to investigate were:
     \begin{itemize}
-        \item \textbf{Weather Data}: I'm assuming this is similar across the different stations but could have an impact on
+        \item \textbf{Weather Data}: I assumed this was going to be similar across the different stations but could have an impact on
         if people are using more or less motorbikes.
-        \item \textbf{Station Data}: For the one model for all station approach it could be beneficial to including station specific data such as longitude
+        \item \textbf{Station Data}: For the one model for all station approach I assumed it could be beneficial to including station specific data such as longitude
         and latitude, number of docks - bigger stations might be at busier locations than smaller stations, or even just the station id.
         \item \textbf{Situational data}: Weekhour could help help with changes in demand for different times of the day and different days of the week.
         Similarly isHoliday could perhaps help to distinguish between times that have very different demands.
     \end{itemize}
 
-    For each features I needed to decide what pre-processing steps were needed and if and how I could sensibly fill the nan values
+    For each feature I needed to decide what pre-processing steps were needed and if and how I should fill the nan values
     for the feature.
 
     \subsubsection*{\nameref{itm:phase1-step4}}
-    As a final step \nameref{phs:one} I wanted to investigate the impact of hyper parametes on the result. For this I
-    ran various used wand's sweep capability. This allowed me to vary the different hyper parameters in congiguration.
+    Finally, I wanted to investigate the impact of hyper parametes on the result. For this I
+    ran various experiments with different configurations using the wandb's sweep capability.
     I created a smaller dataset with just 10\% of the data to save runtime as I was interested in the effect of the hyper parameters not
-    the final MAE. For the best sweep result I ran a normal experiment on the full dataset. This also lead me to increased
-    the sweep dataset to 30\% as the sweep results didn't translate well to the full dataset runs.
+    the final MAE. For the best sweep result I ran a normal experiment on the full dataset. I later on increased
+    the sweep dataset to 30\% as the sweep results didn't translate well to the experiments for the full dataset.
     To safe time I only tuned the Random Forest Regressor as it had been consistently outperforming the Poisson Regressor.
 
-    I was most interested in finding a hyper parameter combination that would lessen the overfitting seen in the previous
-    experiments. This lead me to try out yet another model from scikit-learn: the MultilayerPerceptronRegressor. Implementing
-    it into the code base was simple and followed the same step as describe in \nameref{itm:phase1-step2}.
+    I was most interested in finding a hyper parameter combination that would reduce the overfitting seen in the previous
+    experiments. This lead me to try out yet another model from scikit-learn: the Multilayer Perceptron Regressor. Implementing
+    the new model into the code base was easy and followed the same steps describe in \nameref{itm:phase1-step2}.
 
     \subsection*{\nameref{phs:two}}
     \subsubsection*{\nameref{itm:phase2-step1}}
-    To analyse of the given models I inspected the given .csv files. We'd been given simple linear models trained using approach
+    To analyse of the given models I inspected the given .csv files which was possible to do without any code as we'd been given
+    simple linear models trained using approach
     a).
+
     \subsubsection*{\nameref{itm:phase2-step2}}
 
     Similar to \nameref{itm:phase1-step2} I wrapped the given models in a model class \texttt{BestTrainedModelForAStation}.
-    That class implement like the other model classes the \texttt{fit()} and \texttt{predict()} functions and therefore
-    could be used in the rest of the pipeline, meaning I could reuse most of the the code from \nameref{itm:phase1-step2} of
-    \nameref{phs:one} with a few additions. I modeled the weights in such a way that
-    I could calculate the predictions matrix y for each sample by calculating thedot product of each stations feature matrix X
-    and the models weight matrix W.
+    That implements the \texttt{fit()} and \texttt{predict()} functions and therefore
+    can be used in the rest of the pipeline. This meant that I could reuse most of the the code from \nameref{itm:phase1-step2}.
+    I handeled the given weights of the pretrained in such a way that
+    I could calculate the predictions matrix y for each sample by calculating the dot product of each station's feature matrix X
+    and the model's weight matrix W.
 
-    For the pretrained models from station 1-200, I used the training dataset for models 2001-275 to calculate the MAE for
-    each of the pretrained models would achieve for each station 201-275. I'd then select the the pretrained model with
-    the lowest MAE to be used as estimator for each of the stations 201-275. I could reuse the same \texttt{StationPerModel}
-    class from \nameref{phs:one} to keep track of which model to use for each station.
+    For the pretrained models for station 1-200, I used the training dataset to calulate their MAE for models 201-275. For each
+    station 201-275 I then selected the pretrained model that achieved
+    the lowest MAE on the training dataset and used that as the pretrained model. I reused the same \texttt{StationPerModel}
+    class from \nameref{phs:one} to keep track of which model to use for each station for creating the predictions.
 
     \subsubsection*{\nameref{itm:phase2-step3}}
 
-    To investigate how well this approach of using the pretrained models to predict the number of bikes for stations 201-275
-    did I used the validation dataset to do predictions for data that had not been used to select the pretrained model.
-    I calculated the MAE the same way as I'd been doing and the run was logged on wand db like it had been
-    for other models from \nameref{phs:one}.
+    To investigate how well this approach
+    did I calculated the predeictions for  the validation dataset which had not been used to select the pretrained model used for a station.
+    I calculated the MAE the same way as I've been doing in \nameref{phs:one} and the runs were logged to wandb as well.
 
     \subsection*{\nameref{phs:three}}
     \subsubsection*{\nameref{itm:phase3-step1}}
-    In this step I combined the best model from \nameref{phs:one} with the best pretrained model as created in \nameref{phs:two}
+    In this step I combined the best model from \nameref{phs:one} with the best pretrained model created in \nameref{phs:two}
     by letting both models make an estimation and using the average of the two estimates as prediction of bikes for the combined model.
-    For this I created a new run script that would train both models, then predict using the validation and then
-    combine the results. I extended the existing \texttt{PredictionResult} class to be able to do such a combination.
+    For this I created a new run script that would train both models, use the validation dataset to predict unseen data for each the pretrained models
+    and the Multilayer Perceptron Regressor for  each station (the best model from \nameref{phs:one}) and
+    combine these results. I extended the existing \texttt{PredictionResult} class to be able to handle that combination.
 
     \subsubsection*{\nameref{itm:phase3-step2}}
     I ran a few more sweeps, mainly to tune the Multilayer Perceptron Model. Seeing that the pretrained
     models were using the bikes profile features I also stared to use those features in my multilayer perceptron model as
-    they did perform better than the other features.
+    they did perform better than the other features I had tried up to this point.
 
     \subsubsection*{\nameref{itm:phase3-step3}}
-    I used the same method as I've used for \nameref{phs:one} and \nameref{phs:two} to investigate and compare the
+    I used the same methods as I've used for \nameref{phs:one} and \nameref{phs:two} to investigate and compare the
     overal results.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
     \section{Experiment Setup}\label{sec:experiment-setup}
-    I'm using the JetBrains DataSpell IDE for working with Notebooks and PyCharm IDE for working with Python. Both IDEs offer
+    I'm using the JetBrains DataSpell IDE to work with Notebooks and PyCharm IDE to work with Python and run experiments.
+    Both IDEs offer
     a rich debugging and runtime environment, test and script execution and advanced refactoring abilities.
 
     \subsection*{\nameref{phs:one}}
@@ -276,9 +280,8 @@
     \subsubsection*{\nameref{itm:phase1-step1}}
     I mostly used the
     \href{https://github.com/isabelladegen/mlp-2021/blob/main/notebooks/ExperimentWithPerStationData.ipynb}{ExperimentWithPerStationData.ipynb}
-    Jupyter notebook and loaded the data into a pandas dataframe \cite{reback2020pandas} which overs various methods
-    to get a quick insights of the data such as: \texttt{info()}, \texttt{describe()} and \texttt{value\_counts()} as well
-    as methods to count nan's.
+    Jupyter notebook and loaded the data into a pandas dataframe \cite{reback2020pandas} which offers various methods such as:
+    \texttt{info()}, \texttt{describe()} and \texttt{value\_counts()} to gain quick insights about the data.
 
     \subsubsection*{\nameref{itm:phase1-step2}}
     All the code for the pipeline is just pure Python and can be found in the
@@ -301,11 +304,11 @@
 
     The \texttt{run} script calls \texttt{wandb.init(...)} to start the experiment tracking, loads the training data using the required data,
     creates both a single model and a model per station depending on the configuration, trains the model calling \texttt{fit()},
-    predicts the number of bikes for the training, validation and test data sets calling the different models \texttt{predict(...)}
-    functions which each return a prediction result, which is then called to log the overall MAE as well as the per
+    predicts the number of bikes for the training, validation and test data sets calling the different model's \texttt{predict(...)}
+    function which each return a prediction result, which is then called to log the overall MAE as well as the per
     station MAE for the training and validation dataset, this is logged to wanddb using \texttt{wandb.log(...)} and finally
     the script creates a csv for a Kaggle submission. All the rest of the experiment is automatically tracked by wandb
-    and the results can be visualised on there.
+    and the results can be seen and interacted with on there.
 
     The \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/src/Data.py}{Data} class
     is used to load all the data and also does all of the pre-processing based on configuration values. It encapsulates
@@ -335,10 +338,10 @@
     \end{itemize}
 
     \subsubsection*{\nameref{itm:phase1-step3}}
-    The underlying infrastructure was in place by from the previous step. All I needed to do is change the configurations
+    The underlying infrastructure was in place by from the previous step. All I needed change was the configurations
     and decide what to do with the nan values. I used the
     \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/notebooks/TestAndTrainingDataForFeatureSelection.ipynb}{TestAndTrainingDataForFeatureSelection.ipynb}
-    Jupyter notebook to find get some high level statistics about the features I was about to add. I decided early
+    Jupyter notebook to get some high level statistics about the features I was about to add. I decided early
     on (and mistakenly) not to include the bike profile features due to the many nan values. The location feature investigation is
     in the \href{https://github.com/isabelladegen/mlp-2021/blob/c48d85dc364b5a2e7e59f16961b32f9e6c245735/notebooks/InvestigateFeatures.ipynb}{InvestigateFeatures.ipynb}
     Jupyter notebook.
@@ -370,11 +373,11 @@
 
     To be able to run sweeps I crated the \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/sweep.py}{sweep.py}
     script which sets up all the parameters to sweep, any parameter not overwritten by the
-    sweep configuration will be used from the standard configuration. When sweeping I'm not doing running the test
-    predictions.
+    sweep configuration will be used from the standard configuration.
 
-    Varying too many parameters at once can quickly become overwhelming. Therefore I only varied a few values per sweep
-    and iterated with what seemed to be working best. The results sections has links to all the sweep results which also contain the setup.
+    Varying too many parameters at once can quickly become overwhelming. Therefore, I only varied a few values per sweep
+    and iterated with what seemed to be working best. The results sections has links to all the sweep results which
+    can be used to get the exact setup for each sweep.
 
 
     \subsection*{\nameref{phs:two}}
@@ -383,16 +386,16 @@
     class that had the same method as the other models but with custom \texttt{fit()} and \texttt{predict()} methods.
     This class is remembering which of the models from the \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/Data.py#L29}{PretrainedLinearModel}
     class produces the lowest MAE for the training data. It then uses this pretrained model to predict the numbers of bikes.
-    The \texttt{PretrainedLinearModel} loads all the model's csv files into pandas dataframe. The same but extended
+    The \texttt{PretrainedLinearModel} calss loads all the model's csv files into a pandas dataframe. The same but extended
     \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/models/PerStationModel.py}{PerStationModel.py}
-    class is used manage the per station model setup. \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/predict_using_trained_models.py}{predict\_using\_trained\_models.py}
-    is the new run script. It uses the same \texttt{train\_predict\_evaluate\_log\_for\_model\_and\_data()} function
-    as the other run script but has a slightly different setup to create the \texttt{PretrainedLinearModel} class.
+    class is used manage the per station model setup. The run script for these experiments is \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/predict_using_trained_models.py}{predict\_using\_trained\_models.py}.
+    It uses the same \texttt{train\_predict\_evaluate\_log\_for\_model\_and\_data()} function
+    as the other run scripts but has a slightly different setup to create the \texttt{PretrainedLinearModel} class.
 
 
     \subsection*{\nameref{phs:three}}
 
-    To be able to combine MAE from too models the existing I extend the \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/PredictionResult.py}{PredictionResult}
+    To be able to combine MAE from two models I extend the \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/PredictionResult.py}{PredictionResult}
     class. I also wrote a new run script \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/predict_using_pretrained_and_my_own_model.py}{predict\_using\_pretrained\_and\_my\_own\_model.py}
     that rains both the pre trained model (to find the one best matching the station) and the multilayer perceptron regressor model
     and logs the results to wandb. Other than that the code could be reused from \nameref{phs:one}.
@@ -404,13 +407,13 @@
     \section{Results}\label{sec:results}
     \subsection*{\nameref{phs:one}}
     \subsubsection*{\nameref{itm:phase1-step1}}
-    The dataset we are given has 55875 samples. 75, exactly one per station, of these samples are missing their label ('bikes'
+    The given dataset has 55875 samples. 75, exactly one per station, of these samples are missing their label ('bikes'
     column value null).
     I decided to simply exclude those rows, meaning I had in total 55800 labelled samples, 744 per station. Furthermore,
     13275 rows have a least one nan value in other columns.
     We've been given various information:
     \begin{itemize}
-        \item \textbf{Information about the station}: tation (station id), latitude, longitude and
+        \item \textbf{Information about the station}: station (station id), latitude, longitude and
         numDocks (number of available bike docks)
         \item \textbf{Information about the time when the sample was taken}: timestamp, year, month, day, hour,
         weekday, weekhour (a combination of weekday and hour), isHoliday (marking public holidays)
@@ -422,13 +425,13 @@
         short\_profile\_bikes, bikes
     \end{itemize}
 
-    Other than the information about the bike usage, these all made sense. I'm to this day not sure what the columns
-    about the bike usage actually mean other than bikes\_3h\_ago persumably is the number of bikes at the station 3h
+    Other than the information about the bike usage, these all make sense. I'm to this day not sure what the columns
+    about the bike usage actually mean other than bikes\_3h\_ago presumably is the number of bikes at the station 3h
     before the sample was taken and bikes is the number of bikes at the station when the sample was taken. Curiously it
     is possible for a station to have and record more bikes than the number of docks available.
 
     Not all data types are useful in their raw format. E.g weekday would need to be translated into a numerical value.
-    Other than the weather data the given data was categorical.
+    Other than the weather data, the given data was categorical.
 
     \subsubsection*{\nameref{itm:phase1-step2}}
 
@@ -438,7 +441,7 @@
     \begin{itemize}
         \item \href{https://wandb.ai/idegen/mlp-2021/runs/3k64fgcw/overview?workspace=user-idegen}{Random Guessing} - classic-sun-10
         \item \href{https://wandb.ai/idegen/mlp-2021/runs/1iyx8zmh/overview?workspace=user-idegen}{Poisson Regressor} - chocolate-serenity-19
-        \item \href{https://wandb.ai/idegen/mlp-2021/runs/25zvoihx/overview?workspace=user-idegen}{Random Forest Regressor} -peach-bird-23
+        \item \href{https://wandb.ai/idegen/mlp-2021/runs/25zvoihx/overview?workspace=user-idegen}{Random Forest Regressor} - peach-bird-23
     \end{itemize}
 
     Table \ref{tbl:phase1-step2-simple-model-mae} shows that random guessing is in average 7 bikes off, while both ML models
@@ -468,8 +471,8 @@
     Random Forest Regressor. Both models do better on the training data then the validation data and both models do
     better for a model per station compared to one model. Station 233 performs the worst and has an MAE of 10 for the
     Poisson Regressor and 7.9 for the Random Forest Regressor for a per station model. The error is even bigger with the
-    one model approach for both algorithms. And there are stations that are doing better than average: 209-211, 213, 227,
-    252, 256-259, 262, 265-270, 272-275 and have an MAE around 2 for the Random Forest Regressor.
+    one model approach for both algorithms. There are also stations that are doing better than average which ae: 209-211, 213, 227,
+    252, 256-259, 262, 265-270, 272-275 and achieve an MAE around 2 for the Random Forest Regressor.
 
     The stations that perform consistently the worst are:
     \begin{itemize}
@@ -503,8 +506,8 @@
         increase in different MAEs for the training dataset and validation dataset
         \item Adding the different weather features improved the MAE for the training dataset but worsened it for the validation
         dataset. The model seems to start to overfit to the training data.
-        \item Removing the weather data but adding isHoliday was a further improvement on adding weekhour but only for the Model
-        per station. For the one model, while doing better on the training dataset it performed worse on the validation dataset
+        \item Removing the weather data but adding isHoliday was a further improvement on adding weekhour but only for the model
+        per station. For the one model, while doing better on the training dataset, it performed worse on the validation dataset
         than only using weekhour.
     \end{itemize}
 
@@ -599,15 +602,15 @@
         \centering
         \includegraphics[width=0.8\textwidth]{randomforest-sweep3}
         \includegraphics[width=0.8\textwidth]{random-forest-sweep6}
-        \caption{Parallel Coordinates Graph for Random Forest Sweep 3 (top) and 6 (bottom). The right hand sight is the
+        \caption{Parallel Coordinates Graph for Random Forest Sweep 3 (top) and 6 (bottom). The right hand side is the
         validation MAE the second last column the training dataset MAE. The labels are too long to download but the
-        full interactive graphs can be investigated on wandb.}
+        full interactive graphs can be seen on wandb.}
         \label{fig:sweep3and6RandomForest}
     \end{figure}
 
     Using the best performing features from \nameref{itm:phase1-step3}:station, bikes\_3h\_ago, numDocks, weekhour, isHoliday
-    only varying the hyperparameters resulted in the lowest MAE for the training dataset of 1.392. However that run at
-    a big validation dataset MAE of 3.717. The lowest validation dataset MAE was 3.639 for which the training dataset
+    only varying the hyperparameters resulted in the lowest MAE for the training dataset of 1.392, its validation dataset MAE was 3.717.
+    The lowest validation dataset MAE was 3.639 for which the training dataset
     MAE was 1.739. In short this was worse than what I had achieved with varying features in \nameref{itm:phase1-step3}.
     The best performing features combination was: station, bikes\_3h\_ago, numDocks, weekhour, isHoliday, full\_profile\_bikes,
     full\_profile\_3h\_diff\_bikes, airPressure.mb, relHumidity.HR, windMeanSpeed.m.s. This achieved a training MAE of 0.89
@@ -627,7 +630,7 @@
     \end{figure}
 
     The experiment with a Multilayer Perceptron Regresseor in it's default configuration and using the features: bikes\_3h\_ago,
-    full\_profile\_bikes, full\_profile\_3h\_diff\_bikes, short\_profile\_bikes, short\_profile\_3h\_diff\_bikes achieved
+    full\_profile\_bikes,full\_profile\_3h\_diff\_bikes,\\short\_profile\_bikes, short\_profile\_3h\_diff\_bikes achieved
     comparable MAEs: For the training dataset 2.498 and for the validation training set 2.67 and a surprising 2.41 on the test dataset,
     see experiment \href{https://wandb.ai/idegen/mlp-2021/runs/1of4938t?workspace=user-idegen}{clean-sunset-573} for all the details.
     While these MAE are not a significant improvement, the gap between the training and validation dataset is significantly
@@ -657,20 +660,20 @@
 
     \subsection*{\nameref{phs:three}}
 
-    The result for the untuned combination of best pretrained model and multilayer perceptron for each station can be seen
+    The result for the untuned combination of the best pretrained model and the multilayer perceptron regressor for each station can be seen
     in experiment \href{https://wandb.ai/idegen/mlp-2021/runs/ogsyvkqu?workspace=user-idegen}{young-dragon-628}. The
     MAE for the training dataset was 2.485 and for the validation dataset 2.617 which is an improvement both on the pretrained model
     as well as the multilayer perceptron regressor.
 
     I ran a total of 7 sweeps to tune the parameters for the \href{https://wandb.ai/idegen/mlp-2021/sweeps?workspace=user-idegen}{multilayer preceptron regressor}.
-    Figure shows a multicoordinate graph showing different architecture configurations and their impact on training and
+    Figure shows a parallel coordinates graph showing different architecture configurations and their impact on training and
     validation MAE, the interactive version can be found \href{https://wandb.ai/idegen/mlp-2021/sweeps/rughds30?workspace=user-idegen}{here}.
     I also ran sweeps that were trying out different features.
 
     \begin{figure}[h]
         \centering
         \includegraphics[width=0.8\textwidth]{mlp-sweep}
-        \caption{Multiple coordinates graph for Multilayer Perceptron regessor sweep of diffeent architectures}
+        \caption{Parallel coordinates graph for Multilayer Perceptron Regressor sweep of different architectures}
         \label{fig:mlp-sweep}
     \end{figure}
 
@@ -725,8 +728,8 @@
 
     \subsubsection*{\nameref{itm:phase1-step2}}
     The design for the codebase and wandb worked out much better than what I initially did for the Dialogue and Narrative
-    course work. The configuration got quite big and messy in the end and will need a bit more thought to
-    keep more seperated between different models and experiments. Furthermore for a bigger project it definitely would
+    course work. The configuration got quite big and messy in the end and will and I need to explore more how to
+    keep it separate between different models and experiments. Furthermore for a bigger project it definitely would
     make sense to store the model and save it too, both for
     reproducibility as well as saving time. Most of the model I played with have some randomness injected that is
     beneficial to the model's performance but which makes it impossible to exactly reproduce an experiment. Furthermore
@@ -734,58 +737,57 @@
     would need to avoid keeping all data in memory at all time and use a disk/database streaming solution.
 
     I was suprpised how well the Poisson Regressor worked. It was considerable faster than the Random Forest Regressor
-    and depending on I could see it being good enough to be able to estimate bikes within an error of $\pm$4 bikes.
-    Figure \ref{fig:simple-pr-rfr-mae-perstation} shows however that for some station the error is bigger
+    and depending on its real world application, I could see it being good enough to be able to estimate bikes within an error of $\pm$4 bikes.
+    Figure \ref{fig:simple-pr-rfr-mae-perstation} shows that for some station the error is bigger
     than the overall MAE and the pattern between which stations do well and which stations do badly is the same between the
     two models. However, the error for these stations is smaller for the Random Forest Regressor.
 
-    While I didn't wanted to make a call at this point on which approach is better, the per station model did consistently
+    While I didn't wanted to decide yet which approach is better, the per station model did consistently
     perform better.
 
     \subsubsection*{\nameref{itm:phase1-step3}}
     Adding more features as expected helped to lower MAE for both approaches. For all runs approach a) was
     doing better than approach b). In hindsight I should have perhaps experimented a bit more with nan values and
-    done more investigation as why some stations were performing significantly worse than the average station. I'm also
-    no longer sure why I didn't just do a sweep of different features combination I did for later models.
-    I decided to first look into the impact that the models hyper parameters had on the outcome.
+    done more investigation as why some stations were performing significantly worse than average. I'm also
+    no longer sure why I didn't just do a sweep of different features combinations which I did do in later experiments.
+    Instead, I decided to first look into the impact that the models hyper parameters had on the outcome.
 
     \subsubsection*{\nameref{itm:phase1-step4}}
 
-    I tried to reduce overfitting by finding a bigger min\_impurity\_decrease which did make
+    The most successful parameter to reduce overfitting was min\_impurity\_decrease which did make only
     a small improvement. While using more features decreased the MAE they also increase overfitting and I
-    could not find a hyperparameter setup that could make the gap between the MAE achieved for training and the one achieved
-    for validation smaller. Figure \ref{fig:floral-pine} clearly illustrates this problem.
+    could not find a hyperparameter setup that could make the gap between the MAE achieved for the training and the one achieved
+    for the validation dataset smaller. Figure \ref{fig:floral-pine} clearly illustrates this problem.
 
     The results for the Multilayer Perceptron (see figure \ref{fig:clean-sunset}) surprised me. While the model performed
     worse on my validation dataset, it performed even better on the test dataset than it performed on the training dataset.
     Its biggest difference to any of the Random Forest Regressors is that it achieves very similar results for both the
     training and validation datasets.
 
-    Overall for every model approach a) performed better than approach b). As we've seen some stations have a very different
+    In all expriments run, approach a) performed better than approach b). As we've seen some stations have a very different
     usage pattern which I believe can be better modeled by a model per station than trying to find a generalised model.
-    Having said that depending on how accurate bikes need to be predicted from a business perspective, it's not that clear
-    cut that one single model could not do well but based on MAE the model per station approach performs better.
+    Having said that, depending on how accurate bikes need to be predicted from a business perspective, it's not that clear
+    cut that a single model could not do well too but just based on MAE the model per station approach performs better.
 
     \subsection*{\nameref{phs:two}}
-    The pretrained best pretrained model predicts the bikes for each station as well as the multilayer perceptron regressor
+    The best pretrained predicts the bikes for each station as well as the multilayer perceptron regressor
     which was my best model from \nameref{phs:one}.
-    As we can see in figure \ref{fig:pre-trained-model} it too does worse for the same stations as any of the other models.
-    If I had more time I'd do more investigation on what makes those stations perform much worse than average. I've not
-    submitted this solution on Kaggle but wish I had as I'd be interested to know how well it does for the test data set.
+    As we can see in figure \ref{fig:pre-trained-model} it too does worse for the same stations like any of the other models.
+    If I had more time I'd do more investigation into what makes those stations perform much worse than average.
+
+    I've not submitted a solution for the best pretrained model on Kaggle but wish I had as I'd be interested to know how
+    well it does for the test data set.
 
     \subsection*{\nameref{phs:three}}
     Combining the best performing multilayer perceptron regressor with the pretrained model achieved better MAE results than
-    either model by itself. However the best result on the test dataset was not achieved with the best performing model,
-    see \ref{tbl:phase3}.
+    either model by itself. However the best result on the test dataset was not achieved with the best performing model
+    from my experiments,
+    see table \ref{tbl:phase3}.
 
     There are a lot more things I could have tried and investigated such as what impact does rounding have on the performance
     of the model, better feature scaling (while I did do simple feature scaling for the multilayer perceptron regressor it actually
     negatively impacted the performance), I would also be curious to see what impact choosing the prediction of the model
     with the lower training MAE for that station would have.
-
-
-
-
 
     \bibliographystyle{plain}
     \bibliography{bibliography}
