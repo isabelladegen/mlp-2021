@@ -369,72 +369,37 @@
     \end{table}
 
 
-
     \subsubsection*{\nameref{itm:phase1-step4}}
 
-    For the first sweep I varied just a few of the hyper parameters. Sweep on only 10\% of the dev and val data
-    (dev-sweep1, val-sweep1) and I only run approach b) One Model for all stations, see
-    \href{https://wandb.ai/idegen/mlp-2021/sweeps/ylvvcigm/overview?workspace=user-idegen}{Random Forest Sweep 1}:
+    To be able to run sweeps I crated the \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/sweep.py}{sweep.py}
+    script which sets up all the parameters to sweep, any parameter not overwritten by the
+    sweep configuration will be used from the standard configuration. When sweeping I'm not doing running the test
+    predictions.
 
-    \begin{itemize}
-        \item \textbf{random\_forest\_ccp\_alpha}: 0, 0.05, 0.1, 0.3
-        \item \textbf{random\_forest\_criterion}: squared\_error, poisson
-        \item \textbf{random\_forest\_max\_depth}: null (=default), 10, 50
-        \item \textbf{random\_forest\_min\_samples\_split}: 2, 4
-        \item \textbf{random\_forest\_n\_estimators}: 50, 100, 120
-    \end{itemize}
-
-    -> For the best sweep result re-run the full model:
-    Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
-    -> Best sweep result
-    Features:
-    ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday","full\_profile\_bikes","full\_profile\_3h\_diff\_bikes"]
-    Differnce in hyperparams:
-    random\_forest\_max\_depth: 50
-    random\_forest\_n\_estimators: 50
-    random\_forest\_ccp\_alpha: 0.05
-    random\_forest\_criterion: squared\_error
-
-    Breezy Sound: https://wandb.ai/idegen/mlp-2021/runs/12p54n9c/overview?workspace=user-idegen
-    -> New parameters but features as current best run with default configuration
-    Features: ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday"]
-    random\_forest\_max\_depth: 50
-    random\_forest\_n\_estimators: 50
-    random\_forest\_ccp\_alpha - 0.05
-    random\_forest\_criterion: squared\_error
-
-    Stoic Sun: https://wandb.ai/idegen/mlp-2021/runs/12zlftk6/overview?workspace=user-idegen
-    -> Features from best run squared error and ccp from sweep, max depth and n estimator from best run
-    random\_forest\_features
-    Features: ["station","bikes\_3h\_ago","numDocks","weekhour","isHoliday"]
-    random\_forest\_max\_depth: Default
-    random\_forest\_n\_estimators: 100
-    random\_forest\_ccp\_alpha - 0.05
-    random\_forest\_criterion: squared\_error
-
-    Sweep 2: https://wandb.ai/idegen/mlp-2021/sweeps/79bi8rgn/overview
-    - 30\% of training data
-    - Model per station
-    - Different features, ccp
-    -> lead to an improval on astral feather with zesty field
-
-    Sweep 3:
-    - try some other pruning methods
-
-    Sweep 4: Features and Hyperparmetes including feature combination used in the given models
-    - use full data for sweeping as runtime is low at the momemnt
+    Varying too many parameters at once can quickly become overwhelming. Therefore I only varied a few values per sweep
+    and iterated with what seemed to be working best. The results sections has links to all the sweep results which also contain the setup.
 
 
     \subsection*{\nameref{phs:two}}
-    \subsubsection*{\nameref{itm:phase2-step1}} Analyse the given models
-    \subsubsection*{\nameref{itm:phase2-step2}} Create an end to end pipeline for the given models
-    \subsubsection*{\nameref{itm:phase2-step3}} Investigate the resulting performance and compare to \nameref{phs:one}
+    To be able to reuse as much of the code from \nameref{phs:one} I created a
+    \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/models/BestPreTrainedModelForAStation.py}{BestPreTrainedModelForAStation.py}
+    class that had the same method as the other models but with custom \texttt{fit()} and \texttt{predict()} methods.
+    This class is remembering which of the models from the \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/Data.py#L29}{PretrainedLinearModel}
+    class produces the lowest MAE for the training data. It then uses this pretrained model to predict the numbers of bikes.
+    The \texttt{PretrainedLinearModel} loads all the model's csv files into pandas dataframe. The same but extended
+    \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/models/PerStationModel.py}{PerStationModel.py}
+    class is used manage the per station model setup. \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/predict_using_trained_models.py}{predict\_using\_trained\_models.py}
+    is the new run script. It uses the same \texttt{train\_predict\_evaluate\_log\_for\_model\_and\_data()} function
+    as the other run script but has a slightly different setup to create the \texttt{PretrainedLinearModel} class.
+
 
     \subsection*{\nameref{phs:three}}
-    \subsubsection*{\nameref{itm:phase3-step1}} Create an end to end pipeline for the combining the models from \nameref{phs:one} and \nameref{phs:two}
-    \subsubsection*{\nameref{itm:phase3-step2}} Tune promising setups
-    \subsubsection*{\nameref{itm:phase3-step3}}
-    There is no new experiment setup required for investigating the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}.
+
+    To be able to combine MAE from too models the existing I extend the \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/PredictionResult.py}{PredictionResult}
+    class. I also wrote a new run script \href{https://github.com/isabelladegen/mlp-2021/blob/fba40c1f27f066e1c5413c45a50c90a32a018f81/src/predict_using_pretrained_and_my_own_model.py}{predict\_using\_pretrained\_and\_my\_own\_model.py}
+    that rains both the pre trained model (to find the one best matching the station) and the multilayer perceptron regressor model
+    and logs the results to wandb. Other than that the code could be reused from \nameref{phs:one}.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -748,81 +713,81 @@
     \end{table}
 
 
-        \section{Conclusions}\label{sec:conclusions}
-        \subsection*{\nameref{phs:one}}
-        \subsubsection*{\nameref{itm:phase1-step1}}
-        From the data given I decided that this problem was most naturally a multivariate regression problem where I had to
-        predict for each hour of the day the number of bikes a the station. I could perhaps also use a classifier given that
-        the number I had to predict was from a discrete set of numbers. It's a supervised learning problem given I have 55800
-        in total respectively 744 per station labelled data samples. I could do more feature exploring with clustering to
-        learn how the different features relate to each other. However, I decided to first build an end to end pipeline using
-        just the bikes\_3h\_ago as feature and building the ability to easily change the model and features as well as their
-        pre-processing used.
+    \section{Conclusions}\label{sec:conclusions}
+    \subsection*{\nameref{phs:one}}
+    \subsubsection*{\nameref{itm:phase1-step1}}
+    From the data given I decided that this problem was most naturally a multivariate regression problem where I had to
+    predict for each hour of the day the number of bikes a the station. I could perhaps also use a classifier given that
+    the number I had to predict was from a discrete set of numbers. It's a supervised learning problem given I have 55800
+    in total respectively 744 per station labelled data samples. I could do more feature exploring with clustering to
+    learn how the different features relate to each other. However, I decided to first build an end to end pipeline using
+    just the bikes\_3h\_ago as feature and building the ability to easily change the model and features as well as their
+    pre-processing used.
 
-        \subsubsection*{\nameref{itm:phase1-step2}}
-        The design for the codebase and wandb worked out much better than what I initially did for the Dialogue and Narrative
-        course work. The configuration got quite big and messy in the end and will need a bit more thought to
-        keep more seperated between different models and experiments. Furthermore for a bigger project it definitely would
-        make sense to store the model and save it too, both for
-        reproducibility as well as saving time. Most of the model I played with have some randomness injected that is
-        beneficial to the model's performance but which makes it impossible to exactly reproduce an experiment. Furthermore
-        keeping the data in memory only works for a small dataset like the one we've been given. For a bigger dataset I
-        would need to avoid keeping all data in memory at all time and use a disk/database streaming solution.
+    \subsubsection*{\nameref{itm:phase1-step2}}
+    The design for the codebase and wandb worked out much better than what I initially did for the Dialogue and Narrative
+    course work. The configuration got quite big and messy in the end and will need a bit more thought to
+    keep more seperated between different models and experiments. Furthermore for a bigger project it definitely would
+    make sense to store the model and save it too, both for
+    reproducibility as well as saving time. Most of the model I played with have some randomness injected that is
+    beneficial to the model's performance but which makes it impossible to exactly reproduce an experiment. Furthermore
+    keeping the data in memory only works for a small dataset like the one we've been given. For a bigger dataset I
+    would need to avoid keeping all data in memory at all time and use a disk/database streaming solution.
 
-        I was suprpised how well the Poisson Regressor worked. It was considerable faster than the Random Forest Regressor
-        and depending on I could see it being good enough to be able to estimate bikes within an error of $\pm$4 bikes.
-        Figure \ref{fig:simple-pr-rfr-mae-perstation} shows however that for some station the error is bigger
-        than the overall MAE and the pattern between which stations do well and which stations do badly is the same between the
-        two models. However, the error for these stations is smaller for the Random Forest Regressor.
+    I was suprpised how well the Poisson Regressor worked. It was considerable faster than the Random Forest Regressor
+    and depending on I could see it being good enough to be able to estimate bikes within an error of $\pm$4 bikes.
+    Figure \ref{fig:simple-pr-rfr-mae-perstation} shows however that for some station the error is bigger
+    than the overall MAE and the pattern between which stations do well and which stations do badly is the same between the
+    two models. However, the error for these stations is smaller for the Random Forest Regressor.
 
-        While I didn't wanted to make a call at this point on which approach is better, the per station model did consistently
-        perform better.
+    While I didn't wanted to make a call at this point on which approach is better, the per station model did consistently
+    perform better.
 
-        \subsubsection*{\nameref{itm:phase1-step3}}
-        Adding more features as expected helped to lower MAE for both approaches. For all runs approach a) was
-        doing better than approach b). In hindsight I should have perhaps experimented a bit more with nan values and
-        done more investigation as why some stations were performing significantly worse than the average station. I'm also
-        no longer sure why I didn't just do a sweep of different features combination I did for later models.
-        I decided to first look into the impact that the models hyper parameters had on the outcome.
+    \subsubsection*{\nameref{itm:phase1-step3}}
+    Adding more features as expected helped to lower MAE for both approaches. For all runs approach a) was
+    doing better than approach b). In hindsight I should have perhaps experimented a bit more with nan values and
+    done more investigation as why some stations were performing significantly worse than the average station. I'm also
+    no longer sure why I didn't just do a sweep of different features combination I did for later models.
+    I decided to first look into the impact that the models hyper parameters had on the outcome.
 
-        \subsubsection*{\nameref{itm:phase1-step4}}
+    \subsubsection*{\nameref{itm:phase1-step4}}
 
-        I tried to reduce overfitting by finding a bigger min\_impurity\_decrease which did make
-        a small improvement. While using more features decreased the MAE they also increase overfitting and I
-        could not find a hyperparameter setup that could make the gap between the MAE achieved for training and the one achieved
-        for validation smaller. Figure \ref{fig:floral-pine} clearly illustrates this problem.
+    I tried to reduce overfitting by finding a bigger min\_impurity\_decrease which did make
+    a small improvement. While using more features decreased the MAE they also increase overfitting and I
+    could not find a hyperparameter setup that could make the gap between the MAE achieved for training and the one achieved
+    for validation smaller. Figure \ref{fig:floral-pine} clearly illustrates this problem.
 
-        The results for the Multilayer Perceptron (see figure \ref{fig:clean-sunset}) surprised me. While the model performed
-        worse on my validation dataset, it performed even better on the test dataset than it performed on the training dataset.
-        Its biggest difference to any of the Random Forest Regressors is that it achieves very similar results for both the
-        training and validation datasets.
+    The results for the Multilayer Perceptron (see figure \ref{fig:clean-sunset}) surprised me. While the model performed
+    worse on my validation dataset, it performed even better on the test dataset than it performed on the training dataset.
+    Its biggest difference to any of the Random Forest Regressors is that it achieves very similar results for both the
+    training and validation datasets.
 
-        Overall for every model approach a) performed better than approach b). As we've seen some stations have a very different
-        usage pattern which I believe can be better modeled by a model per station than trying to find a generalised model.
-        Having said that depending on how accurate bikes need to be predicted from a business perspective, it's not that clear
-        cut that one single model could not do well but based on MAE the model per station approach performs better.
+    Overall for every model approach a) performed better than approach b). As we've seen some stations have a very different
+    usage pattern which I believe can be better modeled by a model per station than trying to find a generalised model.
+    Having said that depending on how accurate bikes need to be predicted from a business perspective, it's not that clear
+    cut that one single model could not do well but based on MAE the model per station approach performs better.
 
-        \subsection*{\nameref{phs:two}}
-        The pretrained best pretrained model predicts the bikes for each station as well as the multilayer perceptron regressor
-        which was my best model from \nameref{phs:one}.
-        As we can see in figure \ref{fig:pre-trained-model} it too does worse for the same stations as any of the other models.
-        If I had more time I'd do more investigation on what makes those stations perform much worse than average. I've not
-        submitted this solution on Kaggle but wish I had as I'd be interested to know how well it does for the test data set.
+    \subsection*{\nameref{phs:two}}
+    The pretrained best pretrained model predicts the bikes for each station as well as the multilayer perceptron regressor
+    which was my best model from \nameref{phs:one}.
+    As we can see in figure \ref{fig:pre-trained-model} it too does worse for the same stations as any of the other models.
+    If I had more time I'd do more investigation on what makes those stations perform much worse than average. I've not
+    submitted this solution on Kaggle but wish I had as I'd be interested to know how well it does for the test data set.
 
-        \subsection*{\nameref{phs:three}}
-        Combining the best performing multilayer perceptron regressor with the pretrained model achieved better MAE results than
-        either model by itself. However the best result on the test dataset was not achieved with the best performing model,
-        see \ref{tbl:phase3}.
+    \subsection*{\nameref{phs:three}}
+    Combining the best performing multilayer perceptron regressor with the pretrained model achieved better MAE results than
+    either model by itself. However the best result on the test dataset was not achieved with the best performing model,
+    see \ref{tbl:phase3}.
 
-        There are a lot more things I could have tried and investigated such as what impact does rounding have on the performance
-        of the model, better feature scaling (while I did do simple feature scaling for the multilayer perceptron regressor it actually
-        negatively impacted the performance), I would also be curious to see what impact choosing the prediction of the model
-        with the lower training MAE for that station would have.
-
-
+    There are a lot more things I could have tried and investigated such as what impact does rounding have on the performance
+    of the model, better feature scaling (while I did do simple feature scaling for the multilayer perceptron regressor it actually
+    negatively impacted the performance), I would also be curious to see what impact choosing the prediction of the model
+    with the lower training MAE for that station would have.
 
 
 
-        \bibliographystyle{plain}
-        \bibliography{bibliography}
+
+
+    \bibliographystyle{plain}
+    \bibliography{bibliography}
 \end{document}
