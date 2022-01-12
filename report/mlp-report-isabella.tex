@@ -209,28 +209,63 @@
         and latitude, number of docks - bigger stations might be at busier locations than smaller stations, or even just the station id.
         \item \textbf{Situational data}: Weekhour could help help with changes in demand for different times of the day and different days of the week.
         Similarly isHoliday could perhaps help to distinguish between times that have very different demands.
-        \item \textbf{}
-        \item \textbf{}
-        \item \textbf{}
     \end{itemize}
 
     For each features I needed to decide what pre-processing steps were needed and if and how I could sensibly fill the nan values
     for the feature.
 
     \subsubsection*{\nameref{itm:phase1-step4}}
-    Use weight and biases sweep ability. Define a few different hyperparameters, make a smaller data set (runtime!) and
-    sweep through the parameters to learn which ones have what effect. Iterate multiple times with what works and
-    see if the results from the default configuration can be imporved.
+    As a final step \nameref{phs:one} I wanted to investigate the impact of hyper parametes on the result. For this I
+    ran various used wand's sweep capability. This allowed me to vary the different hyper parameters in congiguration.
+    I created a smaller dataset with just 10\% of the data to save runtime as I was interested in the effect of the hyper parameters not
+    the final MAE. For the best sweep result I ran a normal experiment on the full dataset. This also lead me to increased
+    the sweep dataset to 30\% as the sweep results didn't translate well to the full dataset runs.
+    To safe time I only tuned the Random Forest Regressor as it had been consistently outperforming the Poisson Regressor.
+
+    I was most interested in finding a hyper parameter combination that would lessen the overfitting seen in the previous
+    experiments. This lead me to try out yet another model from scikit-learn: the MultilayerPerceptronRegressor. Implementing
+    it into the code base was simple and followed the same step as describe in \nameref{itm:phase1-step2}.
 
     \subsection*{\nameref{phs:two}}
-    \subsubsection*{\nameref{itm:phase2-step1}} Analyse the given models
-    \subsubsection*{\nameref{itm:phase2-step2}} Create an end to end pipeline for the given models
-    \subsubsection*{\nameref{itm:phase2-step3}} Investigate the resulting performance and compare to \nameref{phs:one}
+    \subsubsection*{\nameref{itm:phase2-step1}}
+    To analyse of the given models I inspected the given .csv files. We'd been given simple linear models trained using approach
+    a).
+    \subsubsection*{\nameref{itm:phase2-step2}}
+
+    Similar to \nameref{itm:phase1-step2} I wrapped the given models in a model class \texttt{BestTrainedModelForAStation}.
+    That class implement like the other model classes the \texttt{fit()} and \texttt{predict()} functions and therefore
+    could be used in the rest of the pipeline, meaning I could reuse most of the the code from \nameref{itm:phase1-step2} of
+    \nameref{phs:one} with a few additions. I modeled the weights in such a way that
+    I could calculate the predictions matrix y for each sample by calculating thedot product of each stations feature matrix X
+    and the models weight matrix W.
+
+    For the pretrained models from station 1-200, I used the training dataset for models 2001-275 to calculate the MAE for
+    each of the pretrained models would achieve for each station 201-275. I'd then select the the pretrained model with
+    the lowest MAE to be used as estimator for each of the stations 201-275. I could reuse the same \texttt{StationPerModel}
+    class from \nameref{phs:one} to keep track of which model to use for each station.
+
+    \subsubsection*{\nameref{itm:phase2-step3}}
+
+    To investigate how well this approach of using the pretrained models to predict the number of bikes for stations 201-275
+    did I used the validation dataset to do predictions for data that had not been used to select the pretrained model.
+    I calculated the MAE the same way as I'd been doing and the run was logged on wand db like it had been
+    for other models from \nameref{phs:one}.
 
     \subsection*{\nameref{phs:three}}
-    \subsubsection*{\nameref{itm:phase3-step1}} Create an end to end pipeline for the combining the models from \nameref{phs:one} and \nameref{phs:two}
-    \subsubsection*{\nameref{itm:phase3-step2}} Tune promising setups
-    \subsubsection*{\nameref{itm:phase3-step3}} Investigate the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}
+    \subsubsection*{\nameref{itm:phase3-step1}}
+    In this step I combined the best model from \nameref{phs:one} with the best pretrained model as created in \nameref{phs:two}
+    by letting both models make an estimation and using the average of the two estimates as prediction of bikes for the combined model.
+    For this I created a new run script that would train both models, then predict using the validation and then
+    combine the results. I extended the existing \texttt{PredictionResult} class to be able to do such a combination.
+
+    \subsubsection*{\nameref{itm:phase3-step2}}
+    I ran a few more sweeps, mainly to tune the Multilayer Perceptron Model. Seeing that the pretrained
+    models were using the bikes profile features I also stared to use those features in my multilayer perceptron model as
+    they did perform better than the other features.
+
+    \subsubsection*{\nameref{itm:phase3-step3}}
+    I used the same method as I've used for \nameref{phs:one} and \nameref{phs:two} to investigate and compare the
+    overal results.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -337,39 +372,18 @@
 
     \subsubsection*{\nameref{itm:phase1-step4}}
 
-    1. Sweep just with a few hyper parameters and 10\% of the dev and val data (dev-sweep1, val-sweep1).
-    - Only sweep one model as it's quicker
-    - Results of sweep in Random Forest Sweep 1 https://wandb.ai/idegen/mlp-2021/sweeps/ylvvcigm?workspace=user-idegen
-    - method: grid
-    name: Random forest sweep 1
-    parameters:
-    random\_forest\_bootstrap:
-    values:
-    - false
-    random\_forest\_ccp\_alpha:
-    values:
-    - 0
-    - 0.05
-    - 0.1
-    - 0.3
-    random\_forest\_criterion:
-    values:
-    - squared\_error
-    - poisson
-    random\_forest\_max\_depth:
-    values:
-    - null
-    - 10
-    - 50
-    random\_forest\_min\_samples\_split:
-    values:
-    - 2
-    - 4
-    random\_forest\_n\_estimators:
-    values:
-    - 50
-    - 100
-    - 120
+    For the first sweep I varied just a few of the hyper parameters. Sweep on only 10\% of the dev and val data
+    (dev-sweep1, val-sweep1) and I only run approach b) One Model for all stations, see
+    \href{https://wandb.ai/idegen/mlp-2021/sweeps/ylvvcigm/overview?workspace=user-idegen}{Random Forest Sweep 1}:
+
+    \begin{itemize}
+        \item \textbf{random\_forest\_ccp\_alpha}: 0, 0.05, 0.1, 0.3
+        \item \textbf{random\_forest\_criterion}: squared\_error, poisson
+        \item \textbf{random\_forest\_max\_depth}: null (=default), 10, 50
+        \item \textbf{random\_forest\_min\_samples\_split}: 2, 4
+        \item \textbf{random\_forest\_n\_estimators}: 50, 100, 120
+    \end{itemize}
+
     -> For the best sweep result re-run the full model:
     Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
     -> Best sweep result
@@ -419,7 +433,8 @@
     \subsection*{\nameref{phs:three}}
     \subsubsection*{\nameref{itm:phase3-step1}} Create an end to end pipeline for the combining the models from \nameref{phs:one} and \nameref{phs:two}
     \subsubsection*{\nameref{itm:phase3-step2}} Tune promising setups
-    \subsubsection*{\nameref{itm:phase3-step3}} Investigate the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}
+    \subsubsection*{\nameref{itm:phase3-step3}}
+    There is no new experiment setup required for investigating the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -605,61 +620,63 @@
 
     \subsubsection*{\nameref{itm:phase1-step4}}
 
-    Random Forest Sweep 1:
-    - Show most influential parameter
-    - Show graphs
-    Parameters:
-    - random\_forest\_n\_estimators:  [50, 100, 120] \# made no difference
-    - random\_forest\_criterion: ['squared\_error', 'absolute\_error']  \# squared\_error better than poisson, try absolute error
-    - random\_forest\_max\_depth: [None, 10, 50]  \# 50 better than 100!
-    - random\_forest\_min\_samples\_split: [2, 4] \# made no difference
-    - random\_forest\_ccp\_alpha: [0.0, 0.05, 0.1, 0.3]  \# unclear but 0.05 did well
-    -> criterion squared\_error speeds up the training significantly (not to sure yet how it impacts the performance)
-    -> The difference in MAE between training and validation however was reduced, this did not impact the overal outcome though
+    In total I ran 6 different sweeps all for the Random Forest Model. For sweep 4-6 I also changed the features used which
+    had by fare the most important impact on MAE. All the sweeps and their results are logged on wandb:
+    \begin{itemize}
+        \item \href{https://wandb.ai/idegen/mlp-2021/sweeps/ylvvcigm?workspace=user-idegen}{Random Forest Regressor Sweep 1}
+        \item \href{https://wandb.ai/idegen/mlp-2021/sweeps/79bi8rgn?workspace=user-idegen}{Random Forest Regressor Sweep 2}
+        \item \href{https://wandb.ai/idegen/mlp-2021/sweeps/42mzcyb3?workspace=user-idegen}{Random Forest Regressor Sweep 3}
+        \item \href{https://wandb.ai/idegen/mlp-2021/sweeps/rrpaocle?workspace=user-idegen}{Random Forest Regressor Sweep 4}
+        \item \href{https://wandb.ai/idegen/mlp-2021/sweeps/au3spnyx?workspace=user-idegen}{Random Forest Regressor Sweep 5}
+        \item \href{https://wandb.ai/idegen/mlp-2021/sweeps/lc68mqc3?workspace=user-idegen}{Random Forest Regressor Sweep 6}
+    \end{itemize}
 
-    Silver Plasma: https://wandb.ai/idegen/mlp-2021/runs/1t2bcd2d/overview?workspace=user-idegen
-    -> Best sweep result does not compete with default configurations
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{randomforest-sweep3}
+        \includegraphics[width=0.8\textwidth]{random-forest-sweep6}
+        \caption{Parallel Coordinates Graph for Random Forest Sweep 3 (top) and 6 (bottom). The right hand sight is the
+        validation MAE the second last column the training dataset MAE. The labels are too long to download but the
+        full interactive graphs can be investigated on wandb.}
+        \label{fig:sweep3and6RandomForest}
+    \end{figure}
 
-    Model per station - Training data: MAE 1.393
-    Model per station - Validation data: MAE 2.72
-    One model - Training data: MAE: 2.918
-    One model - Validation data: MAE 2.947
+    Using the best performing features from \nameref{itm:phase1-step3}:station, bikes\_3h\_ago, numDocks, weekhour, isHoliday
+    only varying the hyperparameters resulted in the lowest MAE for the training dataset of 1.392. However that run at
+    a big validation dataset MAE of 3.717. The lowest validation dataset MAE was 3.639 for which the training dataset
+    MAE was 1.739. In short this was worse than what I had achieved with varying features in \nameref{itm:phase1-step3}.
+    The best performing features combination was: station, bikes\_3h\_ago, numDocks, weekhour, isHoliday, full\_profile\_bikes,
+    full\_profile\_3h\_diff\_bikes, airPressure.mb, relHumidity.HR, windMeanSpeed.m.s. This achieved a training MAE of 0.89
+    and a validation MAE of 2.206. Note that these MAE are only on a part of the dataset and cannot be directly compared
+    to the full runs.
 
-    Breezy Sound: https://wandb.ai/idegen/mlp-2021/runs/12p54n9c/overview?workspace=user-idegen
-    -> New parameters but features as current best run with default configuration
+    For the best sweep result I also ran the full experiment which resulted in the
+    \href{https://wandb.ai/idegen/mlp-2021/runs/2kmp7odq?workspace=user-idegen}{floral-pine-419} experiment. Figure \ref{fig:sweep3and6RandomForest}
+    shows the MAE per station for this experiment. The overall training MAE was 0.9 and the overall validation MAE was
+    2.21. It scored 2.83 on the test dataset which was a slight improvement from the easy-capybara-30 experiment.
 
-    Model per station - Training data: MAE 1.514
-    Model per station - Validation data: MAE 2.432
-    One model - Training data: MAE 3.273
-    One model - Validation data: MAE 3.394
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{floral-pine}
+        \caption{Training and Validation dataset MAE for floral-pine experiment}
+        \label{fig:floral-pine}
+    \end{figure}
 
-    Stoic Sun: https://wandb.ai/idegen/mlp-2021/runs/12zlftk6/overview?workspace=user-idegen
-    -> Features from best run squared error and ccp from sweep, max depth and n estimator from best run (exactelly the same!?)
-    Worse then astral feathers
-    Model per station - Training data: MAE: 1.514
-    Model per station - Validation data: MAE: 2.432
-    One model - Training data: MAE: 3.273
-    One model - Validation data: MAE: 3.394
+    The experiment with a Multilayer Perceptron Regresseor in it's default configuration and using the features: bikes\_3h\_ago,
+    full\_profile\_bikes, full\_profile\_3h\_diff\_bikes, short\_profile\_bikes, short\_profile\_3h\_diff\_bikes achieved
+    comparable MAEs: For the training dataset 2.498 and for the validation training set 2.67 and a surprising 2.41 on the test dataset,
+    see experiment \href{https://wandb.ai/idegen/mlp-2021/runs/1of4938t?workspace=user-idegen}{clean-sunset-573} for all the details.
+    While these MAE are not a significant improvement, the gap between the training and validation dataset is significantly
+    smaller, see figure \ref{fig:clean-sunset}.
 
-    -> More sweeping with more data, model per station instead of one model, smaller ccp's
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.4\textwidth]{model-per-station-clean-sunset}\hfill
+        \includegraphics[width=0.4\textwidth]{onemodel-clean-sunset}
+        \caption{Training and Validation MAE for the Multilayer Perceptron Regressor - clean-sunset-573}
+        \label{fig:clean-sunset}
+    \end{figure}
 
-    Sweep 2:
-    - ?
-    -> decision try astral feather with ccp of 0.001
-    -> Result is zesty field on per station only which is better
-    Model per station - Training data: MAE 1.00787
-    Model per station - Validation data: MAE 2.20771
-    (good thread on the different parameters: https://stackoverflow.com/questions/20463281/how-do-i-solve-overfitting-in-random-forest-of-python-sklearn)
-
-    Sweep 3:
-    - Impurity did not result in better performance for the real dataset
-    - also setting random to 0 makes the runs reproducible
-
-    Sweep 4: Features and Hyperparmetes
-    - Impurity in combination with more features create a better result which could be confimred with floral-pine
-    Model per station - Training data: MAE 0.89522
-    Model per station - Validation data: MAE 2.20609
-    -> For the random forest model the features used in the given models do not perform as well
 
     \subsection*{\nameref{phs:two}}
     \subsubsection*{\nameref{itm:phase2-step1}} Analyse the given models
@@ -710,6 +727,18 @@
     done more investigation as why some stations were performing significantly worse than the average station. I'm also
     no longer sure why I didn't just do a sweep of different features combination I did for later models.
     I decided to first look into the impact that the models hyper parameters had on the outcome.
+
+    \subsubsection*{\nameref{itm:phase1-step4}}
+
+    I tried to reduce overfitting by finding a bigger min\_impurity\_decrease which did make
+    a small improvement. While using more features decreased the MAE they also increase overfitting and I
+    could not find a hyperparameter setup that could make the gap between the MAE achieved for training and the one achieved
+    for validation smaller. Figure \ref{fig:floral-pine} clearly illustrates this problem.
+
+    The results for the Multilayer Perceptron (see figure \ref{fig:clean-sunset}) surprised me. While the model performed
+    worse on my validation dataset, it performed even better on the test dataset than it performed on the training dataset.
+    Its biggest difference to any of the Random Forest Regressors is that it achieves very similar results for both the
+    training and validation datasets.
 
     \bibliographystyle{plain}
     \bibliography{bibliography}
