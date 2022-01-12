@@ -677,69 +677,152 @@
         \label{fig:clean-sunset}
     \end{figure}
 
-
     \subsection*{\nameref{phs:two}}
-    \subsubsection*{\nameref{itm:phase2-step1}} Analyse the given models
-    \subsubsection*{\nameref{itm:phase2-step2}} Create an end to end pipeline for the given models
-    \subsubsection*{\nameref{itm:phase2-step3}} Investigate the resulting performance and compare to \nameref{phs:one}
+    The results for predicting bikes for station 201-275 using solely the pretrained models for station 1-200 can be
+    seen in experiment \href{https://wandb.ai/idegen/mlp-2021/runs/3rs1cuxc?workspace=user-idegen}{whole-rain-575}. Choosing
+    the pretrained model which results in the lowest MAE on the training dataset results in an MAE for the training dataset of 2.569
+    and an MAE for the validation dataset of 2.646 which is lower than the MAE achieved for the untuned Multilayer Perceptron,
+    see figure \ref{fig:pre-trained-model}.
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.6\textwidth]{pretrained-model}
+        \caption{Training and Validation MAE for the best pretrained model - whole-rain-575}
+        \label{fig:pre-trained-model}
+    \end{figure}
 
     \subsection*{\nameref{phs:three}}
-    \subsubsection*{\nameref{itm:phase3-step1}} Create an end to end pipeline for the combining the models from \nameref{phs:one} and \nameref{phs:two}
-    \subsubsection*{\nameref{itm:phase3-step2}} Tune promising setups
-    \subsubsection*{\nameref{itm:phase3-step3}} Investigate the resulting performance and compare to \nameref{phs:one} and \nameref{phs:two}
+
+    The result for the untuned combination of best pretrained model and multilayer perceptron for each station can be seen
+    in experiment \href{https://wandb.ai/idegen/mlp-2021/runs/ogsyvkqu?workspace=user-idegen}{young-dragon-628}. The
+    MAE for the training dataset was 2.485 and for the validation dataset 2.617 which is an improvement both on the pretrained model
+    as well as the multilayer perceptron regressor.
+
+    I ran a total of 7 sweeps to tune the parameters for the \href{https://wandb.ai/idegen/mlp-2021/sweeps?workspace=user-idegen}{multilayer preceptron regressor}.
+    Figure shows a multicoordinate graph showing different architecture configurations and their impact on training and
+    validation MAE, the interactive version can be found \href{https://wandb.ai/idegen/mlp-2021/sweeps/rughds30?workspace=user-idegen}{here}.
+    I also ran sweeps that were trying out different features.
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{mlp-sweep}
+        \caption{Multiple coordinates graph for Multilayer Perceptron regessor sweep of diffeent architectures}
+        \label{fig:mlp-sweep}
+    \end{figure}
+
+    Tuning the hyper parameters of the multilayer perceptron regressor further improved on this performance resulting
+    in the best run achieved on Kaggle for the test dataset
+    \href{https://wandb.ai/idegen/mlp-2021/runs/2w4l1irf?workspace=user-idegen}{worthy-dream-627}, table
+    \ref{tbl:phase3}
+    shows the result for the three best combined model expriments.
+
+    \begin{table}[h]
+        \begin{tabularx}{\textwidth}{|X|p{0.4\textwidth}|XXX|}
+            \hline
+            \multirow{2}{*}{Experiment name} &
+            \multirow{2}{*}{Features} &
+            \multicolumn{3}{l|}{a) Model per station} \\ \cline{3-5}
+            &
+            &
+            \multicolumn{1}{l|}{Training} &
+            \multicolumn{1}{l|}{Validation} &
+            Test \\ \hline
+            \href{https://wandb.ai/idegen/mlp-2021/runs/2w4l1irf?workspace=user-idegen}{fluent-morning-923} &
+            weekhour, bikes\_3h\_ago, full\_profile\_bikes, full\_profile\_3h\_diff\_bikes, short\_profile\_bikes, short\_profile\_3h\_diff\_bikes &
+            \multicolumn{1}{l|}{2.343} &
+            \multicolumn{1}{l|}{2.545} &
+            2.431 \\ \hline
+            \href{https://wandb.ai/idegen/mlp-2021/runs/u7jiadho?workspace=user-idegen}{dainty-deluge-847} &
+            temperature.C, bikes\_3h\_ago, full\_profile\_bikes, full\_profile\_3h\_diff\_bikes, short\_profile\_bikes, short\_profile\_3h\_diff\_bikes &
+            \multicolumn{1}{l|}{2.44} &
+            \multicolumn{1}{l|}{2.587} &
+            2.425 \\ \hline
+            \href{https://wandb.ai/idegen/mlp-2021/runs/1bzsg4s4?workspace=user-idegen}{worthy-dream-627} &
+            weekhour, bikes\_3h\_ago, full\_profile\_bikes, full\_profile\_3h\_diff\_bikes, short\_profile\_bikes, short\_profile\_3h\_diff\_bikes &
+            \multicolumn{1}{l|}{2.481} &
+            \multicolumn{1}{l|}{2.608} &
+            2.362 \\ \hline
+        \end{tabularx}
+        \caption{MAE for the three best runs using the average prediction between the best pre trained models and a multilayer perceptron regressor}
+        \label{tbl:phase3}
+    \end{table}
 
 
-    \section{Conclusions}\label{sec:conclusions}
-    share any insights you gained about how the system works.
+        \section{Conclusions}\label{sec:conclusions}
+        \subsection*{\nameref{phs:one}}
+        \subsubsection*{\nameref{itm:phase1-step1}}
+        From the data given I decided that this problem was most naturally a multivariate regression problem where I had to
+        predict for each hour of the day the number of bikes a the station. I could perhaps also use a classifier given that
+        the number I had to predict was from a discrete set of numbers. It's a supervised learning problem given I have 55800
+        in total respectively 744 per station labelled data samples. I could do more feature exploring with clustering to
+        learn how the different features relate to each other. However, I decided to first build an end to end pipeline using
+        just the bikes\_3h\_ago as feature and building the ability to easily change the model and features as well as their
+        pre-processing used.
 
-    \subsection*{\nameref{phs:one}}
-    \subsubsection*{\nameref{itm:phase1-step1}}
-    From the data given I decided that this problem was most naturally a multivariate regression problem where I had to
-    predict for each hour of the day the number of bikes a the station. I could perhaps also use a classifier given that
-    the number I had to predict was from a discrete set of numbers. It's a supervised learning problem given I have 55800
-    in total respectively 744 per station labelled data samples. I could do more feature exploring with clustering to
-    learn how the different features relate to each other. However, I decided to first build an end to end pipeline using
-    just the bikes\_3h\_ago as feature and building the ability to easily change the model and features as well as their
-    pre-processing used.
+        \subsubsection*{\nameref{itm:phase1-step2}}
+        The design for the codebase and wandb worked out much better than what I initially did for the Dialogue and Narrative
+        course work. The configuration got quite big and messy in the end and will need a bit more thought to
+        keep more seperated between different models and experiments. Furthermore for a bigger project it definitely would
+        make sense to store the model and save it too, both for
+        reproducibility as well as saving time. Most of the model I played with have some randomness injected that is
+        beneficial to the model's performance but which makes it impossible to exactly reproduce an experiment. Furthermore
+        keeping the data in memory only works for a small dataset like the one we've been given. For a bigger dataset I
+        would need to avoid keeping all data in memory at all time and use a disk/database streaming solution.
 
-    \subsubsection*{\nameref{itm:phase1-step2}}
-    The design for the codebase and wandb worked out much better than what I initially did for the Dialogue and Narrative
-    course work. The configuration got quite big and messy in the end and will need a bit more thought to
-    keep more seperated between different models and experiments. Furthermore for a bigger project it definitely would
-    make sense to store the model and save it too, both for
-    reproducibility as well as saving time. Most of the model I played with have some randomness injected that is
-    beneficial to the model's performance but which makes it impossible to exactly reproduce an experiment. Furthermore
-    keeping the data in memory only works for a small dataset like the one we've been given. For a bigger dataset I
-    would need to avoid keeping all data in memory at all time and use a disk/database streaming solution.
+        I was suprpised how well the Poisson Regressor worked. It was considerable faster than the Random Forest Regressor
+        and depending on I could see it being good enough to be able to estimate bikes within an error of $\pm$4 bikes.
+        Figure \ref{fig:simple-pr-rfr-mae-perstation} shows however that for some station the error is bigger
+        than the overall MAE and the pattern between which stations do well and which stations do badly is the same between the
+        two models. However, the error for these stations is smaller for the Random Forest Regressor.
 
-    I was suprpised how well the Poisson Regressor worked. It was considerable faster than the Random Forest Regressor
-    and depending on I could see it being good enough to be able to estimate bikes within an error of $\pm$4 bikes.
-    Figure \ref{fig:simple-pr-rfr-mae-perstation} shows however that for some station the error is bigger
-    than the overall MAE and the pattern between which stations do well and which stations do badly is the same between the
-    two models. However, the error for these stations is smaller for the Random Forest Regressor.
+        While I didn't wanted to make a call at this point on which approach is better, the per station model did consistently
+        perform better.
 
-    While I didn't wanted to make a call at this point on which approach is better, the per station model did consistently
-    perform better.
+        \subsubsection*{\nameref{itm:phase1-step3}}
+        Adding more features as expected helped to lower MAE for both approaches. For all runs approach a) was
+        doing better than approach b). In hindsight I should have perhaps experimented a bit more with nan values and
+        done more investigation as why some stations were performing significantly worse than the average station. I'm also
+        no longer sure why I didn't just do a sweep of different features combination I did for later models.
+        I decided to first look into the impact that the models hyper parameters had on the outcome.
 
-    \subsubsection*{\nameref{itm:phase1-step3}}
-    Adding more features as expected helped to lower MAE for both approaches. For all runs approach a) was
-    doing better than approach b). In hindsight I should have perhaps experimented a bit more with nan values and
-    done more investigation as why some stations were performing significantly worse than the average station. I'm also
-    no longer sure why I didn't just do a sweep of different features combination I did for later models.
-    I decided to first look into the impact that the models hyper parameters had on the outcome.
+        \subsubsection*{\nameref{itm:phase1-step4}}
 
-    \subsubsection*{\nameref{itm:phase1-step4}}
+        I tried to reduce overfitting by finding a bigger min\_impurity\_decrease which did make
+        a small improvement. While using more features decreased the MAE they also increase overfitting and I
+        could not find a hyperparameter setup that could make the gap between the MAE achieved for training and the one achieved
+        for validation smaller. Figure \ref{fig:floral-pine} clearly illustrates this problem.
 
-    I tried to reduce overfitting by finding a bigger min\_impurity\_decrease which did make
-    a small improvement. While using more features decreased the MAE they also increase overfitting and I
-    could not find a hyperparameter setup that could make the gap between the MAE achieved for training and the one achieved
-    for validation smaller. Figure \ref{fig:floral-pine} clearly illustrates this problem.
+        The results for the Multilayer Perceptron (see figure \ref{fig:clean-sunset}) surprised me. While the model performed
+        worse on my validation dataset, it performed even better on the test dataset than it performed on the training dataset.
+        Its biggest difference to any of the Random Forest Regressors is that it achieves very similar results for both the
+        training and validation datasets.
 
-    The results for the Multilayer Perceptron (see figure \ref{fig:clean-sunset}) surprised me. While the model performed
-    worse on my validation dataset, it performed even better on the test dataset than it performed on the training dataset.
-    Its biggest difference to any of the Random Forest Regressors is that it achieves very similar results for both the
-    training and validation datasets.
+        Overall for every model approach a) performed better than approach b). As we've seen some stations have a very different
+        usage pattern which I believe can be better modeled by a model per station than trying to find a generalised model.
+        Having said that depending on how accurate bikes need to be predicted from a business perspective, it's not that clear
+        cut that one single model could not do well but based on MAE the model per station approach performs better.
 
-    \bibliographystyle{plain}
-    \bibliography{bibliography}
+        \subsection*{\nameref{phs:two}}
+        The pretrained best pretrained model predicts the bikes for each station as well as the multilayer perceptron regressor
+        which was my best model from \nameref{phs:one}.
+        As we can see in figure \ref{fig:pre-trained-model} it too does worse for the same stations as any of the other models.
+        If I had more time I'd do more investigation on what makes those stations perform much worse than average. I've not
+        submitted this solution on Kaggle but wish I had as I'd be interested to know how well it does for the test data set.
+
+        \subsection*{\nameref{phs:three}}
+        Combining the best performing multilayer perceptron regressor with the pretrained model achieved better MAE results than
+        either model by itself. However the best result on the test dataset was not achieved with the best performing model,
+        see \ref{tbl:phase3}.
+
+        There are a lot more things I could have tried and investigated such as what impact does rounding have on the performance
+        of the model, better feature scaling (while I did do simple feature scaling for the multilayer perceptron regressor it actually
+        negatively impacted the performance), I would also be curious to see what impact choosing the prediction of the model
+        with the lower training MAE for that station would have.
+
+
+
+
+
+        \bibliographystyle{plain}
+        \bibliography{bibliography}
 \end{document}
