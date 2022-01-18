@@ -13,7 +13,6 @@ dependencies:
   - nltk
   - pytorch
   - seaborn
-  - gensim
   - wandb # experiment mgr
   - pytest
   - pyhamcrest
